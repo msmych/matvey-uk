@@ -1,0 +1,11 @@
+body {
+    background: linear-gradient(to bottom right, #769CB9, #A3B08F, #BAA892);
+    font-family: 'Ubuntu';
+}
+
+.block {
+    max-width: 960px;
+    background-color: #F5F5F5;
+    margin: 0 auto;
+    padding: 20px;
+}
