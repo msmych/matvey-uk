@@ -16,7 +16,7 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    axum::Server::bind(&SocketAddr::from(([127, 0, 0, 1], port)))
+    axum::Server::bind(&SocketAddr::from(([0, 0, 0, 0], port)))
         .serve(
             Router::new()
                 .route("/healthcheck", get(|| async { "OK" }))
