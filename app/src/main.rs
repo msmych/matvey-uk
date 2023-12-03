@@ -1,5 +1,3 @@
-use std::net::SocketAddr;
-
 use app::routes::index_route::index;
 use axum::{routing::get, Router};
 use tower_http::{services::ServeDir, trace::TraceLayer};
@@ -16,15 +14,17 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    axum::Server::bind(&SocketAddr::from(([0, 0, 0, 0], port)))
-        .serve(
-            Router::new()
-                .route("/healthcheck", get(|| async { "OK" }))
-                .route("/", get(index))
-                .nest_service("/assets", ServeDir::new("app/assets"))
-                .layer(TraceLayer::new_for_http())
-                .into_make_service(),
-        )
-        .await
-        .unwrap();
+    axum::serve(
+        tokio::net::TcpListener::bind(format!("0.0.0.0:{port}"))
+            .await
+            .unwrap(),
+        Router::new()
+            .route("/healthcheck", get(|| async { "OK" }))
+            .route("/", get(index))
+            .nest_service("/assets", ServeDir::new("app/assets"))
+            .layer(TraceLayer::new_for_http())
+            .into_make_service(),
+    )
+    .await
+    .unwrap();
 }
