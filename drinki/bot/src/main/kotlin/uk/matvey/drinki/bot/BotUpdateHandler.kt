@@ -16,13 +16,15 @@ import uk.matvey.drinki.bot.drink.SetDrinkIngredientAmount
 import uk.matvey.drinki.bot.drink.SetDrinkName
 import uk.matvey.drinki.bot.drink.SetDrinkRecipe
 import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
+import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.types.Amount
 import uk.matvey.telek.TgRequest
-import java.util.*
+import java.util.UUID
 
 class BotUpdateHandler(
     private val greet: Greet,
     private val addDrink: AddDrink,
+    private val getIngredients: GetIngredients,
     private val editDrink: EditDrink,
     private val editDrinkName: EditDrinkName,
     private val editDrinkIngredientAmount: EditDrinkIngredientAmount,
@@ -48,6 +50,7 @@ class BotUpdateHandler(
         when (command) {
             "start" -> greet(rq)
             "new" -> addDrink(rq)
+            "ingredients" -> getIngredients(rq)
         }
         val (cqCommand, cqArgs) = rq.callbackQueryCommand()
         when (cqCommand) {

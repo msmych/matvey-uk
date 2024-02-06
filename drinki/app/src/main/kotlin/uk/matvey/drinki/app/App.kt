@@ -1,4 +1,4 @@
-package uk.matvey.app
+package uk.matvey.drinki.app
 
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.server.application.call

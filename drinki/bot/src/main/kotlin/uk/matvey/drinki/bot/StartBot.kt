@@ -21,6 +21,7 @@ import uk.matvey.drinki.bot.drink.SetDrinkIngredientAmount
 import uk.matvey.drinki.bot.drink.SetDrinkName
 import uk.matvey.drinki.bot.drink.SetDrinkRecipe
 import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
+import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
 import uk.matvey.telek.TgRequest
@@ -38,6 +39,7 @@ fun startBot(
     val botUpdateHandler = BotUpdateHandler(
         Greet(bot),
         AddDrink(accountService, accountRepo, drinkRepo, bot),
+        GetIngredients(ingredientRepo, bot),
         EditDrink(accountRepo, drinkRepo, ingredientRepo, bot),
         EditDrinkName(accountRepo, drinkRepo, bot),
         EditDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, bot),
