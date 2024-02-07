@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.bot.drink.*
 import uk.matvey.drinki.bot.ingredient.AddIngredient
+import uk.matvey.drinki.bot.ingredient.EditIngredientName
 import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.types.Amount
 import uk.matvey.telek.TgRequest
@@ -26,6 +27,7 @@ class BotUpdateHandler(
     private val toggleDrinkVisibility: ToggleDrinkVisibility,
     private val deleteDrink: DeleteDrink,
     private val addIngredient: AddIngredient,
+    private val editIngredientName: EditIngredientName,
     private val searchDrinks: SearchDrinks,
 
     private val accountService: AccountService,
@@ -54,6 +56,7 @@ class BotUpdateHandler(
             "drink_toggle_visibility" -> toggleDrinkVisibility(rq)
             "drink_delete" -> deleteDrink(rq)
             "ingredient_add" -> addIngredient(rq)
+            "ingredient_edit_name" -> editIngredientName(rq)
         }
         if (command != null || cqCommand != null) {
             return

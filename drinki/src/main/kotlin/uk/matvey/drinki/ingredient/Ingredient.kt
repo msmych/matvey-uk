@@ -26,6 +26,12 @@ data class Ingredient(
         ;
     }
 
+    fun setName(name: String): Ingredient {
+        return this.copy(
+            name = name
+        )
+    }
+
     companion object {
 
         fun public(type: Type, name: String): Ingredient {

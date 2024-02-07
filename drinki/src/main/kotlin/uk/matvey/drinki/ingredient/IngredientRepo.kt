@@ -34,6 +34,25 @@ class IngredientRepo(
         )
     }
 
+    fun update(ingredient: Ingredient) {
+        repo.update(
+            INGREDIENTS,
+            QueryParams()
+                .add(NAME, TextParam(ingredient.name)),
+            "$ID = ?",
+            QueryParams()
+                .add(ID, UuidParam(ingredient.id))
+        )
+    }
+
+    fun get(ingredientId: UUID): Ingredient {
+        return repo.select(
+            "select * from $INGREDIENTS where $ID = ?",
+            QueryParams().add(ID, UuidParam(ingredientId)),
+            ::ingredient
+        ).single()
+    }
+
     fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
         return repo.select(
@@ -50,7 +69,8 @@ class IngredientRepo(
     }
 
     fun findAllByDrink(drinkId: UUID): List<Ingredient> {
-        return repo.select("""
+        return repo.select(
+            """
             select * from $INGREDIENTS 
             where $ID in (
                 select (jsonb_array_elements(${DrinkSql.INGREDIENTS}) ->> 'ingredientId')::uuid 

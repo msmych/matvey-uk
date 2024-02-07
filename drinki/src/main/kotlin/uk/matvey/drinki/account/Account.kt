@@ -36,9 +36,12 @@ data class Account(
         data class IngredientEdit(
             val ingredientId: @Contextual UUID,
             val messageId: Int,
+            val editingName: Boolean,
         )
 
         fun drinkEdit() = requireNotNull(drinkEdit)
+
+        fun ingredientEdit() = requireNotNull(ingredientEdit)
     }
 
     fun tgSession() = requireNotNull(tgSession)
@@ -87,6 +90,17 @@ data class Account(
                 ingredientEdit = TgSession.IngredientEdit(
                     ingredientId = ingredientId,
                     messageId = messageId,
+                    editingName = false,
+                )
+            )
+        )
+    }
+
+    fun editingIngredientName(): Account {
+        return this.copy(
+            tgSession = this.tgSession?.copy(
+                ingredientEdit = this.tgSession.ingredientEdit?.copy(
+                    editingName = true,
                 )
             )
         )
