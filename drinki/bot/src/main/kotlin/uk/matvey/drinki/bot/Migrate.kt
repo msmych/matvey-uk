@@ -1,13 +1,13 @@
 package uk.matvey.drinki.bot
 
 import org.flywaydb.core.Flyway
-import uk.matvey.drinki.DrinkiRepos
+import uk.matvey.drinki.Repos
 import uk.matvey.drinki.ingredient.Ingredient
 import uk.matvey.drinki.ingredient.Ingredient.Type.*
 
-fun migrate(drinkiRepos: DrinkiRepos, clean: Boolean) {
+fun migrate(repos: Repos, clean: Boolean) {
     val flyway = Flyway.configure()
-        .dataSource(drinkiRepos.ds)
+        .dataSource(repos.ds)
         .schemas("drinki")
         .locations("classpath:db/migration")
         .defaultSchema("drinki")
@@ -19,11 +19,11 @@ fun migrate(drinkiRepos: DrinkiRepos, clean: Boolean) {
     }
     flyway
         .migrate()
-    migratePublicIngredients(drinkiRepos)
+    migratePublicIngredients(repos)
 }
 
-private fun migratePublicIngredients(drinkiRepos: DrinkiRepos) {
-    val ingredientRepo = drinkiRepos.ingredientRepo
+private fun migratePublicIngredients(repos: Repos) {
+    val ingredientRepo = repos.ingredientRepo
     val publicIngredientsTypes = ingredientRepo.findAllByAccountId(null).map { it.type }
     listOf(
         Ingredient.public(SPIRIT, "Gin"),

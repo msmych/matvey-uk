@@ -6,7 +6,7 @@ import uk.matvey.drinki.ingredient.IngredientRepo
 import uk.matvey.postal.Repo
 import javax.sql.DataSource
 
-class DrinkiRepos(
+class Repos(
     val ds: DataSource,
 ) {
 

@@ -40,5 +40,18 @@ data class Ingredient(
                 now
             )
         }
+
+        fun private(accountId: UUID, name: String): Ingredient {
+            val now = Instant.now()
+            return Ingredient(
+                randomUUID(),
+                accountId,
+                null,
+                name,
+                Visibility.PRIVATE,
+                now,
+                now
+            )
+        }
     }
 }

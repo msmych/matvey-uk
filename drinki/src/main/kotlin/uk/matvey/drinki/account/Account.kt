@@ -18,6 +18,7 @@ data class Account(
     data class TgSession(
         val userId: Long,
         val drinkEdit: DrinkEdit?,
+        val ingredientEdit: IngredientEdit?,
     ) {
 
         @Serializable
@@ -31,8 +32,13 @@ data class Account(
             fun ingredientId() = requireNotNull(ingredientId)
         }
 
-        fun drinkEdit() = requireNotNull(drinkEdit)
+        @Serializable
+        data class IngredientEdit(
+            val ingredientId: @Contextual UUID,
+            val messageId: Int,
+        )
 
+        fun drinkEdit() = requireNotNull(drinkEdit)
     }
 
     fun tgSession() = requireNotNull(tgSession)
@@ -75,13 +81,24 @@ data class Account(
         )
     }
 
+    fun editingIngredient(ingredientId: UUID, messageId: Int): Account {
+        return this.copy(
+            tgSession = this.tgSession?.copy(
+                ingredientEdit = TgSession.IngredientEdit(
+                    ingredientId = ingredientId,
+                    messageId = messageId,
+                )
+            )
+        )
+    }
+
     companion object {
 
         fun tgAccount(tgUserId: Long): Account {
             val now = Instant.now()
             return Account(
                 randomUUID(),
-                TgSession(tgUserId, null),
+                TgSession(tgUserId, null, null),
                 now,
                 now
             )
