@@ -7,10 +7,24 @@ import com.typesafe.config.Config
 import mu.KotlinLogging
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.account.AccountService
-import uk.matvey.drinki.bot.drink.*
+import uk.matvey.drinki.bot.drink.AddDrink
+import uk.matvey.drinki.bot.drink.AddDrinkIngredient
+import uk.matvey.drinki.bot.drink.DeleteDrink
+import uk.matvey.drinki.bot.drink.DeleteDrinkIngredient
+import uk.matvey.drinki.bot.drink.EditDrink
+import uk.matvey.drinki.bot.drink.EditDrinkIngredientAmount
+import uk.matvey.drinki.bot.drink.EditDrinkIngredients
+import uk.matvey.drinki.bot.drink.EditDrinkName
+import uk.matvey.drinki.bot.drink.EditDrinkRecipe
+import uk.matvey.drinki.bot.drink.SearchDrinks
+import uk.matvey.drinki.bot.drink.SetDrinkIngredientAmount
+import uk.matvey.drinki.bot.drink.SetDrinkName
+import uk.matvey.drinki.bot.drink.SetDrinkRecipe
+import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
 import uk.matvey.drinki.bot.ingredient.AddIngredient
 import uk.matvey.drinki.bot.ingredient.EditIngredientName
 import uk.matvey.drinki.bot.ingredient.GetIngredients
+import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
 import uk.matvey.telek.TgRequest
@@ -41,8 +55,9 @@ fun startBot(
         SetDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, bot),
         ToggleDrinkVisibility(accountRepo, drinkRepo, ingredientRepo, bot),
         DeleteDrink(accountRepo, drinkRepo, bot),
-        AddIngredient(accountRepo, ingredientRepo, bot),
+        AddIngredient(accountService, accountRepo, ingredientRepo, bot),
         EditIngredientName(accountRepo, ingredientRepo, bot),
+        SetIngredientName(accountRepo, ingredientRepo, bot),
         SearchDrinks(accountRepo, drinkRepo, ingredientRepo, bot),
 
         accountService,

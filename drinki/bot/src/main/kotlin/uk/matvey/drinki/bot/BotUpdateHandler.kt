@@ -2,13 +2,27 @@ package uk.matvey.drinki.bot
 
 import mu.KotlinLogging
 import uk.matvey.drinki.account.AccountService
-import uk.matvey.drinki.bot.drink.*
+import uk.matvey.drinki.bot.drink.AddDrink
+import uk.matvey.drinki.bot.drink.AddDrinkIngredient
+import uk.matvey.drinki.bot.drink.DeleteDrink
+import uk.matvey.drinki.bot.drink.DeleteDrinkIngredient
+import uk.matvey.drinki.bot.drink.EditDrink
+import uk.matvey.drinki.bot.drink.EditDrinkIngredientAmount
+import uk.matvey.drinki.bot.drink.EditDrinkIngredients
+import uk.matvey.drinki.bot.drink.EditDrinkName
+import uk.matvey.drinki.bot.drink.EditDrinkRecipe
+import uk.matvey.drinki.bot.drink.SearchDrinks
+import uk.matvey.drinki.bot.drink.SetDrinkIngredientAmount
+import uk.matvey.drinki.bot.drink.SetDrinkName
+import uk.matvey.drinki.bot.drink.SetDrinkRecipe
+import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
 import uk.matvey.drinki.bot.ingredient.AddIngredient
 import uk.matvey.drinki.bot.ingredient.EditIngredientName
 import uk.matvey.drinki.bot.ingredient.GetIngredients
+import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.types.Amount
 import uk.matvey.telek.TgRequest
-import java.util.*
+import java.util.UUID
 
 class BotUpdateHandler(
     private val greet: Greet,
@@ -28,6 +42,7 @@ class BotUpdateHandler(
     private val deleteDrink: DeleteDrink,
     private val addIngredient: AddIngredient,
     private val editIngredientName: EditIngredientName,
+    private val setIngredientName: SetIngredientName,
     private val searchDrinks: SearchDrinks,
 
     private val accountService: AccountService,
@@ -69,6 +84,9 @@ class BotUpdateHandler(
             }
             if (account.tgSession?.drinkEdit?.editingRecipe == true) {
                 return setDrinkRecipe(messageText, rq)
+            }
+            if (account.tgSession?.ingredientEdit?.editingName == true) {
+                return setIngredientName(messageText, rq)
             }
             return searchDrinks(messageText, rq)
         }
