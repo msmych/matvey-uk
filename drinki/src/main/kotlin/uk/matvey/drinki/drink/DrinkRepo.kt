@@ -16,11 +16,14 @@ import uk.matvey.drinki.drink.DrinkSql.UPDATED_AT
 import uk.matvey.drinki.drink.DrinkSql.VISIBILITY
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
-import uk.matvey.postal.QueryParam.*
+import uk.matvey.postal.QueryParam.JsonbParam
+import uk.matvey.postal.QueryParam.TextParam
+import uk.matvey.postal.QueryParam.TimestampParam
+import uk.matvey.postal.QueryParam.UuidParam
 import uk.matvey.postal.QueryParams
 import uk.matvey.postal.Repo
 import uk.matvey.postal.ResultExtractor
-import java.util.*
+import java.util.UUID
 
 class DrinkRepo(
     private val repo: Repo,
@@ -70,7 +73,7 @@ class DrinkRepo(
 
     fun search(accountId: UUID, query: String): List<Drink> {
         return repo.select(
-            "select * from $DRINKS where $ACCOUNT_ID = ? and $NAME ilike ? limit 64",
+            "select * from $DRINKS where $VISIBILITY = 'PUBLIC' or $ACCOUNT_ID = ? and $NAME ilike ? limit 64",
             QueryParams()
                 .add(ACCOUNT_ID, UuidParam(accountId))
                 .add(NAME, TextParam("%$query%")),

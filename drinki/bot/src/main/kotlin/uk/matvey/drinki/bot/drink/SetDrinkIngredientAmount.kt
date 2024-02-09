@@ -29,7 +29,7 @@ class SetDrinkIngredientAmount(
             EditMessageText(
                 rq.userId(),
                 rq.messageId(),
-                DrinkTg.drinkTitle(drink)
+                DrinkTg.drinkDetailsText(drink, drinkIngredients)
             )
                 .parseMode(MarkdownV2)
                 .replyMarkup(

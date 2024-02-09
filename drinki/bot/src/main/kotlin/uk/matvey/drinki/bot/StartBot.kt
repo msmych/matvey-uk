@@ -26,6 +26,7 @@ import uk.matvey.drinki.bot.ingredient.EditIngredientName
 import uk.matvey.drinki.bot.ingredient.EditIngredientType
 import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.bot.ingredient.SetIngredientName
+import uk.matvey.drinki.bot.ingredient.SetIngredientType
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
 import uk.matvey.telek.TgRequest
@@ -60,6 +61,7 @@ fun startBot(
         EditIngredientName(accountRepo, ingredientRepo, bot),
         EditIngredientType(accountRepo, ingredientRepo, bot),
         SetIngredientName(accountRepo, ingredientRepo, bot),
+        SetIngredientType(accountRepo, ingredientRepo, bot),
         SearchDrinks(accountRepo, drinkRepo, ingredientRepo, bot),
 
         accountService,

@@ -2,7 +2,7 @@ package uk.matvey.drinki.ingredient
 
 import uk.matvey.drinki.types.Visibility
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import java.util.UUID.randomUUID
 
 data class Ingredient(
@@ -29,6 +29,12 @@ data class Ingredient(
     fun setName(name: String): Ingredient {
         return this.copy(
             name = name
+        )
+    }
+
+    fun setType(type: Type): Ingredient {
+        return this.copy(
+            type = type
         )
     }
 

@@ -4,9 +4,9 @@ import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
 import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
+import uk.matvey.drinki.bot.ingredient.IngredientTg
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
-import uk.matvey.drinki.bot.ingredient.IngredientTg
 import uk.matvey.telek.TgRequest
 
 class DeleteDrinkIngredient(
@@ -27,7 +27,7 @@ class DeleteDrinkIngredient(
             EditMessageText(
                 rq.userId(),
                 rq.messageId(),
-                DrinkTg.drinkTitle(drink)
+                DrinkTg.drinkDetailsText(drink, drinkIngredients)
             )
                 .parseMode(MarkdownV2)
                 .replyMarkup(

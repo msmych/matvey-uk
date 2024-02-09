@@ -2,7 +2,6 @@ package uk.matvey.drinki.bot.ingredient
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
-import uk.matvey.drinki.bot.amount.AmountTg.label
 import uk.matvey.drinki.drink.Drink
 import uk.matvey.drinki.ingredient.Ingredient
 import uk.matvey.telek.Emoji.DOT
@@ -24,7 +23,7 @@ object IngredientTg {
                     row.map { ingredient ->
                         if (drinkIngredients.containsKey(ingredient.id)) {
                             val amount = drink.ingredientAmount(ingredient.id)
-                            InlineKeyboardButton("$DOT ${amount?.label()} ${drinkIngredients[ingredient.id]?.name}")
+                            InlineKeyboardButton("$DOT ${drinkIngredients[ingredient.id]?.name}")
                                 .callbackData("/drink_edit_ingredient ${ingredient.id}")
                         } else {
                             InlineKeyboardButton(ingredient.name)
@@ -47,9 +46,13 @@ object IngredientTg {
 
     fun ingredientTypeKeyboard(): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
-            Ingredient.Type.entries.map {
-                InlineKeyboardButton(it.name).callbackData("/ingredient_set_type ${it.name}")
+            *Ingredient.Type.entries.map {
+                arrayOf(InlineKeyboardButton(it.label()).callbackData("/ingredient_set_type ${it.name}"))
             }.toTypedArray()
         )
+    }
+
+    fun Ingredient.Type.label(): String {
+        return this.name[0] + this.name.substring(1).lowercase()
     }
 }
