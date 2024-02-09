@@ -29,7 +29,7 @@ class EditDrinkIngredients(
             )
                 .parseMode(MarkdownV2)
                 .replyMarkup(
-                    IngredientTg.editIngredientsKeyboard(
+                    IngredientTg.editDrinkIngredientsKeyboard(
                         drink,
                         drinkIngredients.associateBy { it.id },
                         publicIngredients

@@ -2,9 +2,9 @@ package uk.matvey.drinki.bot.amount
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
-import uk.matvey.drinki.bot.drink.DrinkTg.DELETE_EMOJI
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Amount.Oz
+import uk.matvey.telek.Emoji.DELETE
 
 object AmountTg {
 
@@ -16,7 +16,7 @@ object AmountTg {
             arrayOf("1/2oz", "3/2oz", "5/2oz",  "7/2oz" ).map(Amount.Companion::parse).map { InlineKeyboardButton(it.label()).callbackData("/drink_ing_amt $it") }.toTypedArray(),
             arrayOf("2/3oz", "5/3oz", "8/3oz",  "11/3oz").map(Amount.Companion::parse).map { InlineKeyboardButton(it.label()).callbackData("/drink_ing_amt $it") }.toTypedArray(),
             arrayOf("3/4oz", "7/4oz", "11/4oz", "15/4oz").map(Amount.Companion::parse).map { InlineKeyboardButton(it.label()).callbackData("/drink_ing_amt $it") }.toTypedArray(),
-            arrayOf(InlineKeyboardButton("$DELETE_EMOJI Remove").callbackData("/drink_delete_ingredient"))
+            arrayOf(InlineKeyboardButton("$DELETE Remove").callbackData("/drink_delete_ingredient"))
         )
     }
 

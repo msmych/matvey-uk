@@ -18,6 +18,7 @@ import uk.matvey.drinki.bot.drink.SetDrinkRecipe
 import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
 import uk.matvey.drinki.bot.ingredient.AddIngredient
 import uk.matvey.drinki.bot.ingredient.EditIngredientName
+import uk.matvey.drinki.bot.ingredient.EditIngredientType
 import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.types.Amount
@@ -42,6 +43,7 @@ class BotUpdateHandler(
     private val deleteDrink: DeleteDrink,
     private val addIngredient: AddIngredient,
     private val editIngredientName: EditIngredientName,
+    private val editIngredientType: EditIngredientType,
     private val setIngredientName: SetIngredientName,
     private val searchDrinks: SearchDrinks,
 
@@ -72,6 +74,7 @@ class BotUpdateHandler(
             "drink_delete" -> deleteDrink(rq)
             "ingredient_add" -> addIngredient(rq)
             "ingredient_edit_name" -> editIngredientName(rq)
+            "ingredient_edit_type" -> editIngredientType(rq)
         }
         if (command != null || cqCommand != null) {
             return

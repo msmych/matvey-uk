@@ -23,6 +23,7 @@ import uk.matvey.drinki.bot.drink.SetDrinkRecipe
 import uk.matvey.drinki.bot.drink.ToggleDrinkVisibility
 import uk.matvey.drinki.bot.ingredient.AddIngredient
 import uk.matvey.drinki.bot.ingredient.EditIngredientName
+import uk.matvey.drinki.bot.ingredient.EditIngredientType
 import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.drink.DrinkRepo
@@ -57,6 +58,7 @@ fun startBot(
         DeleteDrink(accountRepo, drinkRepo, bot),
         AddIngredient(accountService, accountRepo, ingredientRepo, bot),
         EditIngredientName(accountRepo, ingredientRepo, bot),
+        EditIngredientType(accountRepo, ingredientRepo, bot),
         SetIngredientName(accountRepo, ingredientRepo, bot),
         SearchDrinks(accountRepo, drinkRepo, ingredientRepo, bot),
 
