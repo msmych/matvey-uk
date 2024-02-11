@@ -38,6 +38,12 @@ data class Ingredient(
         )
     }
 
+    fun toggleVisibility(): Ingredient {
+        return this.copy(
+            visibility = this.visibility.toggle()
+        )
+    }
+
     companion object {
 
         fun public(type: Type, name: String): Ingredient {

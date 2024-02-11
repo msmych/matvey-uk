@@ -23,7 +23,7 @@ class AddIngredient(
         accountRepo.update(account.editingIngredient(ingredient.id, rq.messageId()))
         bot.execute(
             EditMessageText(rq.userId(), rq.messageId(), ingredient.name)
-                .replyMarkup(ingredientActionsKeyboard())
+                .replyMarkup(ingredientActionsKeyboard(ingredient))
         )
     }
 }

@@ -7,14 +7,14 @@ import kotlinx.serialization.json.put
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import java.util.UUID.randomUUID
 
 data class Drink(
     val id: UUID,
     val accountId: UUID?,
     val name: String,
-    val ingredients: List<Pair<UUID, Amount>>,
+    val ingredients: LinkedHashMap<UUID, Amount>,
     val recipe: String?,
     val visibility: Visibility,
     val createdAt: Instant,
@@ -30,18 +30,16 @@ data class Drink(
     }
 
     fun setIngredient(ingredientId: UUID, amount: Amount): Drink {
-        val ingredients = LinkedHashMap(this.ingredients.toMap())
-        ingredients[ingredientId] = amount
+        this.ingredients[ingredientId] = amount
         return this.copy(
-            ingredients = ingredients.map { (k, v) -> k to v }
+            ingredients = this.ingredients
         )
     }
 
     fun deleteIngredient(ingredientId: UUID): Drink {
-        val ingredients = LinkedHashMap(this.ingredients.toMap())
-        ingredients -= ingredientId
+        this.ingredients -= ingredientId
         return this.copy(
-            ingredients = ingredients.map { (k, v) -> k to v }
+            ingredients = this.ingredients
         )
     }
 
@@ -51,10 +49,7 @@ data class Drink(
 
     fun toggleVisibility(): Drink {
         return this.copy(
-            visibility = when (this.visibility) {
-                Visibility.PRIVATE -> Visibility.PUBLIC
-                Visibility.PUBLIC -> Visibility.PRIVATE
-            }
+            visibility = this.visibility.toggle()
         )
     }
 
@@ -76,7 +71,7 @@ data class Drink(
                 randomUUID(),
                 accountId,
                 "New drink",
-                listOf(),
+                linkedMapOf(),
                 null,
                 Visibility.PRIVATE,
                 now,

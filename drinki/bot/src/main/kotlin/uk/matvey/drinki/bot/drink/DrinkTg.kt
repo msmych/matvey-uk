@@ -47,7 +47,7 @@ object DrinkTg {
         )
     }
 
-    private fun visibilityLabel(visibility: Visibility): String {
+    fun visibilityLabel(visibility: Visibility): String {
         return when (visibility) {
             Visibility.PRIVATE -> "🔒 Private"
             Visibility.PUBLIC -> "🥂 Public"

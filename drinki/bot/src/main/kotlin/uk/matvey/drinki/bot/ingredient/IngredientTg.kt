@@ -2,7 +2,7 @@ package uk.matvey.drinki.bot.ingredient
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
-import uk.matvey.drinki.drink.Drink
+import uk.matvey.drinki.bot.drink.DrinkTg
 import uk.matvey.drinki.ingredient.Ingredient
 import uk.matvey.telek.Emoji.DOT
 import uk.matvey.telek.Emoji.EDIT
@@ -10,8 +10,15 @@ import java.util.UUID
 
 object IngredientTg {
 
+    fun ingredientText(ingredient: Ingredient): String {
+        return """
+            **${ingredient.name}**
+             
+            ${ingredient.type}
+        """.trimIndent()
+    }
+
     fun editDrinkIngredientsKeyboard(
-        drink: Drink,
         drinkIngredients: Map<UUID, Ingredient>,
         publicIngredients: List<Ingredient>
     ): InlineKeyboardMarkup {
@@ -22,7 +29,6 @@ object IngredientTg {
                 .map { row ->
                     row.map { ingredient ->
                         if (drinkIngredients.containsKey(ingredient.id)) {
-                            val amount = drink.ingredientAmount(ingredient.id)
                             InlineKeyboardButton("$DOT ${drinkIngredients[ingredient.id]?.name}")
                                 .callbackData("/drink_edit_ingredient ${ingredient.id}")
                         } else {
@@ -35,11 +41,13 @@ object IngredientTg {
         )
     }
 
-    fun ingredientActionsKeyboard(): InlineKeyboardMarkup {
+    fun ingredientActionsKeyboard(ingredient: Ingredient): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
             arrayOf(
                 InlineKeyboardButton("$EDIT Name").callbackData("/ingredient_edit_name"),
                 InlineKeyboardButton("$EDIT Type").callbackData("/ingredient_edit_type"),
+                InlineKeyboardButton(DrinkTg.visibilityLabel(ingredient.visibility))
+                    .callbackData("/ingredient_toggle_visibility"),
             )
         )
     }

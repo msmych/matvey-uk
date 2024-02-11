@@ -1,6 +1,7 @@
 package uk.matvey.drinki.bot.ingredient
 
 import com.pengrad.telegrambot.TelegramBot
+import com.pengrad.telegrambot.request.DeleteMessage
 import com.pengrad.telegrambot.request.SendMessage
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.bot.ingredient.IngredientTg.ingredientActionsKeyboard
@@ -18,9 +19,10 @@ class SetIngredientName(
         val ingredient = ingredientRepo.get(account.tgSession().ingredientEdit().ingredientId)
             .setName(name)
         ingredientRepo.update(ingredient)
+        bot.execute(DeleteMessage(rq.userId(), account.tgSession().ingredientEdit().messageId))
         val sendRs = bot.execute(
             SendMessage(rq.userId(), ingredient.name)
-                .replyMarkup(ingredientActionsKeyboard())
+                .replyMarkup(ingredientActionsKeyboard(ingredient))
         )
         accountRepo.update(account.editingIngredient(ingredient.id, sendRs.message().messageId()))
     }

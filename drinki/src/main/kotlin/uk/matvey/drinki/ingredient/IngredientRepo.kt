@@ -86,7 +86,7 @@ class IngredientRepo(
     private fun ingredient(ex: ResultExtractor): Ingredient {
         return Ingredient(
             ex.uuid(ID),
-            null,
+            ex.uuidOrNull(ACCOUNT_ID),
             ex.stringOrNull(TYPE)?.let(Ingredient.Type::valueOf),
             ex.string(NAME),
             Visibility.valueOf(ex.string(VISIBILITY)),
