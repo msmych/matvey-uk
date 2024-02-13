@@ -7,8 +7,8 @@ import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
 import com.pengrad.telegrambot.request.DeleteMessage
 import com.pengrad.telegrambot.request.SendMessage
 import uk.matvey.drinki.account.AccountRepo
-import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.drink.DrinkService
+import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.telek.TgRequest
 
 class SearchDrinks(
@@ -35,7 +35,7 @@ class SearchDrinks(
                     ).parseMode(MarkdownV2)
                         .replyMarkup(DrinkTg.drinkActionsKeyboard(drink))
                 )
-                accountRepo.update(account.editingDrink(drink.id, rq.messageId()))
+                accountRepo.update(account.editingDrink(drink.id(), rq.messageId()))
             }
             
             else -> {

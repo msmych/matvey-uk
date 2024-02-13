@@ -22,7 +22,7 @@ object DrinkTg {
     }
 
     fun drinkDetailsText(drink: DrinkDetails): String {
-        val title = drinkTitle(drink.name)
+        val title = drinkTitle(drink.name())
         val ingredientsText = "\n\n" + if (drink.ingredients.isNotEmpty()) {
             drink.ingredients
                 .map{ (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}" }
@@ -30,7 +30,7 @@ object DrinkTg {
         } else {
             "Ingredients: $NONE"
         }
-        return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink.recipe))
+        return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink.recipe()))
     }
 
     fun drinkActionsKeyboard(drink: DrinkDetails): InlineKeyboardMarkup {
@@ -41,7 +41,7 @@ object DrinkTg {
                 InlineKeyboardButton("$EDIT Recipe").callbackData("/drink_edit_recipe"),
             ),
             arrayOf(
-                InlineKeyboardButton(visibilityLabel(drink.visibility)).callbackData("/drink_toggle_visibility"),
+                InlineKeyboardButton(visibilityLabel(drink.visibility())).callbackData("/drink_toggle_visibility"),
                 InlineKeyboardButton("$DELETE Delete").callbackData("/drink_delete")
             ),
         )

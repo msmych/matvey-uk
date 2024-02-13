@@ -11,6 +11,7 @@ import uk.matvey.drinki.bot.drink.AddDrink
 import uk.matvey.drinki.bot.drink.AddDrinkIngredient
 import uk.matvey.drinki.bot.drink.DeleteDrink
 import uk.matvey.drinki.bot.drink.DeleteDrinkIngredient
+import uk.matvey.drinki.bot.drink.DrinkTgService
 import uk.matvey.drinki.bot.drink.EditDrink
 import uk.matvey.drinki.bot.drink.EditDrinkIngredientAmount
 import uk.matvey.drinki.bot.drink.EditDrinkIngredients
@@ -44,19 +45,22 @@ fun startBot(
     drinkService: DrinkService,
 ) {
     val bot = TelegramBot(config.getString("bot.token"))
+    
+    val drinkTgService = DrinkTgService(drinkService, bot)
+    
     val botUpdateHandler = BotUpdateHandler(
         Greet(bot),
         AddDrink(accountService, accountRepo, drinkRepo, bot),
         GetIngredients(ingredientRepo, bot),
         EditDrink(accountRepo, drinkService, bot),
-        EditDrinkName(accountRepo, drinkRepo, bot),
-        EditDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, bot),
+        EditDrinkName(accountRepo, drinkService, bot),
+        EditDrinkIngredientAmount(accountRepo, drinkTgService),
         SetDrinkName(accountRepo, drinkRepo, drinkService, bot),
         EditDrinkIngredients(accountRepo, ingredientRepo, drinkService, bot),
         DeleteDrinkIngredient(accountRepo, drinkRepo, ingredientRepo, drinkService, bot),
-        EditDrinkRecipe(accountRepo, drinkRepo, bot),
+        EditDrinkRecipe(accountRepo, drinkService, bot),
         SetDrinkRecipe(accountRepo, drinkRepo, drinkService, bot),
-        AddDrinkIngredient(accountRepo, drinkRepo, ingredientRepo, bot),
+        AddDrinkIngredient(accountRepo, drinkRepo, drinkTgService),
         SetDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, drinkService, bot),
         ToggleDrinkVisibility(accountRepo, drinkRepo, drinkService, bot),
         DeleteDrink(accountRepo, drinkRepo, bot),

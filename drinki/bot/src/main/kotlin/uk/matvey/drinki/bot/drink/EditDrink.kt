@@ -28,6 +28,6 @@ class EditDrink(
                 .parseMode(MarkdownV2)
                 .replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
         )
-        accountRepo.update(account.editingDrink(drinkDetails.id, rq.messageId()))
+        accountRepo.update(account.editingDrink(drinkDetails.id(), rq.messageId()))
     }
 }

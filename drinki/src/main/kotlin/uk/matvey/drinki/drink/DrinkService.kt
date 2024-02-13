@@ -5,7 +5,7 @@ import java.util.UUID
 
 class DrinkService(
     private val drinkRepo: DrinkRepo,
-    private val ingredientRepo: IngredientRepo
+    private val ingredientRepo: IngredientRepo,
 ) {
     
     fun getDrinkDetails(id: UUID): DrinkDetails {
