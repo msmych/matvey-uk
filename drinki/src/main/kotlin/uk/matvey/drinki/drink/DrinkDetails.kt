@@ -15,4 +15,23 @@ data class DrinkDetails(
     val visibility: Visibility,
     val createdAt: Instant,
     val updatedAt: Instant,
-)
+) {
+    
+    companion object {
+        
+        fun from(drink: Drink, ingredients: List<Ingredient>): DrinkDetails {
+            return DrinkDetails(
+                drink.id,
+                drink.accountId,
+                drink.name,
+                ingredients.associateWithTo(LinkedHashMap()) {
+                    drink.ingredients.getValue(it.id)
+                },
+                drink.recipe,
+                drink.visibility,
+                drink.createdAt,
+                drink.updatedAt,
+            )
+        }
+    }
+}

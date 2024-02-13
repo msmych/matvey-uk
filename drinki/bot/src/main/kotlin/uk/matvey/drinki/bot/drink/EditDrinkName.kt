@@ -20,7 +20,7 @@ class EditDrinkName(
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
         accountRepo.update(account.editingDrinkName())
         bot.execute(
-            EditMessageText(rq.userId(), rq.messageId(), DrinkTg.drinkTitle(drink))
+            EditMessageText(rq.userId(), rq.messageId(), DrinkTg.drinkTitle(drink.name))
                 .parseMode(MarkdownV2)
                 .replyMarkup(InlineKeyboardMarkup())
         )

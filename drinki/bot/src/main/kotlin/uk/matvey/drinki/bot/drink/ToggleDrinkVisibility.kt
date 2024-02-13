@@ -5,13 +5,13 @@ import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
 import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.drink.DrinkRepo
-import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.telek.TgRequest
 
 class ToggleDrinkVisibility(
     private val accountRepo: AccountRepo,
     private val drinkRepo: DrinkRepo,
-    private val ingredientRepo: IngredientRepo,
+    private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
 
@@ -20,11 +20,11 @@ class ToggleDrinkVisibility(
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
             .toggleVisibility()
         drinkRepo.update(drink)
-        val ingredients = ingredientRepo.findAllByDrink(drink.id)
+        val drinkDetails = drinkService.getDrinkDetails(drink.id)
         bot.execute(
-            EditMessageText(rq.userId(), rq.messageId(), DrinkTg.drinkDetailsText(drink, ingredients)).parseMode(
+            EditMessageText(rq.userId(), rq.messageId(), DrinkTg.drinkDetailsText(drinkDetails)).parseMode(
                 MarkdownV2
-            ).replyMarkup(DrinkTg.drinkActionsKeyboard(drink))
+            ).replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
         )
     }
 }

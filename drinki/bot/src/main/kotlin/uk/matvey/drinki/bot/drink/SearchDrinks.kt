@@ -8,16 +8,16 @@ import com.pengrad.telegrambot.request.DeleteMessage
 import com.pengrad.telegrambot.request.SendMessage
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.drink.DrinkRepo
-import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.telek.TgRequest
 
 class SearchDrinks(
     private val accountRepo: AccountRepo,
     private val drinkRepo: DrinkRepo,
-    private val ingredientRepo: IngredientRepo,
+    private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(query: String, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drinks = drinkRepo.search(account.id, query)
@@ -27,18 +27,17 @@ class SearchDrinks(
                 account.tgSession?.drinkEdit?.let { (_, messageId) ->
                     bot.execute(DeleteMessage(rq.userId(), messageId))
                 }
-                val drink = drinks.single()
-                val ingredients = ingredientRepo.findAllByDrink(drink.id)
+                val drink = drinkService.getDrinkDetails(drinks.single().id)
                 bot.execute(
                     SendMessage(
                         rq.userId(),
-                        DrinkTg.drinkDetailsText(drink, ingredients)
+                        DrinkTg.drinkDetailsText(drink)
                     ).parseMode(MarkdownV2)
                         .replyMarkup(DrinkTg.drinkActionsKeyboard(drink))
                 )
                 accountRepo.update(account.editingDrink(drink.id, rq.messageId()))
             }
-
+            
             else -> {
                 bot.execute(
                     SendMessage(rq.userId(), "Results:")

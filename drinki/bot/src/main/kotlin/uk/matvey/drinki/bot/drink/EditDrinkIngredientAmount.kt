@@ -25,7 +25,7 @@ class EditDrinkIngredientAmount(
         val ingredients = ingredientRepo.findAllByDrink(drink.id)
         val currentIngredientText = ingredients.first { it.id == ingredientId }.name
         val messageText = """
-            ${DrinkTg.drinkTitle(drink)}
+            ${DrinkTg.drinkTitle(drink.name)}
             
             $currentIngredientText:
         """.trimIndent()

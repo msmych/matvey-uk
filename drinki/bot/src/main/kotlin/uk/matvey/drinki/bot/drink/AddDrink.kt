@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.request.SendMessage
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.drink.Drink
+import uk.matvey.drinki.drink.DrinkDetails
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.telek.TgRequest
 
@@ -16,7 +17,7 @@ class AddDrink(
     private val drinkRepo: DrinkRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountService.ensureTgAccount(rq.userId())
         val drink = Drink.new(account.id)
@@ -24,10 +25,11 @@ class AddDrink(
         account.tgSession?.drinkEdit?.let { (_, messageId) ->
             bot.execute(DeleteMessage(rq.userId(), messageId))
         }
+        val drinkDetails = DrinkDetails.from(drink, listOf())
         val sendResult = bot.execute(
-            SendMessage(rq.userId(), DrinkTg.drinkDetailsText(drink, listOf()))
+            SendMessage(rq.userId(), DrinkTg.drinkDetailsText(drinkDetails))
                 .parseMode(MarkdownV2)
-                .replyMarkup(DrinkTg.drinkActionsKeyboard(drink))
+                .replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
         )
         accountRepo.update(account.editingDrink(drink.id, sendResult.message().messageId()))
     }

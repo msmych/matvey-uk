@@ -6,13 +6,13 @@ import com.pengrad.telegrambot.request.DeleteMessage
 import com.pengrad.telegrambot.request.SendMessage
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.drink.DrinkRepo
-import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.telek.TgRequest
 
 class SetDrinkName(
     private val accountRepo: AccountRepo,
     private val drinkRepo: DrinkRepo,
-    private val ingredientRepo: IngredientRepo,
+    private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
 
@@ -22,14 +22,14 @@ class SetDrinkName(
             .setName(name)
         drinkRepo.update(drink)
         bot.execute(DeleteMessage(rq.userId(), account.tgSession().drinkEdit().messageId))
-        val ingredients = ingredientRepo.findAllByDrink(drink.id)
+        val drinkDetails = drinkService.getDrinkDetails(drink.id)
         val result = bot.execute(
             SendMessage(
                 rq.userId(),
-                DrinkTg.drinkDetailsText(drink, ingredients)
+                DrinkTg.drinkDetailsText(drinkDetails)
             )
                 .parseMode(MarkdownV2)
-            .replyMarkup(DrinkTg.drinkActionsKeyboard(drink))
+            .replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
         )
         accountRepo.update(account.editingDrink(drink.id, result.message().messageId()))
     }

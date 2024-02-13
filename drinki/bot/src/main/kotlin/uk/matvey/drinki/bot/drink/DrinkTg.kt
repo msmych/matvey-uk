@@ -3,8 +3,7 @@ package uk.matvey.drinki.bot.drink
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
 import uk.matvey.drinki.bot.amount.AmountTg.label
-import uk.matvey.drinki.drink.Drink
-import uk.matvey.drinki.ingredient.Ingredient
+import uk.matvey.drinki.drink.DrinkDetails
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.telek.Emoji.COCKTAIL
 import uk.matvey.telek.Emoji.DELETE
@@ -14,26 +13,27 @@ import uk.matvey.telek.TgSupport.escapeSpecial
 
 object DrinkTg {
 
-
-    fun drinkTitle(drink: Drink): String {
-        return "$COCKTAIL *${drink.name}*"
+    fun drinkTitle(name: String): String {
+        return "$COCKTAIL *$name*"
     }
 
-    fun drinkRecipe(drink: Drink): String {
-        return drink.recipe?.let { ">$it" } ?: "Recipe: $NONE"
+    fun drinkRecipe(recipe: String?): String {
+        return recipe?.let { ">$it" } ?: "Recipe: $NONE"
     }
 
-    fun drinkDetailsText(drink: Drink, ingredients: List<Ingredient>): String {
-        val title = drinkTitle(drink)
-        val ingredientsText = "\n\n" + if (ingredients.isNotEmpty()) {
-            ingredients.joinToString("\n") { "- ${drink.ingredientAmount(it.id)?.label()} ${it.name}" }
+    fun drinkDetailsText(drink: DrinkDetails): String {
+        val title = drinkTitle(drink.name)
+        val ingredientsText = "\n\n" + if (drink.ingredients.isNotEmpty()) {
+            drink.ingredients
+                .map{ (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}" }
+                .joinToString("\n")
         } else {
             "Ingredients: $NONE"
         }
-        return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink))
+        return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink.recipe))
     }
 
-    fun drinkActionsKeyboard(drink: Drink): InlineKeyboardMarkup {
+    fun drinkActionsKeyboard(drink: DrinkDetails): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
             arrayOf(
                 InlineKeyboardButton("$EDIT Name").callbackData("/drink_edit_name"),

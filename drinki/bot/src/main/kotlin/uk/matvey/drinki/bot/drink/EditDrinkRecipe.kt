@@ -14,7 +14,7 @@ class EditDrinkRecipe(
     private val drinkRepo: DrinkRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
@@ -23,7 +23,7 @@ class EditDrinkRecipe(
             EditMessageText(
                 rq.userId(),
                 rq.messageId(),
-                DrinkTg.drinkTitle(drink) + "\n\n" + DrinkTg.drinkRecipe(drink)
+                DrinkTg.drinkTitle(drink.name) + "\n\n" + DrinkTg.drinkRecipe(drink.recipe)
             )
                 .replyMarkup(InlineKeyboardMarkup())
                 .parseMode(MarkdownV2)

@@ -29,6 +29,7 @@ import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.bot.ingredient.SetIngredientType
 import uk.matvey.drinki.bot.ingredient.ToggleIngredientVisibility
 import uk.matvey.drinki.drink.DrinkRepo
+import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.drinki.ingredient.IngredientRepo
 import uk.matvey.telek.TgRequest
 
@@ -39,24 +40,25 @@ fun startBot(
     accountRepo: AccountRepo,
     accountService: AccountService,
     drinkRepo: DrinkRepo,
-    ingredientRepo: IngredientRepo
+    ingredientRepo: IngredientRepo,
+    drinkService: DrinkService,
 ) {
     val bot = TelegramBot(config.getString("bot.token"))
     val botUpdateHandler = BotUpdateHandler(
         Greet(bot),
         AddDrink(accountService, accountRepo, drinkRepo, bot),
         GetIngredients(ingredientRepo, bot),
-        EditDrink(accountRepo, drinkRepo, ingredientRepo, bot),
+        EditDrink(accountRepo, drinkService, bot),
         EditDrinkName(accountRepo, drinkRepo, bot),
         EditDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, bot),
-        SetDrinkName(accountRepo, drinkRepo, ingredientRepo, bot),
-        EditDrinkIngredients(accountRepo, drinkRepo, ingredientRepo, bot),
-        DeleteDrinkIngredient(accountRepo, drinkRepo, ingredientRepo, bot),
+        SetDrinkName(accountRepo, drinkRepo, drinkService, bot),
+        EditDrinkIngredients(accountRepo, ingredientRepo, drinkService, bot),
+        DeleteDrinkIngredient(accountRepo, drinkRepo, ingredientRepo, drinkService, bot),
         EditDrinkRecipe(accountRepo, drinkRepo, bot),
-        SetDrinkRecipe(accountRepo, drinkRepo, ingredientRepo, bot),
+        SetDrinkRecipe(accountRepo, drinkRepo, drinkService, bot),
         AddDrinkIngredient(accountRepo, drinkRepo, ingredientRepo, bot),
-        SetDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, bot),
-        ToggleDrinkVisibility(accountRepo, drinkRepo, ingredientRepo, bot),
+        SetDrinkIngredientAmount(accountRepo, drinkRepo, ingredientRepo, drinkService, bot),
+        ToggleDrinkVisibility(accountRepo, drinkRepo, drinkService, bot),
         DeleteDrink(accountRepo, drinkRepo, bot),
         AddIngredient(accountService, accountRepo, ingredientRepo, bot),
         EditIngredientName(accountRepo, ingredientRepo, bot),
@@ -64,7 +66,7 @@ fun startBot(
         SetIngredientName(accountRepo, ingredientRepo, bot),
         SetIngredientType(accountRepo, ingredientRepo, bot),
         ToggleIngredientVisibility(accountRepo, ingredientRepo, bot),
-        SearchDrinks(accountRepo, drinkRepo, ingredientRepo, bot),
+        SearchDrinks(accountRepo, drinkRepo, drinkService, bot),
 
         accountService,
     )
