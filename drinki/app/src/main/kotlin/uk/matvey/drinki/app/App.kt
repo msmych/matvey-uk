@@ -11,38 +11,30 @@ import io.ktor.server.http.content.staticResources
 import io.ktor.server.netty.Netty
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import uk.matvey.drinki.Repos
-import uk.matvey.drinki.drink.Drink
+import uk.matvey.drinki.app.drink.drinkRouting
+import uk.matvey.drinki.app.ingredient.ingredientRouting
+import uk.matvey.drinki.migrate
 import uk.matvey.postal.dataSource
-import java.util.UUID.randomUUID
 
 fun main() {
     val config = ConfigFactory.load("drinki-app.conf")
     val ds = dataSource(config)
     val repos = Repos(ds)
     val drinkRepo = repos.drinkRepo
+    migrate(repos, false)
     embeddedServer(Netty, 8080) {
         install(FreeMarker) {
             templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
         }
         routing {
-            staticResources("/", "public")
-            get("/drinki") {
+            staticResources("/assets", "/assets")
+            get("/") {
                 call.respond(FreeMarkerContent("drinki.ftl", null))
             }
-            route("/drinks") {
-                post {
-                    val drink = Drink.new(randomUUID())
-                    drinkRepo.add(drink)
-                    call.respond(FreeMarkerContent("drink-edit.ftl", mapOf("drink" to drink)))
-                }
-                get("/new-ingredient") {
-                    call.respond(FreeMarkerContent("drinks/new-ingredient.ftl", null))
-                }
-            }
+            drinkRouting()
+            ingredientRouting(repos.ingredientRepo)
         }
     }
         .start(wait = true)

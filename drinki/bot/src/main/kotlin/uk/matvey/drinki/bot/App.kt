@@ -7,6 +7,7 @@ import mu.KotlinLogging
 import uk.matvey.drinki.Repos
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.drink.DrinkService
+import uk.matvey.drinki.migrate
 import uk.matvey.postal.dataSource
 
 private val log = KotlinLogging.logger("drinki-bot")

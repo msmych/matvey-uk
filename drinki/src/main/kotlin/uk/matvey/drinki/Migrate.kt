@@ -1,9 +1,14 @@
-package uk.matvey.drinki.bot
+package uk.matvey.drinki
 
 import org.flywaydb.core.Flyway
-import uk.matvey.drinki.Repos
 import uk.matvey.drinki.ingredient.Ingredient
-import uk.matvey.drinki.ingredient.Ingredient.Type.*
+import uk.matvey.drinki.ingredient.Ingredient.Type.BITTER
+import uk.matvey.drinki.ingredient.Ingredient.Type.JUICE
+import uk.matvey.drinki.ingredient.Ingredient.Type.OTHER
+import uk.matvey.drinki.ingredient.Ingredient.Type.SPIRIT
+import uk.matvey.drinki.ingredient.Ingredient.Type.SYRUP
+import uk.matvey.drinki.ingredient.Ingredient.Type.TONIC
+import uk.matvey.drinki.ingredient.Ingredient.Type.WINE
 
 fun migrate(repos: Repos, clean: Boolean) {
     val flyway = Flyway.configure()
