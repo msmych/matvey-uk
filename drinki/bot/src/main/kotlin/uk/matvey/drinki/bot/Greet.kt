@@ -7,7 +7,7 @@ import uk.matvey.telek.TgRequest
 class Greet(
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         bot.execute(SendMessage(rq.userId(), "🍹"))
     }

@@ -9,9 +9,9 @@ import javax.sql.DataSource
 class Repos(
     val ds: DataSource,
 ) {
-
+    
     val repo = Repo(ds)
-
+    
     val accountRepo = AccountRepo(repo)
     val ingredientRepo = IngredientRepo(repo)
     val drinkRepo = DrinkRepo(repo)

@@ -10,7 +10,7 @@ repositories {
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-
+    
     repositories {
         mavenCentral()
     }

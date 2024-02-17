@@ -12,27 +12,27 @@ import uk.matvey.telek.Emoji.NONE
 import uk.matvey.telek.TgSupport.escapeSpecial
 
 object DrinkTg {
-
+    
     fun drinkTitle(name: String): String {
         return "$COCKTAIL *$name*"
     }
-
+    
     fun drinkRecipe(recipe: String?): String {
         return recipe?.let { ">$it" } ?: "Recipe: $NONE"
     }
-
+    
     fun drinkDetailsText(drink: DrinkDetails): String {
         val title = drinkTitle(drink.name())
         val ingredientsText = "\n\n" + if (drink.ingredients.isNotEmpty()) {
             drink.ingredients
-                .map{ (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}" }
+                .map { (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}" }
                 .joinToString("\n")
         } else {
             "Ingredients: $NONE"
         }
         return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink.recipe()))
     }
-
+    
     fun drinkActionsKeyboard(drink: DrinkDetails): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
             arrayOf(
@@ -46,7 +46,7 @@ object DrinkTg {
             ),
         )
     }
-
+    
     fun visibilityLabel(visibility: Visibility): String {
         return when (visibility) {
             Visibility.PRIVATE -> "🔒 Private"

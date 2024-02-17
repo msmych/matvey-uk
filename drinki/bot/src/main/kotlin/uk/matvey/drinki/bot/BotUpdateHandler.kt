@@ -51,12 +51,12 @@ class BotUpdateHandler(
     private val setIngredientType: SetIngredientType,
     private val toggleIngredientVisibility: ToggleIngredientVisibility,
     private val searchDrinks: SearchDrinks,
-
+    
     private val accountService: AccountService,
 ) {
-
+    
     private val log = KotlinLogging.logger {}
-
+    
     fun handle(rq: TgRequest) {
         log.info { rq.update }
         val (command, _) = rq.command()

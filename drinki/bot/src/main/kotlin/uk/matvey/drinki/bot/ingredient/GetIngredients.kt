@@ -11,7 +11,7 @@ class GetIngredients(
     private val ingredients: IngredientRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val publicIngredients = ingredients.publicIngredients()
         val keyboard = InlineKeyboardMarkup(

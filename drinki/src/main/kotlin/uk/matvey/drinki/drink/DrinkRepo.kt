@@ -29,7 +29,7 @@ import java.util.UUID
 class DrinkRepo(
     private val repo: Repo,
 ) {
-
+    
     fun add(drink: Drink) {
         repo.insert(
             DRINKS,
@@ -44,7 +44,7 @@ class DrinkRepo(
                 .add(UPDATED_AT, TimestampParam(drink.updatedAt))
         )
     }
-
+    
     fun update(drink: Drink) {
         repo.update(
             DRINKS,
@@ -58,11 +58,11 @@ class DrinkRepo(
                 .add(ID, UuidParam(drink.id)),
         )
     }
-
+    
     fun delete(id: UUID) {
         repo.delete(DRINKS, "$ID = ?", QueryParams().add(ID, UuidParam(id)))
     }
-
+    
     fun get(id: UUID): Drink {
         return repo.select(
             "select * from $DRINKS where $ID = ?",
@@ -71,7 +71,7 @@ class DrinkRepo(
         )
             .single()
     }
-
+    
     fun search(accountId: UUID, query: String): List<Drink> {
         return repo.select(
             "select * from $DRINKS where $VISIBILITY = 'PUBLIC' or $ACCOUNT_ID = ? and $NAME ilike ? limit 64",
@@ -81,7 +81,7 @@ class DrinkRepo(
             ::drink
         )
     }
-
+    
     private fun drink(ex: ResultExtractor) = Drink(
         ex.uuid(ID),
         ex.uuid(ACCOUNT_ID),
@@ -101,7 +101,7 @@ class DrinkRepo(
         ex.instant(CREATED_AT),
         ex.instant(UPDATED_AT),
     )
-
+    
     data class DrinkIngredientAmount(
         val drink: Drink,
         val ingredient: Ingredient,

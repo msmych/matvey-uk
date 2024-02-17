@@ -9,12 +9,15 @@ import uk.matvey.drinki.account.AccountSql.CREATED_AT
 import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
-import uk.matvey.postal.QueryParam.*
+import uk.matvey.postal.QueryParam.JsonbParam
+import uk.matvey.postal.QueryParam.TextParam
+import uk.matvey.postal.QueryParam.TimestampParam
+import uk.matvey.postal.QueryParam.UuidParam
 import uk.matvey.postal.QueryParams
 import uk.matvey.postal.Repo
 
 class AccountRepo(private val repo: Repo) {
-
+    
     fun add(account: Account) {
         repo.insert(
             ACCOUNTS,
@@ -25,7 +28,7 @@ class AccountRepo(private val repo: Repo) {
                 .add(UPDATED_AT, TimestampParam(account.updatedAt))
         )
     }
-
+    
     fun update(account: Account) {
         repo.update(
             ACCOUNTS,
@@ -36,7 +39,7 @@ class AccountRepo(private val repo: Repo) {
                 .add(ID, UuidParam(account.id))
         )
     }
-
+    
     fun findByTgUserId(tgUserId: Long): Account? {
         return repo.select(
             "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
@@ -53,6 +56,6 @@ class AccountRepo(private val repo: Repo) {
         }
             .singleOrNull()
     }
-
+    
     fun getByTgUserId(tgUserId: Long): Account = requireNotNull(findByTgUserId(tgUserId))
 }

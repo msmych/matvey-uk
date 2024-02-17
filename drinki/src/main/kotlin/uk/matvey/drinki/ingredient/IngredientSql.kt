@@ -1,9 +1,9 @@
 package uk.matvey.drinki.ingredient
 
 object IngredientSql {
-
+    
     const val INGREDIENTS = "drinki.ingredients"
-
+    
     const val ID = "id"
     const val ACCOUNT_ID = "account_id"
     const val TYPE = "type"

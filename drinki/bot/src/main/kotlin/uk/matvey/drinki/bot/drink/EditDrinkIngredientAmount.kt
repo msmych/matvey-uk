@@ -8,7 +8,7 @@ class EditDrinkIngredientAmount(
     private val accountRepo: AccountRepo,
     private val drinkTgService: DrinkTgService,
 ) {
-
+    
     operator fun invoke(ingredientId: UUID, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
             .updateTgEditDrinkIngredient(ingredientId)

@@ -13,7 +13,7 @@ class SetIngredientName(
     private val ingredientRepo: IngredientRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(name: String, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val ingredient = ingredientRepo.get(account.tgSession().ingredientEdit().ingredientId)

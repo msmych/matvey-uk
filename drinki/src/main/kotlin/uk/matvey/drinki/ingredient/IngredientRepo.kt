@@ -10,16 +10,18 @@ import uk.matvey.drinki.ingredient.IngredientSql.NAME
 import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
-import uk.matvey.postal.QueryParam.*
+import uk.matvey.postal.QueryParam.TextParam
+import uk.matvey.postal.QueryParam.TimestampParam
+import uk.matvey.postal.QueryParam.UuidParam
 import uk.matvey.postal.QueryParams
 import uk.matvey.postal.Repo
 import uk.matvey.postal.ResultExtractor
-import java.util.*
+import java.util.UUID
 
 class IngredientRepo(
     private val repo: Repo,
 ) {
-
+    
     fun add(ingredient: Ingredient) {
         repo.insert(
             INGREDIENTS,
@@ -33,7 +35,7 @@ class IngredientRepo(
                 .add(UPDATED_AT, TimestampParam(ingredient.updatedAt))
         )
     }
-
+    
     fun update(ingredient: Ingredient) {
         repo.update(
             INGREDIENTS,
@@ -44,7 +46,7 @@ class IngredientRepo(
                 .add(ID, UuidParam(ingredient.id))
         )
     }
-
+    
     fun get(ingredientId: UUID): Ingredient {
         return repo.select(
             "select * from $INGREDIENTS where $ID = ?",
@@ -52,7 +54,7 @@ class IngredientRepo(
             ::ingredient
         ).single()
     }
-
+    
     fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
         return repo.select(
@@ -63,11 +65,11 @@ class IngredientRepo(
             ::ingredient
         )
     }
-
+    
     fun publicIngredients(): List<Ingredient> {
         return findAllByAccountId(null)
     }
-
+    
     fun findAllByDrink(drinkId: UUID): List<Ingredient> {
         return repo.select(
             """
@@ -82,7 +84,7 @@ class IngredientRepo(
             ::ingredient
         )
     }
-
+    
     private fun ingredient(ex: ResultExtractor): Ingredient {
         return Ingredient(
             ex.uuid(ID),

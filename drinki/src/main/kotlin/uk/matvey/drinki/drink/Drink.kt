@@ -20,39 +20,39 @@ data class Drink(
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
-
+    
     fun ingredientAmount(ingredientId: UUID): Amount? {
         return this.ingredients.toMap()[ingredientId]
     }
-
+    
     fun setName(name: String): Drink {
         return this.copy(name = name)
     }
-
+    
     fun setIngredient(ingredientId: UUID, amount: Amount): Drink {
         this.ingredients[ingredientId] = amount
         return this.copy(
             ingredients = this.ingredients
         )
     }
-
+    
     fun deleteIngredient(ingredientId: UUID): Drink {
         this.ingredients -= ingredientId
         return this.copy(
             ingredients = this.ingredients
         )
     }
-
+    
     fun setRecipe(recipe: String): Drink {
         return this.copy(recipe = recipe)
     }
-
+    
     fun toggleVisibility(): Drink {
         return this.copy(
             visibility = this.visibility.toggle()
         )
     }
-
+    
     fun ingredientsJson(): JsonArray {
         return buildJsonArray {
             ingredients.map { (k, v) ->
@@ -63,7 +63,7 @@ data class Drink(
             }
         }
     }
-
+    
     companion object {
         fun new(accountId: UUID): Drink {
             val now = Instant.now()

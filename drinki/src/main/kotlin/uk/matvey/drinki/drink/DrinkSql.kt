@@ -1,9 +1,9 @@
 package uk.matvey.drinki.drink
 
 object DrinkSql {
-
+    
     const val DRINKS = "drinki.drinks"
-
+    
     const val ID = "id"
     const val ACCOUNT_ID = "account_id"
     const val NAME = "name"

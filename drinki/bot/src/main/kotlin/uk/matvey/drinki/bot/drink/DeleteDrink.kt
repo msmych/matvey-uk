@@ -11,7 +11,7 @@ class DeleteDrink(
     private val drinkRepo: DrinkRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         drinkRepo.delete(account.tgSession().drinkEdit().drinkId)

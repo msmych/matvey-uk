@@ -15,7 +15,7 @@ class AddIngredient(
     private val ingredientRepo: IngredientRepo,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountService.ensureTgAccount(rq.userId())
         val ingredient = Ingredient.private(account.id, "New")

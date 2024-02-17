@@ -14,7 +14,7 @@ class EditDrinkName(
     private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         accountRepo.update(account.editingDrinkName())

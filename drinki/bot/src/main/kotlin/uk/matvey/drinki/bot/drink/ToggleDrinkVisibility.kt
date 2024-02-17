@@ -14,7 +14,7 @@ class ToggleDrinkVisibility(
     private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)

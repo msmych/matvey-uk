@@ -7,7 +7,7 @@ import javax.sql.DataSource
 class Repo(
     private val ds: DataSource,
 ) {
-
+    
     fun insert(tableName: String, params: QueryParams) {
         withConnection { conn ->
             val paramNames = params.paramNames()
@@ -20,7 +20,7 @@ class Repo(
             }
         }
     }
-
+    
     fun update(
         tableName: String,
         updateParams: QueryParams,
@@ -37,7 +37,7 @@ class Repo(
             }
         }
     }
-
+    
     fun <T> select(query: String, params: QueryParams, mapper: (ResultExtractor) -> T): List<T> {
         return withConnection { conn ->
             withStatement(conn, query) { st ->
@@ -51,7 +51,7 @@ class Repo(
             }
         }
     }
-
+    
     fun delete(tableName: String, condition: String, params: QueryParams) {
         withConnection { conn ->
             val query = "delete from $tableName where $condition"
@@ -61,11 +61,11 @@ class Repo(
             }
         }
     }
-
+    
     fun <T> withStatement(conn: Connection, query: String, block: (PreparedStatement) -> T): T {
         return conn.prepareStatement(query).use(block)
     }
-
+    
     fun <T> withConnection(block: (Connection) -> T): T {
         return ds.connection.use(block)
     }

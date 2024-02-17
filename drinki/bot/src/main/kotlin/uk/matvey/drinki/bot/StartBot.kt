@@ -71,7 +71,7 @@ fun startBot(
         SetIngredientType(accountRepo, ingredientRepo, bot),
         ToggleIngredientVisibility(accountRepo, ingredientRepo, bot),
         SearchDrinks(accountRepo, drinkRepo, drinkService, bot),
-
+        
         accountService,
     )
     bot.setUpdatesListener { updates ->

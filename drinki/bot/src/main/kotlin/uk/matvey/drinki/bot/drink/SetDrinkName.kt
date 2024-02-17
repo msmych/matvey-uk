@@ -15,7 +15,7 @@ class SetDrinkName(
     private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
-
+    
     operator fun invoke(name: String, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
@@ -29,7 +29,7 @@ class SetDrinkName(
                 DrinkTg.drinkDetailsText(drinkDetails)
             )
                 .parseMode(MarkdownV2)
-            .replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
+                .replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
         )
         accountRepo.update(account.editingDrink(drink.id, result.message().messageId()))
     }

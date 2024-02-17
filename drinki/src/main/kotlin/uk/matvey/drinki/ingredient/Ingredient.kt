@@ -14,7 +14,7 @@ data class Ingredient(
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
-
+    
     enum class Type {
         SPIRIT,
         BITTER,
@@ -25,27 +25,27 @@ data class Ingredient(
         OTHER,
         ;
     }
-
+    
     fun setName(name: String): Ingredient {
         return this.copy(
             name = name
         )
     }
-
+    
     fun setType(type: Type): Ingredient {
         return this.copy(
             type = type
         )
     }
-
+    
     fun toggleVisibility(): Ingredient {
         return this.copy(
             visibility = this.visibility.toggle()
         )
     }
-
+    
     companion object {
-
+        
         fun public(type: Type, name: String): Ingredient {
             val now = Instant.now()
             return Ingredient(
@@ -58,7 +58,7 @@ data class Ingredient(
                 now
             )
         }
-
+        
         fun private(accountId: UUID, name: String): Ingredient {
             val now = Instant.now()
             return Ingredient(

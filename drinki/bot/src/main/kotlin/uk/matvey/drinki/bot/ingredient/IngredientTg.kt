@@ -9,7 +9,7 @@ import uk.matvey.telek.Emoji.EDIT
 import java.util.UUID
 
 object IngredientTg {
-
+    
     fun ingredientText(ingredient: Ingredient): String {
         return """
             **${ingredient.name}**
@@ -17,7 +17,7 @@ object IngredientTg {
             ${ingredient.type}
         """.trimIndent()
     }
-
+    
     fun editDrinkIngredientsKeyboard(
         drinkIngredients: Map<UUID, Ingredient>,
         publicIngredients: List<Ingredient>
@@ -40,7 +40,7 @@ object IngredientTg {
             arrayOf(InlineKeyboardButton("Done").callbackData("/drink_edit"))
         )
     }
-
+    
     fun ingredientActionsKeyboard(ingredient: Ingredient): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
             arrayOf(
@@ -51,7 +51,7 @@ object IngredientTg {
             )
         )
     }
-
+    
     fun ingredientTypeKeyboard(): InlineKeyboardMarkup {
         return InlineKeyboardMarkup(
             *Ingredient.Type.entries.map {
@@ -59,7 +59,7 @@ object IngredientTg {
             }.toTypedArray()
         )
     }
-
+    
     fun Ingredient.Type.label(): String {
         return this.name[0] + this.name.substring(1).lowercase()
     }
