@@ -11,6 +11,9 @@ dependencies {
     implementation("com.typesafe:config:1.4.3")
     
     implementation(project(":dukt"))
+    implementation(project(":postal"))
+    implementation(project(":drinki"))
+    implementation(project(":drinki:bot"))
     
     testImplementation("io.ktor:ktor-client-cio")
 }
