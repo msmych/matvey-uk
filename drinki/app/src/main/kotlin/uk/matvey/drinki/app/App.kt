@@ -12,7 +12,7 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import uk.matvey.drinki.Repos
+import uk.matvey.drinki.DrinkiRepos
 import uk.matvey.drinki.app.drink.drinkRouting
 import uk.matvey.drinki.app.ingredient.ingredientRouting
 import uk.matvey.drinki.migrate
@@ -21,9 +21,9 @@ import uk.matvey.postal.dataSource
 fun main() {
     val config = ConfigFactory.load("drinki-app.conf")
     val ds = dataSource(config)
-    val repos = Repos(ds)
-    val drinkRepo = repos.drinkRepo
-    migrate(repos, false)
+    val drinkiRepos = DrinkiRepos(ds)
+    val drinkRepo = drinkiRepos.drinkRepo
+    migrate(drinkiRepos, false)
     embeddedServer(Netty, 8080) {
         install(FreeMarker) {
             templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
@@ -34,7 +34,7 @@ fun main() {
                 call.respond(FreeMarkerContent("drinki.ftl", null))
             }
             drinkRouting()
-            ingredientRouting(repos.ingredientRepo)
+            ingredientRouting(drinkiRepos.ingredientRepo)
         }
     }
         .start(wait = true)
