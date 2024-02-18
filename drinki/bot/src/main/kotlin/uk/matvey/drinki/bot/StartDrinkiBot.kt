@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
 import com.pengrad.telegrambot.request.AnswerCallbackQuery
 import com.typesafe.config.Config
 import mu.KotlinLogging
-import uk.matvey.drinki.account.AccountRepo
+import uk.matvey.drinki.DrinkiRepos
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.bot.drink.AddDrink
 import uk.matvey.drinki.bot.drink.AddDrinkIngredient
@@ -29,24 +29,25 @@ import uk.matvey.drinki.bot.ingredient.GetIngredients
 import uk.matvey.drinki.bot.ingredient.SetIngredientName
 import uk.matvey.drinki.bot.ingredient.SetIngredientType
 import uk.matvey.drinki.bot.ingredient.ToggleIngredientVisibility
-import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.drink.DrinkService
-import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.drinki.migrate
 import uk.matvey.telek.TgRequest
 
 private val log = KotlinLogging.logger("drinki-bot")
 
-fun startBot(
+fun startDrinkiBot(
     config: Config,
-    accountRepo: AccountRepo,
+    repos: DrinkiRepos,
     accountService: AccountService,
-    drinkRepo: DrinkRepo,
-    ingredientRepo: IngredientRepo,
     drinkService: DrinkService,
 ) {
+    migrate(repos, System.getenv("CLEAN_DB") == "true")
     val bot = TelegramBot(config.getString("bot.token"))
     
     val drinkTgService = DrinkTgService(drinkService, bot)
+    val accountRepo = repos.accountRepo
+    val drinkRepo = repos.drinkRepo
+    val ingredientRepo = repos.ingredientRepo
     
     val botUpdateHandler = BotUpdateHandler(
         Greet(bot),
