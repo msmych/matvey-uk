@@ -10,6 +10,8 @@ dependencies {
     implementation("com.typesafe:config:1.4.3")
     
     implementation(project(":dukt"))
+    
+    testImplementation("io.ktor:ktor-client-cio")
 }
 
 application {
