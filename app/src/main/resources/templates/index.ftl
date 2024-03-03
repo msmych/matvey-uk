@@ -4,12 +4,13 @@
 </head>
 <body>
 <div class="container">
-    <div>
-        My name is Matvey Smychkov. I live in London and work as a software engineer.
-    </div>
-    <div>
-        Check out my <a href="https://www.linkedin.com/in/matvey-smychkov-743b21175/">LinkedIn page</a> to learn more about my technical background and work experience
-    </div>
+    <h1>Matvey Smychkov</h1>
+<#--    <div>-->
+<#--        My name is Matvey Smychkov. I live in London and work as a software engineer.-->
+<#--    </div>-->
+<#--    <div>-->
+<#--        Check out my <a href="https://www.linkedin.com/in/matvey-smychkov-743b21175/">LinkedIn page</a> to learn more about my technical background and work experience-->
+<#--    </div>-->
 </div>
 </body>
 </html>
