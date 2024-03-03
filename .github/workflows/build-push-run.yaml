@@ -1,4 +1,4 @@
-name: Build and push image
+name: Build, push, and run image
 
 on:
   push:
@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: matvey-docker
+      AWS_HOST: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
       IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com/matvey-docker:latest
 
     steps:
@@ -41,3 +42,14 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
+
+      - name: Run app
+        run: |
+          docker stop matvey-app || true
+          docker rm matvey-app || true
+          aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $AWS_HOST
+          docker pull $IMAGE
+          docker run -d \
+            --name matvey-app \
+            -p 80:8080 \
+            $IMAGE
