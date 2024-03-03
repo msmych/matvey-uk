@@ -42,19 +42,3 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
-
-      - name: Run app
-        uses: appleboy/ssh-action@master
-        with:
-          host: ec2-18-169-18-53.eu-west-2.compute.amazonaws.com
-          username: ec2-user
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            docker stop ${{ env.IMAGE_NAME }} || true
-            docker rm ${{ env.IMAGE_NAME }} || true
-            aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${{ env.AWS_HOST }}
-            docker pull ${{ env.IMAGE }} 
-            docker run -d \
-              --name matvey-app \
-              -p 80:8080 \
-              ${{ env.IMAGE }}
