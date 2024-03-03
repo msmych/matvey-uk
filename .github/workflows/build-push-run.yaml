@@ -50,8 +50,8 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker stop matvey-app || true
-            docker rm matvey-app || true
+            docker stop $IMAGE_NAME || true
+            docker rm $IMAGE_NAME || true
             aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $AWS_HOST
             docker pull $IMAGE
             docker run -d \
