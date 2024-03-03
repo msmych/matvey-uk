@@ -9,9 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      AWS_HOST: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
       IMAGE_NAME: matvey-docker
-      IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com:matvey-docker:latest
+      IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com/matvey-docker:latest
 
     steps:
       - name: Checkout code
@@ -35,7 +34,7 @@ jobs:
 
       - name: Drop last image from ECR
         run: |
-          aws ecr batch-delete-image --repository-name matvey-docker --image-ids imageTag=latest || true
+          aws ecr batch-delete-image --repository-name $IMAGE_NAME --image-ids imageTag=latest || true
 
       - name: Build Docker image
         run: |
