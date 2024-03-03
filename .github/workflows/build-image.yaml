@@ -9,9 +9,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      AWS_HOST: 667377285515.dkr.ecr.us-east-1.amazonaws.com
+      AWS_HOST: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
       IMAGE_NAME: matvey-docker
-      IMAGE: 667377285515.dkr.ecr.us-east-1.amazonaws.com:matvey-docker:latest"
+      IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com:matvey-docker:latest
 
     steps:
       - name: Checkout code
