@@ -21,4 +21,4 @@ COPY --from=builder /app/app/build/libs/app-all.jar /app/app-all.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "app-all.jar"]
+CMD ["java", "-jar", "app-all.jar", "prod"]

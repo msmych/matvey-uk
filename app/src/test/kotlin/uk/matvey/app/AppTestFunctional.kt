@@ -12,7 +12,8 @@ open class AppTestFunctional {
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startServer(false)
+            val config = AppConfig.load("matvey-app", "local")
+            startServer(config, false)
         }
     }
 }
