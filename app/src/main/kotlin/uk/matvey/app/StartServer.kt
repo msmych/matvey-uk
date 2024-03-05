@@ -31,7 +31,6 @@ fun startServer(config: AppConfig, wait: Boolean) {
         }
         developmentMode = config.env == Env.LOCAL
         if (config.env == Env.PROD) {
-            val p12Pass = System.getenv("P12_PASS")
             val jksPass = System.getenv("JKS_PASS")
             val keyStoreFile = File("/certs/keystore.jks")
             sslConnector(
@@ -39,7 +38,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
                     load(FileInputStream(keyStoreFile), jksPass.toCharArray())
                 },
                 keyAlias = "matveyAppCert",
-                privateKeyPassword = { p12Pass.toCharArray() },
+                privateKeyPassword = { jksPass.toCharArray() },
                 keyStorePassword = { jksPass.toCharArray() }) {
                 port = 8443
                 keyStorePath = keyStoreFile
