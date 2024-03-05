@@ -39,7 +39,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
                     load(FileInputStream(keyStoreFile), jksPass.toCharArray())
                 },
                 keyAlias = "matveyAppCert",
-                privateKeyPassword = { p12Pass.toCharArray() },
+                privateKeyPassword = { "".toCharArray() },
                 keyStorePassword = { jksPass.toCharArray() }) {
                 port = 8443
                 keyStorePath = keyStoreFile
