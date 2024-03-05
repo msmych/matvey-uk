@@ -32,7 +32,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
         developmentMode = config.env == Env.LOCAL
         if (config.env == Env.PROD) {
             val keyStoreFile = File("/certs/keystore.jks")
-            val p12Pass = System.getenv("CERT_P12_PASS")
+            val p12Pass = System.getenv("P12_PASS")
             val jksPass = System.getenv("JKS_PASS")
             sslConnector(
                 keyStore = KeyStore.getInstance("JKS").apply {

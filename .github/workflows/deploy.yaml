@@ -27,7 +27,7 @@ jobs:
             docker run -d \
               --name ${{ env.APP_NAME }} \
               -v /etc/letsencrypt/live/matvey.uk:/certs \
-              -e CERT_P12_PASS="${{ secrets.CERT_P12_PASS }}" \
+              -e P12_PASS=${{ secrets.P12_PASS }} \
               -e JKS_PASS="${{ secrets.JKS_PASS }}" \
               -p 443:8443 \
               ${{ env.IMAGE }}
