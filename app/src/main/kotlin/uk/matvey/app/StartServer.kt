@@ -37,7 +37,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
             val keyStore = buildKeyStore {
                 certificate("matveyAppCert") {
                     password = p12Pass
-                    domains = listOf("matvey.uk", "127.0.0.1", "0.0.0.0", "localhost")
+                    domains = listOf("matvey.uk")
                 }
             }
             keyStore.saveToFile(keyStoreFile, jksPass)
