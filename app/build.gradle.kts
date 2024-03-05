@@ -7,6 +7,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-server-freemarker")
+    implementation("io.ktor:ktor-network-tls-certificates")
     
     implementation("com.typesafe:config:1.4.3")
     

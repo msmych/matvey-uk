@@ -19,6 +19,6 @@ WORKDIR /app
 
 COPY --from=builder /app/app/build/libs/app-all.jar /app/app-all.jar
 
-EXPOSE 8080
+EXPOSE 8443
 
 CMD ["java", "-jar", "app-all.jar", "prod"]
