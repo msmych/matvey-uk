@@ -36,7 +36,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
             val keyStoreFile = File("/certs/keystore.jks")
             sslConnector(
                 keyStore = KeyStore.getInstance("JKS").apply {
-                    load(FileInputStream(keyStoreFile), p12Pass.toCharArray())
+                    load(FileInputStream(keyStoreFile), jksPass.toCharArray())
                 },
                 keyAlias = "matveyAppCert",
                 privateKeyPassword = { p12Pass.toCharArray() },
