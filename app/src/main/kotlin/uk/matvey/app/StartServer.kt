@@ -56,6 +56,9 @@ fun startServer(config: AppConfig, wait: Boolean) {
                 get("/") {
                     call.respond(FreeMarkerContent("index.ftl", null))
                 }
+                get("/tech") {
+                    call.respond(FreeMarkerContent("tech.ftl", null))
+                }
             }
             
         }
