@@ -1,7 +1,7 @@
 package uk.matvey.app
 
 fun main(args: Array<String>) {
-    val config = AppConfig.load("matvey-app", args[0])
+    val config = AppConfig.load("matvey-app", args.getOrElse(0) { "local" })
 //    val ds = dataSource(drinkiBotConfig)
 //    val drinkiRepos = DrinkiRepos(ds)
 //    val accountService = AccountService(drinkiRepos.accountRepo)
