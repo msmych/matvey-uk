@@ -7,3 +7,7 @@
     🧑‍💻 I write some code in my spare time as well.
     You can check out my <a href="https://github.com/msmych">GitHub page</a>.
 </div>
+<div>
+    🪛 I use Warp as a terminal and recommend it to others.
+    If you feel like trying Warp, use my <a href="https://app.warp.dev/referral/Z8NEK">referral link</a>.
+</div>

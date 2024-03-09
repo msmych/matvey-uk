@@ -54,7 +54,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
                     call.respond("OK")
                 }
                 get("/") {
-                    call.respond(FreeMarkerContent("index.ftl", null))
+                    call.respond(FreeMarkerContent("index.ftl", mapOf("assets" to config.getString("app.assetsUri"))))
                 }
                 get("/tech") {
                     call.respond(FreeMarkerContent("tech.ftl", null))
