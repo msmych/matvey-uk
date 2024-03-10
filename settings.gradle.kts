@@ -6,6 +6,7 @@ include(
     "drinki",
     "drinki:app",
     "drinki:bot",
+    "migraine",
     "postal",
     "telek",
 )

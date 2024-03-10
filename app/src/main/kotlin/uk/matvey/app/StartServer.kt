@@ -50,6 +50,7 @@ fun startServer(config: AppConfig, wait: Boolean) {
             }
             routing {
                 staticResources("/assets", "/assets")
+                staticResources("/migraine/inbox", "/migraine/inbox")
                 get("/healthcheck") {
                     call.respond("OK")
                 }
