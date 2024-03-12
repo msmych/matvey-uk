@@ -4,7 +4,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import uk.matvey.drinki.Setup.JSON
+import uk.matvey.dukt.json.JsonSetup.JSON
 import uk.matvey.drinki.drink.DrinkSql.ACCOUNT_ID
 import uk.matvey.drinki.drink.DrinkSql.CREATED_AT
 import uk.matvey.drinki.drink.DrinkSql.DRINKS

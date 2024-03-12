@@ -3,4 +3,5 @@ dependencies {
     
     implementation(project(":dukt"))
     implementation(project(":telek"))
+    implementation(project(":postal"))
 }

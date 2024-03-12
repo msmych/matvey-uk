@@ -1,5 +1,8 @@
 package uk.matvey.migraine.frobot
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed class RockGardenCell(
     val symbol: Char,
     val emoji: String,

@@ -2,11 +2,12 @@ package uk.matvey.migraine.frobot
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup
+import kotlinx.serialization.Serializable
 import uk.matvey.migraine.frobot.RockGardenCell.Frog
 import uk.matvey.migraine.frobot.RockGardenCell.Rock
 import uk.matvey.migraine.frobot.RockGardenCell.TreasureMap
 
-class RockGardenBoard(private val cells: List<List<RockGardenCell>>) {
+class RockGardenBoard(val cells: List<List<RockGardenCell>>) {
     
     fun cellAt(i: Int, j: Int): RockGardenCell {
         return cells[i][j]

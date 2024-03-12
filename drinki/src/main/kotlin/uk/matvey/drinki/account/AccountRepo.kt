@@ -3,12 +3,12 @@ package uk.matvey.drinki.account
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
-import uk.matvey.drinki.Setup.JSON
 import uk.matvey.drinki.account.AccountSql.ACCOUNTS
 import uk.matvey.drinki.account.AccountSql.CREATED_AT
 import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
+import uk.matvey.dukt.json.JsonSetup.JSON
 import uk.matvey.postal.QueryParam.JsonbParam
 import uk.matvey.postal.QueryParam.TextParam
 import uk.matvey.postal.QueryParam.TimestampParam

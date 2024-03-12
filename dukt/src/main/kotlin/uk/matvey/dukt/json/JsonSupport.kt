@@ -1,11 +1,11 @@
-package uk.matvey.dukt
+package uk.matvey.dukt.json
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import java.util.*
+import java.util.UUID
 
 object JsonSupport {
     
