@@ -24,6 +24,10 @@ class TgRequest(
         return update.callbackQuery().id()
     }
     
+    fun callbackQueryData(): String {
+        return update.callbackQuery().data()
+    }
+    
     fun command(): Pair<String?, List<String>> {
         return update.message()?.text()
             ?.takeIf { it.startsWith('/') }

@@ -1,35 +1,39 @@
 package uk.matvey.migraine.frobot
 
 import mu.KotlinLogging
+import uk.matvey.migraine.frobot.Frobot.State.ACTIVE
+import uk.matvey.migraine.frobot.Frobot.State.BATTERY_LOW
+import uk.matvey.migraine.frobot.Frobot.State.OVERHEATED
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
+import uk.matvey.migraine.frobot.handlers.RockGardenJump
+import uk.matvey.migraine.frobot.handlers.RockGardenStart
 import uk.matvey.telek.TgRequest
 
 class BotUpdateHandler(
-    handleMessageWithLowBattery: HandleMessageWithLowBattery
+    private val frobotRepo: FrobotRepo,
+    
+    private val handleMessageWithLowBattery: HandleMessageWithLowBattery,
+    private val rockGardenStart: RockGardenStart,
+    private val rockGardenJump: RockGardenJump,
 ) {
     
     private val log = KotlinLogging.logger {}
     
     fun handle(rq: TgRequest) {
         log.info { rq.update }
-    }
-    
-    companion object {
-        
-        val NULL_POINTER_MESSAGES = setOf(
-            "Epic Null Pointer Fail",
-            "Null Pointer Annihilation",
-            "Null Pointer Catastrophe",
-            "Null Pointer Collapse",
-            "Null Pointer Death",
-            "Null Pointer Disaster",
-            "Null Pointer Explosion",
-            "Null Pointer Fiasco",
-            "Null Pointer Horror",
-            "Null Pointer Misery",
-            "Null Pointer Misfortune",
-            "Null Pointer Tragedy",
-            "Null Pointer Trouble",
-        )
+        val frobot = frobotRepo.findByTgUserId(rq.userId()) ?: frobotRepo.add(Frobot.frobot(rq.userId()))
+            .run { requireNotNull(frobotRepo.findByTgUserId(rq.userId())) }
+        when (frobot.state) {
+            BATTERY_LOW -> handleMessageWithLowBattery(rq, frobot.id)
+            ACTIVE -> {
+                if (rq.command().first == "/jump") {
+                    rockGardenStart(rq, frobot.id)
+                } else {
+                    rockGardenJump(rq, frobot.id)
+                }
+            }
+            
+            OVERHEATED -> {}
+        }
     }
 }

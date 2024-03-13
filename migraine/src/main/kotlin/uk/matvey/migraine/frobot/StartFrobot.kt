@@ -6,6 +6,8 @@ import com.pengrad.telegrambot.request.AnswerCallbackQuery
 import com.typesafe.config.Config
 import mu.KotlinLogging
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
+import uk.matvey.migraine.frobot.handlers.RockGardenJump
+import uk.matvey.migraine.frobot.handlers.RockGardenStart
 import uk.matvey.postal.Repo
 import uk.matvey.postal.dataSource
 import uk.matvey.telek.TgRequest
@@ -18,7 +20,14 @@ fun startFrobot(config: Config) {
     val repo = Repo(ds)
     val frobotRepo = FrobotRepo(repo)
     val handleMessageWithLowBattery = HandleMessageWithLowBattery(frobotRepo, bot)
-    val botUpdateHandler = BotUpdateHandler(handleMessageWithLowBattery)
+    val rockGardenStart = RockGardenStart(frobotRepo, bot)
+    val rockGardenJump = RockGardenJump(frobotRepo, bot)
+    val botUpdateHandler = BotUpdateHandler(
+        frobotRepo,
+        handleMessageWithLowBattery,
+        rockGardenStart,
+        rockGardenJump
+    )
     bot.setUpdatesListener { updates ->
         updates.forEach { update ->
             try {
