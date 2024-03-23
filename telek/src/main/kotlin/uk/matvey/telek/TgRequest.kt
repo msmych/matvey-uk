@@ -1,5 +1,6 @@
 package uk.matvey.telek
 
+import com.pengrad.telegrambot.model.Message
 import com.pengrad.telegrambot.model.Update
 
 class TgRequest(
@@ -11,11 +12,15 @@ class TgRequest(
     }
     
     fun messageText(): String? {
-        return update.message()?.text()
+        return message().text()
+    }
+    
+    fun message(): Message {
+        return update.message() ?: update.callbackQuery().message()
     }
     
     fun messageId(): Int {
-        return (update.message() ?: update.callbackQuery().message()).messageId()
+        return message().messageId()
     }
     
     fun isCallbackQuery() = update.callbackQuery() != null

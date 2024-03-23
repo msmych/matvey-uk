@@ -2,7 +2,9 @@ package uk.matvey.migraine.frobot
 
 import kotlinx.serialization.encodeToString
 import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.migraine.frobot.FrobotSql.FROBOT
 import uk.matvey.postal.QueryParam
+import uk.matvey.postal.QueryParam.TextParam
 import uk.matvey.postal.QueryParam.UuidParam
 import uk.matvey.postal.QueryParams
 import uk.matvey.postal.Repo
@@ -15,16 +17,17 @@ class FrobotRepo(
     
     fun add(frobot: Frobot) {
         repo.insert(
-            "frobot", QueryParams()
+            FROBOT, QueryParams()
                 .add("id", UuidParam(frobot.id))
-                .add("state", QueryParam.TextParam(frobot.state.name))
+                .add("state", TextParam(frobot.state.name))
                 .add("tg", QueryParam.JsonbParam(JSON.encodeToString(frobot.tg)))
         )
     }
     
     fun update(frobot: Frobot) {
         repo.update(
-            "frobot", QueryParams()
+            FROBOT, QueryParams()
+                .add("state", TextParam(frobot.state.name))
                 .add("tg", QueryParam.JsonbParam(JSON.encodeToString(frobot.tg))),
             "id = ?", QueryParams().add("id", UuidParam(frobot.id))
         )
@@ -32,7 +35,7 @@ class FrobotRepo(
     
     fun get(id: UUID): Frobot {
         return repo.select(
-            "select * from frobot where id = ?",
+            "select * from $FROBOT where id = ?",
             QueryParams().add("id", UuidParam(id)),
             ::frobotFrom
         )
@@ -41,8 +44,8 @@ class FrobotRepo(
     
     fun findByTgUserId(userId: Long): Frobot? {
         return repo.select(
-            "select * from frobot where tg ->> 'userId' = ?",
-            QueryParams().add("tgUserId", QueryParam.BigintParam(userId)),
+            "select * from $FROBOT where tg ->> 'userId' = ?",
+            QueryParams().add("tgUserId", TextParam(userId.toString())),
             ::frobotFrom
         )
             .singleOrNull()

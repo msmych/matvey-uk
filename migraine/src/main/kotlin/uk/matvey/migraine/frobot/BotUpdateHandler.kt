@@ -26,7 +26,7 @@ class BotUpdateHandler(
         when (frobot.state) {
             BATTERY_LOW -> handleMessageWithLowBattery(rq, frobot.id)
             ACTIVE -> {
-                if (rq.command().first == "/jump") {
+                if (rq.command().first == "jump") {
                     rockGardenStart(rq, frobot.id)
                 } else {
                     rockGardenJump(rq, frobot.id)
