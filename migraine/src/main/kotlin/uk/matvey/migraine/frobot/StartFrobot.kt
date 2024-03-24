@@ -51,7 +51,7 @@ fun migrate(ds: DataSource, clean: Boolean) {
     val flyway = Flyway.configure()
         .dataSource(ds)
         .schemas("migraine")
-        .locations("classpath:db/migration")
+        .locations("classpath:db/migration/migraine")
         .defaultSchema("migraine")
         .createSchemas(true)
         .cleanDisabled(!clean)
