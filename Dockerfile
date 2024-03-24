@@ -7,6 +7,7 @@ COPY gradlew settings.gradle.kts build.gradle.kts /app/
 COPY gradle /app/gradle
 COPY app /app/app
 COPY drinki /app/drinki
+COPY migraine /app/migraine
 COPY dukt /app/dukt
 COPY postal /app/postal
 COPY telek /app/telek
