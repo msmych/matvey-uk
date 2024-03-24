@@ -14,7 +14,7 @@ fun migrate(drinkiRepos: DrinkiRepos, clean: Boolean) {
     val flyway = Flyway.configure()
         .dataSource(drinkiRepos.ds)
         .schemas("drinki")
-        .locations("classpath:db/migration")
+        .locations("classpath:db/migration/drinki")
         .defaultSchema("drinki")
         .createSchemas(true)
         .cleanDisabled(!clean)

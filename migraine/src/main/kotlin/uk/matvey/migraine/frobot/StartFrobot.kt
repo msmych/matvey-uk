@@ -19,7 +19,7 @@ private val log = KotlinLogging.logger("frobot")
 fun startFrobot(config: Config) {
     val bot = TelegramBot(config.getString("frobot.token"))
     val ds = dataSource(config)
-    migrate(ds, true)
+    migrate(ds, System.getenv("CLEAN_DB") == "true")
     val repo = Repo(ds)
     val frobotRepo = FrobotRepo(repo)
     val handleMessageWithLowBattery = HandleMessageWithLowBattery(frobotRepo, bot)

@@ -2,6 +2,7 @@ package uk.matvey.migraine.frobot
 
 import kotlinx.serialization.Serializable
 import uk.matvey.migraine.frobot.Frobot.State.BATTERY_LOW
+import java.time.Instant
 import java.util.UUID
 import java.util.UUID.randomUUID
 
@@ -9,6 +10,8 @@ data class Frobot(
     val id: UUID,
     val state: State,
     val tg: Tg,
+    val createdAt: Instant,
+    val updatedAt: Instant,
 ) {
     
     enum class State {
@@ -38,7 +41,8 @@ data class Frobot(
         
         fun frobot(userId: Long): Frobot {
             val id = randomUUID()
-            return Frobot(id, BATTERY_LOW, Tg(userId,null))
+            val now = Instant.now()
+            return Frobot(id, BATTERY_LOW, Tg(userId,null), now, now)
         }
     }
 }
