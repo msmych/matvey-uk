@@ -1,11 +1,10 @@
 package uk.matvey.app
 
+import uk.matvey.migraine.frobot.startFrobot
+
 fun main(args: Array<String>) {
-    val config = AppConfig.load("matvey-app", args.getOrElse(0) { "local" })
-//    val ds = dataSource(drinkiBotConfig)
-//    val drinkiRepos = DrinkiRepos(ds)
-//    val accountService = AccountService(drinkiRepos.accountRepo)
-//    val drinkService = DrinkService(drinkiRepos.drinkRepo, drinkiRepos.ingredientRepo)
-//    startDrinkiBot(drinkiBotConfig, drinkiRepos, accountService, drinkService)
+    val env = args.getOrElse(0) { "local" }
+    val config = AppConfig.load("matvey-app", env)
+    startFrobot(AppConfig.load("frobot-prod.conf", env))
     startServer(config, true)
 }
