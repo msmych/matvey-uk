@@ -33,7 +33,7 @@ fun startBot(config: Config) {
                 val (command, _) = rq.command()
                 
                 if (command == "start") {
-                    bot.execute(SendMessage(rq.userId(), "Hello!"))
+                    bot.execute(SendMessage(rq.userId(), "Ciao"))
                 }
                 
                 if (command == "wishlist") {
