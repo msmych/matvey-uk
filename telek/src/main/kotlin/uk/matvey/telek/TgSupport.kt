@@ -2,10 +2,12 @@ package uk.matvey.telek
 
 object TgSupport {
     
-    fun escapeSpecial(s: String): String {
-        return s
+    fun String.tgEscape(): String {
+        return this
             .replace(".", "\\.")
             .replace("!", "\\!")
             .replace("-", "\\-")
+            .replace("(", "\\(")
+            .replace(")", "\\)")
     }
 }

@@ -9,7 +9,7 @@ import uk.matvey.telek.Emoji.COCKTAIL
 import uk.matvey.telek.Emoji.DELETE
 import uk.matvey.telek.Emoji.EDIT
 import uk.matvey.telek.Emoji.NONE
-import uk.matvey.telek.TgSupport.escapeSpecial
+import uk.matvey.telek.TgSupport.tgEscape
 
 object DrinkTg {
     
@@ -18,19 +18,19 @@ object DrinkTg {
     }
     
     fun drinkRecipe(recipe: String?): String {
-        return recipe?.let { ">$it" } ?: "Recipe: $NONE"
+        return recipe?.let { ">${it.tgEscape()}" } ?: "Recipe: $NONE"
     }
     
     fun drinkDetailsText(drink: DrinkDetails): String {
         val title = drinkTitle(drink.name())
         val ingredientsText = "\n\n" + if (drink.ingredients.isNotEmpty()) {
             drink.ingredients
-                .map { (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}" }
+                .map { (ingredient, amount) -> "- ${amount.label()} ${ingredient.name}".tgEscape() }
                 .joinToString("\n")
         } else {
             "Ingredients: $NONE"
         }
-        return escapeSpecial(title + ingredientsText + "\n\n" + drinkRecipe(drink.recipe()))
+        return title.tgEscape() + ingredientsText + "\n\n" + drinkRecipe(drink.recipe())
     }
     
     fun drinkActionsKeyboard(drink: DrinkDetails): InlineKeyboardMarkup {
