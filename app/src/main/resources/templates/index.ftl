@@ -20,7 +20,11 @@
     <div id="main-content" class="v-stack gap-16">
         <h2>👋 Hi there</h2>
         <div>
-            My name is Matvey. I'm a software engineer.
+            My name is Matvey.
+            Not much is going on here yet, but I'll be adding more thing over time.
+        </div>
+        <div>
+            I'm a software engineer.
             Check out <a href="#" hx-get="/tech" hx-target="#main-content">tech page</a> to learn more.
         </div>
     </div>

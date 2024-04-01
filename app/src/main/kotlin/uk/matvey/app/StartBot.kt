@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.request.SendMessage
 import com.typesafe.config.Config
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
+import uk.matvey.app.wishlist.WishlistItem.State
 import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.app.wishlist.WishlistTg
 import uk.matvey.postal.Repo
@@ -50,7 +51,9 @@ fun startBot(config: Config) {
                     if (queryCommand == "wishlist_item_lock_toggle") {
                         val itemId = UUID.fromString(queryCommandArgs.first())
                         val item = wishlistRepo.findById(itemId)!!
-                        wishlistRepo.update(item.toggleLock(rq.userId()))
+                        if (item.state == State.WANTED || item.state == State.LOCKED && item.tg.lockedBy == rq.userId()) {
+                            wishlistRepo.update(item.toggleLock(rq.userId()))
+                        }
                         val items = wishlistRepo.findAllActive()
                         val text = WishlistTg.wishlistMessageText(items)
                         val markup = WishlistTg.lockableWishlistItemsMarkup(items, rq.userId())
