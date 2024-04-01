@@ -30,6 +30,7 @@ jobs:
               -e JKS_PASS=${{ secrets.JKS_PASS }} \
               -e DB_HOST="jdbc:postgresql://matvey-pg.cv3jxdawbqpx.eu-west-2.rds.amazonaws.com:5432/postgres" \
               -e DB_PASS=${{ secrets.DB_PASS }} \
+              -e MATVEY_BOT_TOKEN=${{ secrets.MATVEY_BOT_TOKEN }} \
               -e FROBOT_TOKEN=${{ secrets.FROBOT_TOKEN }} \
               -p 443:8443 \
               ${{ env.IMAGE }}

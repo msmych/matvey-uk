@@ -44,4 +44,14 @@ class ResultExtractor(private val resultSet: ResultSet) {
     }
     
     fun jsonb(name: String) = requireNotNull(jsonbOrNull(name))
+    
+    fun stringListOrNull(name: String): List<String>? {
+        val arr = this.resultSet.getArray(name)
+        return arr
+            .takeUnless { this.resultSet.wasNull() }
+            ?.array
+            ?.let { it as Array<String> }?.toList()
+    }
+    
+    fun stringList(name: String): Collection<String> = requireNotNull(stringListOrNull(name))
 }

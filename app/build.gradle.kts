@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":drinki"))
     implementation(project(":drinki:bot"))
     implementation(project(":migraine"))
+    implementation(project(":telek"))
     
     testImplementation("io.ktor:ktor-client-cio")
 }

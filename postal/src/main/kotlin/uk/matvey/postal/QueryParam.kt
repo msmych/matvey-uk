@@ -54,4 +54,15 @@ interface QueryParam {
             st.setObject(index, pgObj)
         }
     }
+    
+    class TextArrayParam(private val value: Collection<String>?) : QueryParam {
+        override fun setValue(st: PreparedStatement, index: Int) {
+            this.value?.let {
+                st.connection.let { conn ->
+                    val arr = conn.createArrayOf("text", it.toTypedArray())
+                    st.setArray(index, arr)
+                }
+            } ?: st.setNull(index, Types.ARRAY)
+        }
+    }
 }
