@@ -1,5 +1,7 @@
 package uk.matvey.app.wishlist
 
+import uk.matvey.app.wishlist.WishlistItem.Priority
+import uk.matvey.app.wishlist.WishlistItem.State
 import uk.matvey.app.wishlist.WishlistSql.CREATED_AT
 import uk.matvey.app.wishlist.WishlistSql.DESCRIPTION
 import uk.matvey.app.wishlist.WishlistSql.ID
@@ -14,6 +16,7 @@ import uk.matvey.postal.QueryParam.TextParam
 import uk.matvey.postal.QueryParam.TimestampParam
 import uk.matvey.postal.QueryParams
 import uk.matvey.postal.Repo
+import java.net.URI
 
 class WishlistRepo(private val repo: Repo) {
     
@@ -30,5 +33,23 @@ class WishlistRepo(private val repo: Repo) {
                 .add(CREATED_AT, TimestampParam(wishlistItem.createdAt))
                 .add(UPDATED_AT, TimestampParam(wishlistItem.updatedAt))
         )
+    }
+    
+    fun findAllWanted(): List<WishlistItem> {
+        return repo.select(
+            "select * from $WISHLIST where $STATE = 'WANTED' order by $CREATED_AT desc",
+            QueryParams(),
+        ) { ex ->
+            WishlistItem(
+                id = ex.uuid(ID),
+                name = ex.string(NAME),
+                state = State.valueOf(ex.string(STATE)),
+                priority = Priority.valueOf(ex.string(PRIORITY)),
+                description = ex.stringOrNull(DESCRIPTION),
+                url = ex.stringOrNull(URL)?.let(::URI),
+                createdAt = ex.instant(CREATED_AT),
+                updatedAt = ex.instant(UPDATED_AT),
+            )
+        }
     }
 }

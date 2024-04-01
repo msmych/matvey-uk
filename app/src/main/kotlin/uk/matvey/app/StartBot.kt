@@ -2,7 +2,9 @@ package uk.matvey.app
 
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
+import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
 import com.pengrad.telegrambot.request.AnswerCallbackQuery
+import com.pengrad.telegrambot.request.SendMessage
 import com.typesafe.config.Config
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
@@ -10,6 +12,7 @@ import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.postal.Repo
 import uk.matvey.postal.dataSource
 import uk.matvey.telek.TgRequest
+import uk.matvey.telek.TgSupport.escapeSpecial
 import javax.sql.DataSource
 
 private val log = KotlinLogging.logger("matvey-bot")
@@ -24,6 +27,26 @@ fun startBot(config: Config) {
         updates.forEach { update ->
             try {
                 val rq = TgRequest(update)
+                
+                val (command, _) = rq.command()
+                
+                if (command == "start") {
+                    bot.execute(SendMessage(rq.userId(), "Hello!"))
+                }
+                
+                if (command == "wishlist") {
+                    val items = wishlistRepo.findAllWanted()
+                    val text = "*Wishlist*\n\n" + items.joinToString("\n") {
+                        "\\* " + if (it.url != null) {
+                            "[${it.name}](${it.url})"
+                        } else {
+                            it.name
+                        } + (it.description?.let { description -> "\n$description" } ?: "")
+                    }
+                    val result = bot.execute(SendMessage(rq.userId(), escapeSpecial(text)).parseMode(MarkdownV2))
+                    log.warn { result }
+                }
+                
                 if (rq.isCallbackQuery()) {
                     bot.execute(AnswerCallbackQuery(rq.callbackQueryId()))
                 }
