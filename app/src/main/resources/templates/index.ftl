@@ -21,7 +21,7 @@
         <h2>👋 Hi there</h2>
         <div>
             My name is Matvey.
-            Not much is going on here yet, but I'll be adding more thing over time.
+            Not much is going on here yet, but I'll be adding more things over time.
         </div>
         <div>
             I'm a software engineer.
