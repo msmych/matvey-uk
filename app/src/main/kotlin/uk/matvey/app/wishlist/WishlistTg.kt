@@ -9,15 +9,25 @@ import uk.matvey.telek.TgSupport.tgEscape
 object WishlistTg {
     
     fun wishlistMessageText(items: List<WishlistItem>): String {
-        val text = "*Wishlist*\n\n" + items.joinToString("\n") { item ->
+        val (lockable, nonLockable) = items.partition { it.tags.contains(Tag.LOCKABLE) }
+        val text = "*Wishlist*\n" +
+            ((
+            "\nHere are some things I would love to receive as a gift".tgEscape() +
+            " (you can lock some of them using buttons below):".tgEscape() +
+            "\n" + lockable.joinToString("\n") { item ->
             "- ".tgEscape() + (if (item.state == State.LOCKED) {
                 "🔒"
             } else {
                 ""
             }) +
-                (item.url?.let { "[${item.name.tgEscape()}](${it.toString().tgEscape()})" } ?: item.name) +
-                (item.description?.let { description -> "\n${description.tgEscape()}" } ?: "")
-        }
+                (item.url?.let { "[*${item.name.tgEscape()}*](${it.toString().tgEscape()})" } ?: item.name) +
+                (item.description?.let { description -> ". $description".tgEscape() } ?: "")
+        }).takeIf { lockable.isNotEmpty() } ?: "") + "\n" + (("\n" + ("Also ".takeIf { lockable.isNotEmpty() } ?: "") + "I'm always happy to receive any of the following:\n".tgEscape() +
+            nonLockable.joinToString("\n") { item ->
+                "- ".tgEscape() +
+                    (item.url?.let { "[*${item.name.tgEscape()}*](${it.toString().tgEscape()})" } ?: item.name) +
+                    (item.description?.let { description -> ". $description".tgEscape() } ?: "")
+            }).takeIf { nonLockable.isNotEmpty() } ?: "")
         return text
     }
     
