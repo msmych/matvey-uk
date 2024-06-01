@@ -23,7 +23,7 @@ class Repo(
         conditionParams: List<QueryParam> = listOf(),
     ) {
         val setting = params.joinToString { "${it.first} = ?" }
-        val query = "UPDATE $tableName SET $setting" + (condition?.let { " $it" } ?: "")
+        val query = "UPDATE $tableName SET $setting" + (condition?.let { " WHERE $it" } ?: "")
         dataAccess.withStatement(query) { statement ->
             setParams(statement, params.map { it.second } + conditionParams)
             statement.executeUpdate()
@@ -35,7 +35,7 @@ class Repo(
         condition: String? = null,
         conditionParams: List<QueryParam> = listOf()
     ) {
-        val query = "DELETE FROM $tableName" + (condition?.let { " $it" } ?: "")
+        val query = "DELETE FROM $tableName" + (condition?.let { " WHERE $it" } ?: "")
         dataAccess.withStatement(query) { statement ->
             setParams(statement, conditionParams)
             statement.executeUpdate()

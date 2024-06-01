@@ -24,7 +24,7 @@ class RepoTest : FunctionalTestSetup() {
     fun setup() {
         val dataAccess = DataAccess(dataSource())
         repo = Repo(dataAccess)
-        dataAccess.update(
+        dataAccess.execute(
             """
                 CREATE TABLE IF NOT EXISTS test (
                     id UUID NULL,
@@ -176,5 +176,67 @@ class RepoTest : FunctionalTestSetup() {
         
         // then
         assertThat(result6).isNull()
+    }
+    
+    @Test
+    fun `should update records`() {
+        // given
+        val id = randomUUID()
+        repo.insert(
+            "test",
+            "id" to uuid(id),
+            "name" to text(name),
+            "created_at" to timestamp(createdAt),
+            "details" to jsonb(details),
+            "tags" to textArray(tags),
+        )
+        
+        // when
+        val newDetails = """{"key": "value2"}"""
+        val newTags = listOf("tag3", "tag4")
+        repo.update(
+            "test",
+            listOf(
+                "details" to jsonb(newDetails),
+                "tags" to textArray(newTags),
+            ),
+            "id = ?",
+            listOf(uuid(id))
+        )
+        
+        // then
+        val result = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
+            mapOf(
+                "details" to reader.string("details"),
+                "tags" to reader.stringList("tags")
+            )
+        }
+        
+        assertThat(result["details"]).isEqualTo(newDetails)
+        assertThat(result["tags"]).isEqualTo(newTags)
+    }
+    
+    @Test
+    fun `should delete records`() {
+        // given
+        val id = randomUUID()
+        repo.insert(
+            "test",
+            "id" to uuid(id),
+            "name" to text(name),
+            "created_at" to timestamp(createdAt),
+            "details" to jsonb(details),
+            "tags" to textArray(tags),
+        )
+        
+        // when
+        repo.delete("test", "id = ?", listOf(uuid(id)))
+        
+        // then
+        val result = repo.select("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
+            reader.uuid("id")
+        }
+        
+        assertThat(result).isEmpty()
     }
 }

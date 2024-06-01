@@ -8,7 +8,7 @@ class DataAccess(
     private val dataSource: DataSource,
 ) {
     
-    fun update(query: String) {
+    fun execute(query: String) {
         withStatement(query, PreparedStatement::executeUpdate)
     }
     
