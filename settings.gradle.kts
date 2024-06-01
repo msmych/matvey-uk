@@ -8,5 +8,6 @@ include(
     "drinki:bot",
     "migraine",
     "postal",
+    "shkaf",
     "telek",
 )
