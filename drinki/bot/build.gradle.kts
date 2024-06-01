@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
+    implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:1.4.3")
     
     implementation(project(":dukt"))
-    implementation(project(":postal"))
     implementation(project(":telek"))
     implementation(project(":drinki"))
 }

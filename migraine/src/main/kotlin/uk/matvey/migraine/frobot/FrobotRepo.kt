@@ -8,13 +8,12 @@ import uk.matvey.migraine.frobot.FrobotSql.ID
 import uk.matvey.migraine.frobot.FrobotSql.STATE
 import uk.matvey.migraine.frobot.FrobotSql.TG
 import uk.matvey.migraine.frobot.FrobotSql.UPDATED_AT
-import uk.matvey.postal.QueryParam.JsonbParam
-import uk.matvey.postal.QueryParam.TextParam
-import uk.matvey.postal.QueryParam.TimestampParam
-import uk.matvey.postal.QueryParam.UuidParam
-import uk.matvey.postal.QueryParams
-import uk.matvey.postal.Repo
-import uk.matvey.postal.ResultExtractor
+import uk.matvey.slon.QueryParam.Companion.jsonb
+import uk.matvey.slon.QueryParam.Companion.text
+import uk.matvey.slon.QueryParam.Companion.timestamp
+import uk.matvey.slon.QueryParam.Companion.uuid
+import uk.matvey.slon.RecordReader
+import uk.matvey.slon.Repo
 import java.time.Instant
 import java.util.UUID
 
@@ -24,30 +23,35 @@ class FrobotRepo(
     
     fun add(frobot: Frobot) {
         repo.insert(
-            FROBOT, QueryParams()
-                .add(ID, UuidParam(frobot.id))
-                .add(STATE, TextParam(frobot.state.name))
-                .add(TG, JsonbParam(JSON.encodeToString(frobot.tg)))
-                .add(CREATED_AT, TimestampParam(frobot.createdAt))
-                .add(UPDATED_AT, TimestampParam(frobot.updatedAt))
+            FROBOT,
+            ID to uuid(frobot.id),
+            STATE to text(frobot.state.name),
+            TG to jsonb(JSON.encodeToString(frobot.tg)),
+            CREATED_AT to timestamp(frobot.createdAt),
+            UPDATED_AT to timestamp(frobot.updatedAt),
         )
     }
     
     fun update(frobot: Frobot) {
         repo.update(
-            FROBOT, QueryParams()
-                .add(STATE, TextParam(frobot.state.name))
-                .add(TG, JsonbParam(JSON.encodeToString(frobot.tg)))
-                .add(UPDATED_AT, TimestampParam(Instant.now())),
+            FROBOT,
+            listOf(
+                STATE to text(frobot.state.name),
+                TG to jsonb(JSON.encodeToString(frobot.tg)),
+                UPDATED_AT to timestamp(Instant.now())
+            ),
             "$ID = ? and $UPDATED_AT = ?",
-            QueryParams().add(ID, UuidParam(frobot.id)).add(UPDATED_AT, TimestampParam(frobot.updatedAt))
+            listOf(
+                uuid(frobot.id),
+                timestamp(frobot.updatedAt)
+            )
         )
     }
     
     fun get(id: UUID): Frobot {
         return repo.select(
             "select * from $FROBOT where $ID = ?",
-            QueryParams().add(ID, UuidParam(id)),
+            listOf(uuid(id)),
             ::frobotFrom
         )
             .single()
@@ -56,19 +60,19 @@ class FrobotRepo(
     fun findByTgUserId(userId: Long): Frobot? {
         return repo.select(
             "select * from $FROBOT where $TG ->> 'userId' = ?",
-            QueryParams().add("tgUserId", TextParam(userId.toString())),
+            listOf(text(userId.toString())),
             ::frobotFrom
         )
             .singleOrNull()
     }
     
-    private fun frobotFrom(ex: ResultExtractor): Frobot {
+    private fun frobotFrom(reader: RecordReader): Frobot {
         return Frobot(
-            id = ex.uuid(ID),
-            tg = JSON.decodeFromString(ex.jsonb(TG)),
-            state = Frobot.State.valueOf(ex.string(STATE)),
-            createdAt = ex.instant(CREATED_AT),
-            updatedAt = ex.instant(UPDATED_AT),
+            id = reader.uuid(ID),
+            tg = JSON.decodeFromString(reader.string(TG)),
+            state = Frobot.State.valueOf(reader.string(STATE)),
+            createdAt = reader.instant(CREATED_AT),
+            updatedAt = reader.instant(UPDATED_AT),
         )
     }
 }

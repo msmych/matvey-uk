@@ -8,15 +8,17 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-server-freemarker")
     implementation("io.ktor:ktor-network-tls-certificates")
+    implementation("org.flywaydb:flyway-core:9.22.3")
+    implementation("com.zaxxer:HikariCP:5.1.0")
     
     implementation("com.typesafe:config:1.4.3")
     
     implementation(project(":dukt"))
-    implementation(project(":postal"))
     implementation(project(":drinki"))
     implementation(project(":drinki:bot"))
     implementation(project(":migraine"))
     implementation(project(":telek"))
+    implementation(project(":slon"))
     
     testImplementation("io.ktor:ktor-client-cio")
 }
