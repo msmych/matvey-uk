@@ -1,4 +1,4 @@
-package uk.matvey.shkaf
+package uk.matvey.slon
 
 import java.sql.Connection
 import java.sql.PreparedStatement

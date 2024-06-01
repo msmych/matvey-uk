@@ -10,12 +10,11 @@ import uk.matvey.drinki.ingredient.IngredientSql.NAME
 import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
-import uk.matvey.postal.QueryParam.TextParam
-import uk.matvey.postal.QueryParam.TimestampParam
-import uk.matvey.postal.QueryParam.UuidParam
-import uk.matvey.postal.QueryParams
-import uk.matvey.postal.Repo
-import uk.matvey.postal.ResultExtractor
+import uk.matvey.slon.QueryParam.Companion.text
+import uk.matvey.slon.QueryParam.Companion.timestamp
+import uk.matvey.slon.QueryParam.Companion.uuid
+import uk.matvey.slon.RecordReader
+import uk.matvey.slon.Repo
 import java.util.UUID
 
 class IngredientRepo(
@@ -25,32 +24,29 @@ class IngredientRepo(
     fun add(ingredient: Ingredient) {
         repo.insert(
             INGREDIENTS,
-            QueryParams()
-                .add(ID, UuidParam(ingredient.id))
-                .add(ACCOUNT_ID, UuidParam(ingredient.accountId))
-                .add(TYPE, TextParam(ingredient.type?.name))
-                .add(NAME, TextParam(ingredient.name))
-                .add(VISIBILITY, TextParam(ingredient.visibility.name))
-                .add(CREATED_AT, TimestampParam(ingredient.createdAt))
-                .add(UPDATED_AT, TimestampParam(ingredient.updatedAt))
+            ID to uuid(ingredient.id),
+            ACCOUNT_ID to uuid(ingredient.accountId),
+            TYPE to text(ingredient.type?.name),
+            NAME to text(ingredient.name),
+            VISIBILITY to text(ingredient.visibility.name),
+            CREATED_AT to timestamp(ingredient.createdAt),
+            UPDATED_AT to timestamp(ingredient.updatedAt),
         )
     }
     
     fun update(ingredient: Ingredient) {
         repo.update(
             INGREDIENTS,
-            QueryParams()
-                .add(NAME, TextParam(ingredient.name)),
+            listOf(NAME to text(ingredient.name)),
             "$ID = ?",
-            QueryParams()
-                .add(ID, UuidParam(ingredient.id))
+            listOf(uuid(ingredient.id))
         )
     }
     
     fun get(ingredientId: UUID): Ingredient {
         return repo.select(
             "select * from $INGREDIENTS where $ID = ?",
-            QueryParams().add(ID, UuidParam(ingredientId)),
+            listOf(uuid(ingredientId)),
             ::ingredient
         ).single()
     }
@@ -59,9 +55,7 @@ class IngredientRepo(
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
         return repo.select(
             "select * from $INGREDIENTS where $accountIdCondition order by $TYPE nulls last, $NAME",
-            QueryParams().apply {
-                accountId?.let { add(ACCOUNT_ID, UuidParam(it)) }
-            },
+            listOfNotNull(accountId?.let { uuid(it) }),
             ::ingredient
         )
     }
@@ -79,21 +73,20 @@ class IngredientRepo(
                 from ${DrinkSql.DRINKS} where ${DrinkSql.ID} = ?
             )
             """.trimIndent(),
-            QueryParams()
-                .add(DrinkSql.ID, UuidParam(drinkId)),
+            listOf(uuid(drinkId)),
             ::ingredient
         )
     }
     
-    private fun ingredient(ex: ResultExtractor): Ingredient {
+    private fun ingredient(reader: RecordReader): Ingredient {
         return Ingredient(
-            ex.uuid(ID),
-            ex.uuidOrNull(ACCOUNT_ID),
-            ex.stringOrNull(TYPE)?.let(Ingredient.Type::valueOf),
-            ex.string(NAME),
-            Visibility.valueOf(ex.string(VISIBILITY)),
-            ex.instant(CREATED_AT),
-            ex.instant(UPDATED_AT),
+            reader.uuid(ID),
+            reader.nullableUuid(ACCOUNT_ID),
+            reader.nullableString(TYPE)?.let(Ingredient.Type::valueOf),
+            reader.string(NAME),
+            Visibility.valueOf(reader.string(VISIBILITY)),
+            reader.instant(CREATED_AT),
+            reader.instant(UPDATED_AT),
         )
     }
 }

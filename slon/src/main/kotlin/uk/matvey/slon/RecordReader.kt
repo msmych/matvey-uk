@@ -1,4 +1,4 @@
-package uk.matvey.shkaf
+package uk.matvey.slon
 
 import java.sql.ResultSet
 import java.util.UUID

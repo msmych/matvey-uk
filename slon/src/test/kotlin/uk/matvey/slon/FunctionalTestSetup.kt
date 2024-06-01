@@ -1,4 +1,4 @@
-package uk.matvey.shkaf
+package uk.matvey.slon
 
 import com.zaxxer.hikari.HikariDataSource
 import org.junit.jupiter.api.AfterAll
@@ -17,7 +17,7 @@ open class FunctionalTestSetup {
         
         @BeforeAll
         @JvmStatic
-        fun setup() {
+        fun globalSetup() {
             postgres.start()
             dataSource = HikariDataSource().apply {
                 jdbcUrl = postgres.jdbcUrl
@@ -28,7 +28,7 @@ open class FunctionalTestSetup {
         
         @AfterAll
         @JvmStatic
-        fun teardown() {
+        fun globalTeardown() {
             postgres.stop()
         }
     }

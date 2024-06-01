@@ -1,25 +1,32 @@
-package uk.matvey.shkaf
+package uk.matvey.slon
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import uk.matvey.shkaf.QueryParam.Companion.jsonb
-import uk.matvey.shkaf.QueryParam.Companion.text
-import uk.matvey.shkaf.QueryParam.Companion.textArray
-import uk.matvey.shkaf.QueryParam.Companion.timestamp
-import uk.matvey.shkaf.QueryParam.Companion.uuid
+import uk.matvey.slon.QueryParam.Companion.jsonb
+import uk.matvey.slon.QueryParam.Companion.text
+import uk.matvey.slon.QueryParam.Companion.textArray
+import uk.matvey.slon.QueryParam.Companion.timestamp
+import uk.matvey.slon.QueryParam.Companion.uuid
 import java.time.Instant
 import java.util.UUID.randomUUID
 
 class RepoTest : FunctionalTestSetup() {
     
-    @Test
-    fun `should insert records`() {
-        // given
+    private lateinit var repo: Repo
+    
+    private val name = "name"
+    private val createdAt = Instant.now()
+    private val details = """{"key": "value"}"""
+    private val tags = listOf("tag1", "tag2")
+    
+    @BeforeEach
+    fun setup() {
         val dataAccess = DataAccess(dataSource())
-        val repo = Repo(dataAccess)
+        repo = Repo(dataAccess)
         dataAccess.update(
             """
-                CREATE TABLE test (
+                CREATE TABLE IF NOT EXISTS test (
                     id UUID NULL,
                     name TEXT NULL,
                     created_at TIMESTAMP NULL,
@@ -28,13 +35,12 @@ class RepoTest : FunctionalTestSetup() {
                 )
                 """.trimIndent()
         )
-        
+    }
+    
+    @Test
+    fun `should insert records`() {
+        // given
         val id = randomUUID()
-        val name = "name"
-        val createdAt = Instant.now()
-        val details = """{"key": "value"}"""
-        val tags = listOf("tag1", "tag2")
-        
         repo.insert(
             "test",
             "id" to uuid(id),
@@ -45,7 +51,7 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result = repo.select("SELECT * FROM test WHERE id = ?", uuid(id)) { reader ->
+        val result = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
             mapOf(
                 "id" to reader.uuid("id"),
                 "name" to reader.string("name"),
@@ -61,7 +67,10 @@ class RepoTest : FunctionalTestSetup() {
         assertThat(result["createdAt"]).isEqualTo(createdAt)
         assertThat(result["details"]).isEqualTo(details)
         assertThat(result["tags"]).isEqualTo(tags)
-        
+    }
+    
+    @Test
+    fun `should insert NULL to UUID column`() {
         // given
         repo.insert(
             "test",
@@ -73,18 +82,21 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result2 = repo.select("SELECT * FROM test WHERE name = ?", text("name2")) { reader ->
+        val result2 = repo.selectSingle("SELECT * FROM test WHERE name = ?", listOf(text("name2"))) { reader ->
             reader.nullableUuid("id")
         }
         
         // then
         assertThat(result2).isNull()
-        
+    }
+    
+    @Test
+    fun `should insert NULL to TEXT column`() {
         // given
-        val id3 = randomUUID()
+        val id = randomUUID()
         repo.insert(
             "test",
-            "id" to uuid(id3),
+            "id" to uuid(id),
             "name" to text(null),
             "created_at" to timestamp(createdAt),
             "details" to jsonb(details),
@@ -92,18 +104,21 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result3 = repo.select("SELECT * FROM test WHERE id = ?", uuid(id3)) { reader ->
+        val result3 = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
             reader.nullableString("name")
         }
         
         // then
         assertThat(result3).isNull()
-        
+    }
+    
+    @Test
+    fun `should insert NULL to TIMESTAMP column`() {
         // given
-        val id4 = randomUUID()
+        val id = randomUUID()
         repo.insert(
             "test",
-            "id" to uuid(id4),
+            "id" to uuid(id),
             "name" to text(name),
             "created_at" to timestamp(null),
             "details" to jsonb(details),
@@ -111,18 +126,21 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result4 = repo.select("SELECT * FROM test WHERE id = ?", uuid(id4)) { reader ->
+        val result4 = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
             reader.nullableInstant("created_at")
         }
         
         // then
         assertThat(result4).isNull()
-        
+    }
+    
+    @Test
+    fun `should insert NULL to JSONB column`() {
         // given
-        val id5 = randomUUID()
+        val id = randomUUID()
         repo.insert(
             "test",
-            "id" to uuid(id5),
+            "id" to uuid(id),
             "name" to text(name),
             "created_at" to timestamp(createdAt),
             "details" to jsonb(null),
@@ -130,18 +148,21 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result5 = repo.select("SELECT * FROM test WHERE id = ?", uuid(id5)) { reader ->
+        val result5 = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
             reader.nullableString("details")
         }
         
         // then
         assertThat(result5).isNull()
-        
+    }
+    
+    @Test
+    fun `should insert NULL to ARRAY column`() {
         // given
-        val id6 = randomUUID()
+        val id = randomUUID()
         repo.insert(
             "test",
-            "id" to uuid(id6),
+            "id" to uuid(id),
             "name" to text(name),
             "created_at" to timestamp(createdAt),
             "details" to jsonb(details),
@@ -149,7 +170,7 @@ class RepoTest : FunctionalTestSetup() {
         )
         
         // when
-        val result6 = repo.select("SELECT * FROM test WHERE id = ?", uuid(id6)) { reader ->
+        val result6 = repo.selectSingle("SELECT * FROM test WHERE id = ?", listOf(uuid(id))) { reader ->
             reader.nullableStringList("tags")
         }
         

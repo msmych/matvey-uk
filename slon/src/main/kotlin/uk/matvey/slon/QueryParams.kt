@@ -1,11 +1,11 @@
-package uk.matvey.shkaf
+package uk.matvey.slon
 
 import org.postgresql.util.PGobject
-import uk.matvey.shkaf.QueryParam.Type.JSONB
-import uk.matvey.shkaf.QueryParam.Type.TEXT
-import uk.matvey.shkaf.QueryParam.Type.TEXT_ARRAY
-import uk.matvey.shkaf.QueryParam.Type.TIMESTAMP
-import uk.matvey.shkaf.QueryParam.Type.UUID
+import uk.matvey.slon.QueryParam.Type.JSONB
+import uk.matvey.slon.QueryParam.Type.TEXT
+import uk.matvey.slon.QueryParam.Type.TEXT_ARRAY
+import uk.matvey.slon.QueryParam.Type.TIMESTAMP
+import uk.matvey.slon.QueryParam.Type.UUID
 import java.sql.PreparedStatement
 import java.sql.Timestamp
 import java.sql.Types.NULL
