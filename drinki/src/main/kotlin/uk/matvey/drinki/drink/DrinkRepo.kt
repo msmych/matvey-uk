@@ -21,58 +21,67 @@ import uk.matvey.slon.QueryParam.Companion.jsonb
 import uk.matvey.slon.QueryParam.Companion.text
 import uk.matvey.slon.QueryParam.Companion.timestamp
 import uk.matvey.slon.QueryParam.Companion.uuid
-import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
+import uk.matvey.slon.command.Delete.Builder.Companion.delete
+import uk.matvey.slon.command.Insert.Builder.Companion.insert
+import uk.matvey.slon.command.Update.Builder.Companion.update
+import uk.matvey.slon.query.RecordReader
 import java.util.UUID
 
 class DrinkRepo(
     private val repo: Repo,
 ) {
-    
+
     fun add(drink: Drink) {
-        repo.insert(
-            DRINKS,
-            ID to uuid(drink.id),
-            ACCOUNT_ID to uuid(drink.accountId),
-            NAME to text(drink.name),
-            INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
-            RECIPE to text(drink.recipe),
-            VISIBILITY to text(drink.visibility.name),
-            CREATED_AT to timestamp(drink.createdAt),
-            UPDATED_AT to timestamp(drink.updatedAt),
+        repo.execute(
+            insert(DRINKS)
+                .values(
+                    ID to uuid(drink.id),
+                    ACCOUNT_ID to uuid(drink.accountId),
+                    NAME to text(drink.name),
+                    INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
+                    RECIPE to text(drink.recipe),
+                    VISIBILITY to text(drink.visibility.name),
+                    CREATED_AT to timestamp(drink.createdAt),
+                    UPDATED_AT to timestamp(drink.updatedAt),
+                )
         )
     }
-    
+
     fun update(drink: Drink) {
-        repo.update(
-            DRINKS,
-            listOf(
-                NAME to text(drink.name),
-                INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
-                RECIPE to text(drink.recipe),
-                VISIBILITY to text(drink.visibility.name)
-            ),
-            "$ID = ?",
-            listOf(uuid(drink.id))
+        repo.execute(
+            update(DRINKS)
+                .set(
+                    NAME to text(drink.name),
+                    INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
+                    RECIPE to text(drink.recipe),
+                    VISIBILITY to text(drink.visibility.name)
+                )
+                .where("$ID = ?", uuid(drink.id))
         )
     }
-    
+
     fun delete(id: UUID) {
-        repo.delete(DRINKS, "$ID = ?", listOf(uuid(id)))
+        repo.execute(delete(DRINKS).where("$ID = ?", uuid(id)))
     }
-    
+
     fun get(id: UUID): Drink {
-        return repo.select(
-            "select * from $DRINKS where $ID = ?",
+        return repo.query(
+            "SELECT * FROM $DRINKS WHERE $ID = ?",
             listOf(uuid(id)),
             ::drink
         )
             .single()
     }
-    
+
     fun search(accountId: UUID, query: String): List<Drink> {
-        return repo.select(
-            "select * from $DRINKS where $VISIBILITY = 'PUBLIC' or $ACCOUNT_ID = ? and $NAME ilike ? limit 64",
+        return repo.query(
+            """
+                SELECT * FROM $DRINKS 
+                WHERE $VISIBILITY = 'PUBLIC' 
+                OR $ACCOUNT_ID = ? AND $NAME ILIKE ? 
+                LIMIT 64
+                """.trimIndent(),
             listOf(
                 uuid(accountId),
                 text("%$query%")
@@ -80,7 +89,7 @@ class DrinkRepo(
             ::drink
         )
     }
-    
+
     private fun drink(reader: RecordReader) = Drink(
         reader.uuid(ID),
         reader.uuid(ACCOUNT_ID),
@@ -100,7 +109,7 @@ class DrinkRepo(
         reader.instant(CREATED_AT),
         reader.instant(UPDATED_AT),
     )
-    
+
     data class DrinkIngredientAmount(
         val drink: Drink,
         val ingredient: Ingredient,

@@ -12,60 +12,64 @@ import uk.matvey.slon.QueryParam.Companion.jsonb
 import uk.matvey.slon.QueryParam.Companion.text
 import uk.matvey.slon.QueryParam.Companion.timestamp
 import uk.matvey.slon.QueryParam.Companion.uuid
-import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
+import uk.matvey.slon.command.Insert.Builder.Companion.insert
+import uk.matvey.slon.command.Update.Builder.Companion.update
+import uk.matvey.slon.query.RecordReader
 import java.time.Instant
 import java.util.UUID
 
 class FrobotRepo(
     private val repo: Repo,
 ) {
-    
+
     fun add(frobot: Frobot) {
-        repo.insert(
-            FROBOT,
-            ID to uuid(frobot.id),
-            STATE to text(frobot.state.name),
-            TG to jsonb(JSON.encodeToString(frobot.tg)),
-            CREATED_AT to timestamp(frobot.createdAt),
-            UPDATED_AT to timestamp(frobot.updatedAt),
+        repo.execute(
+            insert(FROBOT)
+                .values(
+                    ID to uuid(frobot.id),
+                    STATE to text(frobot.state.name),
+                    TG to jsonb(JSON.encodeToString(frobot.tg)),
+                    CREATED_AT to timestamp(frobot.createdAt),
+                    UPDATED_AT to timestamp(frobot.updatedAt),
+                )
         )
     }
-    
+
     fun update(frobot: Frobot) {
-        repo.update(
-            FROBOT,
-            listOf(
-                STATE to text(frobot.state.name),
-                TG to jsonb(JSON.encodeToString(frobot.tg)),
-                UPDATED_AT to timestamp(Instant.now())
-            ),
-            "$ID = ? and $UPDATED_AT = ?",
-            listOf(
-                uuid(frobot.id),
-                timestamp(frobot.updatedAt)
-            )
+        repo.execute(
+            update(FROBOT)
+                .set(
+                    STATE to text(frobot.state.name),
+                    TG to jsonb(JSON.encodeToString(frobot.tg)),
+                    UPDATED_AT to timestamp(Instant.now())
+                )
+                .where(
+                    "$ID = ? and $UPDATED_AT = ?",
+                    uuid(frobot.id),
+                    timestamp(frobot.updatedAt)
+                )
         )
     }
-    
+
     fun get(id: UUID): Frobot {
-        return repo.select(
-            "select * from $FROBOT where $ID = ?",
+        return repo.query(
+            "SELECT * FROM $FROBOT WHERE $ID = ?",
             listOf(uuid(id)),
             ::frobotFrom
         )
             .single()
     }
-    
+
     fun findByTgUserId(userId: Long): Frobot? {
-        return repo.select(
-            "select * from $FROBOT where $TG ->> 'userId' = ?",
+        return repo.query(
+            "SELECT * FROM $FROBOT WHERE $TG ->> 'userId' = ?",
             listOf(text(userId.toString())),
             ::frobotFrom
         )
             .singleOrNull()
     }
-    
+
     private fun frobotFrom(reader: RecordReader): Frobot {
         return Frobot(
             id = reader.uuid(ID),

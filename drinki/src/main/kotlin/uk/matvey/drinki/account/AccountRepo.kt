@@ -14,31 +14,34 @@ import uk.matvey.slon.QueryParam.Companion.text
 import uk.matvey.slon.QueryParam.Companion.timestamp
 import uk.matvey.slon.QueryParam.Companion.uuid
 import uk.matvey.slon.Repo
+import uk.matvey.slon.command.Insert.Builder.Companion.insert
+import uk.matvey.slon.command.Update.Builder.Companion.update
 
 class AccountRepo(private val repo: Repo) {
-    
+
     fun add(account: Account) {
-        repo.insert(
-            ACCOUNTS,
-            ID to uuid(account.id),
-            TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
-            CREATED_AT to timestamp(account.createdAt),
-            UPDATED_AT to timestamp(account.updatedAt),
+        repo.execute(
+            insert(ACCOUNTS)
+                .values(
+                    ID to uuid(account.id),
+                    TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
+                    CREATED_AT to timestamp(account.createdAt),
+                    UPDATED_AT to timestamp(account.updatedAt),
+                )
         )
     }
-    
+
     fun update(account: Account) {
-        repo.update(
-            ACCOUNTS,
-            listOf(TG_SESSION to jsonb(JSON.encodeToString(account.tgSession))),
-            "$ID = ?",
-            listOf(uuid(account.id)),
+        repo.execute(
+            update(ACCOUNTS)
+                .set(TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)))
+                .where("$ID = ?", uuid(account.id))
         )
     }
-    
+
     fun findByTgUserId(tgUserId: Long): Account? {
-        return repo.select(
-            "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
+        return repo.query(
+            "SELECT * FROM $ACCOUNTS WHERE $TG_SESSION ->> 'userId' = ?",
             listOf(text(tgUserId.toString()))
         ) { reader ->
             Account(
@@ -52,6 +55,6 @@ class AccountRepo(private val repo: Repo) {
         }
             .singleOrNull()
     }
-    
+
     fun getByTgUserId(tgUserId: Long): Account = requireNotNull(findByTgUserId(tgUserId))
 }

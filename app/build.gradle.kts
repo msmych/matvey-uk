@@ -10,6 +10,7 @@ dependencies {
     implementation("io.ktor:ktor-network-tls-certificates")
     implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("uk.matvey:slon:0.0.2-RC2")
     
     implementation("com.typesafe:config:1.4.3")
     
@@ -18,7 +19,6 @@ dependencies {
     implementation(project(":drinki:bot"))
     implementation(project(":migraine"))
     implementation(project(":telek"))
-    implementation(project(":slon"))
     
     testImplementation("io.ktor:ktor-client-cio")
 }
