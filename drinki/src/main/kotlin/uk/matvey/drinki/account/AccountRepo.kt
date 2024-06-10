@@ -9,39 +9,38 @@ import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
 import uk.matvey.dukt.json.JsonSetup.JSON
-import uk.matvey.slon.QueryParam.Companion.jsonb
-import uk.matvey.slon.QueryParam.Companion.text
-import uk.matvey.slon.QueryParam.Companion.timestamp
-import uk.matvey.slon.QueryParam.Companion.uuid
 import uk.matvey.slon.Repo
-import uk.matvey.slon.command.Insert.Builder.Companion.insert
-import uk.matvey.slon.command.Update.Builder.Companion.update
+import uk.matvey.slon.param.JsonbParam.Companion.jsonb
+import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.TimestampParam.Companion.timestamp
+import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 
 class AccountRepo(private val repo: Repo) {
 
     fun add(account: Account) {
-        repo.execute(
-            insert(ACCOUNTS)
-                .values(
-                    ID to uuid(account.id),
-                    TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
-                    CREATED_AT to timestamp(account.createdAt),
-                    UPDATED_AT to timestamp(account.updatedAt),
-                )
+        repo.insertOne(
+            ACCOUNTS,
+            ID to uuid(account.id),
+            TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
+            CREATED_AT to timestamp(account.createdAt),
+            UPDATED_AT to timestamp(account.updatedAt),
         )
     }
 
     fun update(account: Account) {
-        repo.execute(
-            update(ACCOUNTS)
-                .set(TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)))
-                .where("$ID = ?", uuid(account.id))
-        )
+        repo.access { a ->
+            a.execute(
+                update(ACCOUNTS)
+                    .set(TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)))
+                    .where("$ID = ?", uuid(account.id))
+            )
+        }
     }
 
     fun findByTgUserId(tgUserId: Long): Account? {
-        return repo.query(
-            "SELECT * FROM $ACCOUNTS WHERE $TG_SESSION ->> 'userId' = ?",
+        return repo.queryOneNullable(
+            "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
             listOf(text(tgUserId.toString()))
         ) { reader ->
             Account(
@@ -53,7 +52,6 @@ class AccountRepo(private val repo: Repo) {
                 reader.instant(UPDATED_AT)
             )
         }
-            .singleOrNull()
     }
 
     fun getByTgUserId(tgUserId: Long): Account = requireNotNull(findByTgUserId(tgUserId))

@@ -11,7 +11,6 @@ import org.flywaydb.core.Flyway
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
-import uk.matvey.slon.DataAccess
 import uk.matvey.slon.Repo
 import uk.matvey.telek.TgRequest
 import javax.sql.DataSource
@@ -22,7 +21,7 @@ fun startFrobot(config: Config) {
     val bot = TelegramBot(config.getString("frobot.token"))
     val ds = dataSource(config)
     migrate(ds, System.getenv("CLEAN_DB") == "true")
-    val repo = Repo(DataAccess(ds))
+    val repo = Repo(ds)
     val frobotRepo = FrobotRepo(repo)
     val handleMessageWithLowBattery = HandleMessageWithLowBattery(frobotRepo, bot)
     val rockGardenStart = RockGardenStart(frobotRepo, bot)

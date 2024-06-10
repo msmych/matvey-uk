@@ -13,64 +13,63 @@ import uk.matvey.app.wishlist.WishlistSql.UPDATED_AT
 import uk.matvey.app.wishlist.WishlistSql.URL
 import uk.matvey.app.wishlist.WishlistSql.WISHLIST
 import uk.matvey.dukt.json.JsonSetup.JSON
-import uk.matvey.slon.QueryParam.Companion.jsonb
-import uk.matvey.slon.QueryParam.Companion.text
-import uk.matvey.slon.QueryParam.Companion.textArray
-import uk.matvey.slon.QueryParam.Companion.timestamp
-import uk.matvey.slon.QueryParam.Companion.uuid
+import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
-import uk.matvey.slon.command.Insert.Builder.Companion.insert
-import uk.matvey.slon.command.Update.Builder.Companion.update
-import uk.matvey.slon.query.RecordReader
+import uk.matvey.slon.param.ArrayParam.Companion.textArray
+import uk.matvey.slon.param.JsonbParam.Companion.jsonb
+import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.TimestampParam.Companion.timestamp
+import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import java.net.URI
 import java.util.UUID
 
 class WishlistRepo(private val repo: Repo) {
 
     fun add(wishlistItem: WishlistItem) {
-        repo.execute(
-            insert(WISHLIST)
-                .values(
-                    ID to uuid(wishlistItem.id),
-                    NAME to text(wishlistItem.name),
-                    STATE to text(wishlistItem.state.name),
-                    TAGS to textArray(wishlistItem.tags.map { it.toString() }),
-                    DESCRIPTION to text(wishlistItem.description),
-                    URL to text(wishlistItem.url?.toString()),
-                    TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
-                    CREATED_AT to timestamp(wishlistItem.createdAt),
-                    UPDATED_AT to timestamp(wishlistItem.updatedAt),
-                )
+        repo.insertOne(
+            WISHLIST,
+            ID to uuid(wishlistItem.id),
+            NAME to text(wishlistItem.name),
+            STATE to text(wishlistItem.state.name),
+            TAGS to textArray(wishlistItem.tags.map { it.toString() }),
+            DESCRIPTION to text(wishlistItem.description),
+            URL to text(wishlistItem.url?.toString()),
+            TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
+            CREATED_AT to timestamp(wishlistItem.createdAt),
+            UPDATED_AT to timestamp(wishlistItem.updatedAt),
         )
     }
 
     fun update(wishlistItem: WishlistItem) {
-        repo.execute(
-            update(WISHLIST)
-                .set(
-                    NAME to text(wishlistItem.name),
-                    STATE to text(wishlistItem.state.name),
-                    TAGS to textArray(wishlistItem.tags.map { it.toString() }),
-                    DESCRIPTION to text(wishlistItem.description),
-                    URL to text(wishlistItem.url?.toString()),
-                    TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
-                    UPDATED_AT to timestamp(wishlistItem.updatedAt)
-                )
-                .where("$ID = ?", uuid(wishlistItem.id))
-        )
+        repo.access { a ->
+            a.execute(
+                update(WISHLIST)
+                    .set(
+                        NAME to text(wishlistItem.name),
+                        STATE to text(wishlistItem.state.name),
+                        TAGS to textArray(wishlistItem.tags.map { it.toString() }),
+                        DESCRIPTION to text(wishlistItem.description),
+                        URL to text(wishlistItem.url?.toString()),
+                        TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
+                        UPDATED_AT to timestamp(wishlistItem.updatedAt)
+                    )
+                    .where("$ID = ?", uuid(wishlistItem.id))
+            )
+        }
     }
 
     fun findById(id: UUID): WishlistItem? {
-        return repo.query(
-            "SELECT * FROM $WISHLIST WHERE $ID = ?",
+        return repo.queryOneNullable(
+            "select * from $WISHLIST where $ID = ?",
             listOf(uuid(id)),
             ::toWishlistItem
-        ).singleOrNull()
+        )
     }
 
     fun findAllActive(): List<WishlistItem> {
         return repo.query(
-            "SELECT * FROM $WISHLIST WHERE $STATE IN ('WANTED', 'LOCKED') ORDER BY $CREATED_AT DESC",
+            "select * from $WISHLIST where $STATE in ('WANTED', 'LOCKED') order by $CREATED_AT desc",
             listOf(),
             ::toWishlistItem
         )

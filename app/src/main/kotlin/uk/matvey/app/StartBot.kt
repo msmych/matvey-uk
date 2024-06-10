@@ -14,7 +14,6 @@ import org.flywaydb.core.Flyway
 import uk.matvey.app.wishlist.WishlistItem.State
 import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.app.wishlist.WishlistTg
-import uk.matvey.slon.DataAccess
 import uk.matvey.slon.Repo
 import uk.matvey.telek.TgRequest
 import java.util.UUID
@@ -26,7 +25,7 @@ fun startBot(config: Config) {
     val bot = TelegramBot(config.getString("bot.token"))
     val ds = dataSource(config)
     migrate(ds, System.getenv("CLEAN_DB") == "true")
-    val repo = Repo(DataAccess(ds))
+    val repo = Repo(ds)
     val wishlistRepo = WishlistRepo(repo)
     bot.setUpdatesListener { updates ->
         updates.forEach { update ->

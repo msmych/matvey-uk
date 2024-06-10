@@ -1,6 +1,8 @@
+val slonVersion: String by project
+
 dependencies {
     implementation("org.flywaydb:flyway-core:9.22.3")
-    implementation("uk.matvey:slon:0.0.2-RC2")
+    implementation("uk.matvey:slon:$slonVersion")
 
     implementation(project(":dukt"))
 }

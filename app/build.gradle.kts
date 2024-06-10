@@ -3,6 +3,9 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
+val typesafeConfigVersion: String by project
+val slonVersion: String by project
+
 dependencies {
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-netty")
@@ -10,9 +13,9 @@ dependencies {
     implementation("io.ktor:ktor-network-tls-certificates")
     implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("uk.matvey:slon:0.0.2-RC2")
+    implementation("uk.matvey:slon:$slonVersion")
     
-    implementation("com.typesafe:config:1.4.3")
+    implementation("com.typesafe:config:$typesafeConfigVersion")
     
     implementation(project(":dukt"))
     implementation(project(":drinki"))

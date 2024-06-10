@@ -13,19 +13,17 @@ import uk.matvey.drinki.drink.DrinkSql.NAME
 import uk.matvey.drinki.drink.DrinkSql.RECIPE
 import uk.matvey.drinki.drink.DrinkSql.UPDATED_AT
 import uk.matvey.drinki.drink.DrinkSql.VISIBILITY
-import uk.matvey.drinki.ingredient.Ingredient
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.dukt.json.JsonSetup.JSON
-import uk.matvey.slon.QueryParam.Companion.jsonb
-import uk.matvey.slon.QueryParam.Companion.text
-import uk.matvey.slon.QueryParam.Companion.timestamp
-import uk.matvey.slon.QueryParam.Companion.uuid
+import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
-import uk.matvey.slon.command.Delete.Builder.Companion.delete
-import uk.matvey.slon.command.Insert.Builder.Companion.insert
-import uk.matvey.slon.command.Update.Builder.Companion.update
-import uk.matvey.slon.query.RecordReader
+import uk.matvey.slon.param.JsonbParam.Companion.jsonb
+import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.TimestampParam.Companion.timestamp
+import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.update.DeleteQuery.Builder.Companion.deleteFrom
+import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import java.util.UUID
 
 class DrinkRepo(
@@ -33,18 +31,16 @@ class DrinkRepo(
 ) {
 
     fun add(drink: Drink) {
-        repo.execute(
-            insert(DRINKS)
-                .values(
-                    ID to uuid(drink.id),
-                    ACCOUNT_ID to uuid(drink.accountId),
-                    NAME to text(drink.name),
-                    INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
-                    RECIPE to text(drink.recipe),
-                    VISIBILITY to text(drink.visibility.name),
-                    CREATED_AT to timestamp(drink.createdAt),
-                    UPDATED_AT to timestamp(drink.updatedAt),
-                )
+        repo.insertOne(
+            DRINKS,
+            ID to uuid(drink.id),
+            ACCOUNT_ID to uuid(drink.accountId),
+            NAME to text(drink.name),
+            INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
+            RECIPE to text(drink.recipe),
+            VISIBILITY to text(drink.visibility.name),
+            CREATED_AT to timestamp(drink.createdAt),
+            UPDATED_AT to timestamp(drink.updatedAt),
         )
     }
 
@@ -62,25 +58,24 @@ class DrinkRepo(
     }
 
     fun delete(id: UUID) {
-        repo.execute(delete(DRINKS).where("$ID = ?", uuid(id)))
+        repo.access { a -> a.execute(deleteFrom(DRINKS).where("$ID = ?", uuid(id))) }
     }
 
     fun get(id: UUID): Drink {
-        return repo.query(
-            "SELECT * FROM $DRINKS WHERE $ID = ?",
+        return repo.queryOne(
+            "select * from $DRINKS where $ID = ?",
             listOf(uuid(id)),
             ::drink
         )
-            .single()
     }
 
     fun search(accountId: UUID, query: String): List<Drink> {
         return repo.query(
             """
-                SELECT * FROM $DRINKS 
-                WHERE $VISIBILITY = 'PUBLIC' 
-                OR $ACCOUNT_ID = ? AND $NAME ILIKE ? 
-                LIMIT 64
+                select * from $DRINKS 
+                where $VISIBILITY = 'PUBLIC' 
+                or $ACCOUNT_ID = ? and $NAME ilike ? 
+                limit 64
                 """.trimIndent(),
             listOf(
                 uuid(accountId),
@@ -108,11 +103,5 @@ class DrinkRepo(
         Visibility.valueOf(reader.string(VISIBILITY)),
         reader.instant(CREATED_AT),
         reader.instant(UPDATED_AT),
-    )
-
-    data class DrinkIngredientAmount(
-        val drink: Drink,
-        val ingredient: Ingredient,
-        val amount: Amount
     )
 }
