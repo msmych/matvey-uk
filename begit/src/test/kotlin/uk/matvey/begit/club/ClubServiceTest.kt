@@ -71,7 +71,7 @@ class ClubServiceTest : TestContainerSetup() {
         val (club, _) = clubService.ensureClub("club1", clubTgId)
 
         // when
-        clubService.addClubMember(clubTgId, memberTgId, memberName)
+        clubService.addClubMember(club.id, memberTgId, memberName)
 
         // then
         val result = repo.queryOneNullable(

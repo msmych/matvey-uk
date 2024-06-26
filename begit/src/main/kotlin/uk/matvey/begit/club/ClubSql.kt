@@ -71,13 +71,13 @@ object ClubSql {
         ) { it.int(1) } > 0
     }
 
-    fun Access.addClubMember(clubId: UUID, memberId: UUID) {
-        execute(
+    fun Access.addClubMember(clubId: UUID, memberId: UUID): Boolean {
+        return execute(
             insertInto(CLUB_MEMBERS)
                 .set(CLUB_ID to uuid(clubId), MEMBER_ID to uuid(memberId))
                 .onConflictDoNothing()
                 .build()
-        )
+        ) > 0
     }
 
     fun RecordReader.readClub(): Club {

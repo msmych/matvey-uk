@@ -24,11 +24,11 @@ create unique index if not exists clubs_tg_id_idx on clubs ((refs ->> 'tgId'));
 create table if not exists club_members
 (
     club_id   uuid not null,
-    member_id uuid not null
+    member_id uuid not null,
+    constraint club_members_pk primary key (club_id, member_id)
 );
 
 create index if not exists club_members_club_id_idx on club_members (club_id);
-create unique index if not exists club_members_club_id_member_id_idx on club_members (club_id, member_id);
 
 create table if not exists events
 (

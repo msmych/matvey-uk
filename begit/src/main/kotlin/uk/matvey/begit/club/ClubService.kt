@@ -3,9 +3,9 @@ package uk.matvey.begit.club
 import uk.matvey.begit.club.ClubSql.addClubMember
 import uk.matvey.begit.club.ClubSql.countMembers
 import uk.matvey.begit.club.ClubSql.ensureClub
-import uk.matvey.begit.club.ClubSql.getClubByTgId
 import uk.matvey.begit.member.MemberSql.ensureMember
 import uk.matvey.slon.Repo
+import java.util.UUID
 
 class ClubService(
     private val repo: Repo,
@@ -18,11 +18,10 @@ class ClubService(
         }
     }
 
-    fun addClubMember(chatId: Long, userId: Long, username: String) {
-        repo.access { a ->
+    fun addClubMember(clubId: UUID, userId: Long, username: String): Boolean {
+        return repo.access { a ->
             val member = a.ensureMember(userId, username)
-            val club = a.getClubByTgId(chatId)
-            a.addClubMember(club.id, member.id)
+            a.addClubMember(clubId, member.id)
         }
     }
 }
