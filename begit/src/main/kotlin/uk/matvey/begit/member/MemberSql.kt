@@ -19,10 +19,9 @@ object MemberSql {
     private const val REFS = "refs"
     private const val CREATED_AT = "created_at"
     private const val UPDATED_AT = "updated_at"
-
     private const val TG_ID = "($REFS ->> 'tgId')"
 
-    fun Access.addMember(chatId: Long, name: String): Member {
+    fun Access.ensureMember(chatId: Long, name: String): Member {
         return execute(
             insertInto(MEMBERS)
                 .set(

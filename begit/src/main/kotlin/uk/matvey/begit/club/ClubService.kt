@@ -4,7 +4,7 @@ import uk.matvey.begit.club.ClubSql.addClubMember
 import uk.matvey.begit.club.ClubSql.countMembers
 import uk.matvey.begit.club.ClubSql.ensureClub
 import uk.matvey.begit.club.ClubSql.getClubByTgId
-import uk.matvey.begit.member.MemberSql.addMember
+import uk.matvey.begit.member.MemberSql.ensureMember
 import uk.matvey.slon.Repo
 
 class ClubService(
@@ -20,7 +20,7 @@ class ClubService(
 
     fun addClubMember(chatId: Long, userId: Long, username: String) {
         repo.access { a ->
-            val member = a.addMember(userId, username)
+            val member = a.ensureMember(userId, username)
             val club = a.getClubByTgId(chatId)
             a.addClubMember(club.id, member.id)
         }
