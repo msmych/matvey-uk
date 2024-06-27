@@ -2,6 +2,8 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -14,6 +16,7 @@ import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.NAME
 import uk.matvey.begit.club.ClubSql.REFS
 import uk.matvey.begit.club.ClubSql.UPDATED_AT
+import uk.matvey.dukt.random.RandomSupport.randomInt
 import uk.matvey.dukt.random.RandomSupport.randomLong
 import uk.matvey.dukt.random.RandomSupport.randomStr
 import uk.matvey.slon.Repo
@@ -69,9 +72,13 @@ class ClubServiceTest : TestContainerSetup() {
         val memberTgId = randomLong()
         val memberName = randomStr(10)
         val (club, _) = clubService.ensureClub("club1", clubTgId)
+        val refs = buildJsonObject {
+            put("tgChatId", randomLong())
+            put("tgMessageId", randomInt())
+        }
 
         // when
-        clubService.addClubMember(club.id, memberTgId, memberName)
+        clubService.addClubMember(club.id, memberTgId, memberName, refs)
 
         // then
         val result = repo.queryOneNullable(

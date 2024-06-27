@@ -12,22 +12,22 @@ import uk.matvey.slon.param.TextParam.Companion.text
 
 object MemberSql {
 
-    private const val MEMBERS = "begit.members"
+    const val MEMBERS = "begit.members"
 
-    private const val ID = "id"
-    private const val NAME = "name"
-    private const val REFS = "refs"
-    private const val CREATED_AT = "created_at"
-    private const val UPDATED_AT = "updated_at"
-    private const val TG_ID = "($REFS ->> 'tgId')"
+    const val ID = "id"
+    const val NAME = "name"
+    const val REFS = "refs"
+    const val CREATED_AT = "created_at"
+    const val UPDATED_AT = "updated_at"
+    const val TG_ID = "($REFS ->> 'tgId')"
 
-    fun Access.ensureMember(chatId: Long, name: String): Member {
+    fun Access.ensureMember(tgId: Long, name: String): Member {
         return execute(
             insertInto(MEMBERS)
                 .set(
                     ID to genRandomUuid(),
                     NAME to text(name),
-                    REFS to jsonb(Json.encodeToString(Member.Refs(chatId))),
+                    REFS to jsonb(Json.encodeToString(Member.Refs(tgId))),
                     CREATED_AT to now(),
                     UPDATED_AT to now(),
                 )

@@ -4,14 +4,16 @@ import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.Update
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
+import uk.matvey.begit.member.MemberRepo
 
 class UpdateProcessor(
     clubService: ClubService,
     clubRepo: ClubRepo,
+    memberRepo: MemberRepo,
     bot: TelegramBot,
 ) {
 
-    private val clubUpdateProcessor = ClubUpdateProcessor(clubService, clubRepo, bot)
+    private val clubUpdateProcessor = ClubUpdateProcessor(clubService, clubRepo, memberRepo, bot)
 
     fun process(update: Update) {
         update.message()?.let { message ->
@@ -25,16 +27,9 @@ class UpdateProcessor(
             }
         }
         update.callbackQuery()?.let { callbackQuery ->
-            val callbackQueryId = callbackQuery.id()
-            val message = callbackQuery.maybeInaccessibleMessage()
-            val chatId = message.chat().id()
-            val messageId = message.messageId()
             callbackQuery.data()?.let { data ->
-                val from = callbackQuery.from()
-                val userId = from.id()
-                val username = from.username()
-                if (data == "/clubs/join") {
-                    clubUpdateProcessor.joinClub(chatId, userId, username, messageId, callbackQueryId)
+                if (data.startsWith("/clubs")) {
+                    clubUpdateProcessor.processCallback(update)
                 }
             }
         }

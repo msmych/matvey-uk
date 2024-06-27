@@ -2,6 +2,7 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
@@ -41,40 +42,17 @@ object ClubSql {
         ).single()
     }
 
-    fun Access.getClubByTgId(tgId: Long): Club {
-        return queryOne(
-            """
-                select * from $CLUBS
-                | where $TG_ID = ?
-                """.trimMargin(),
-            listOf(text(tgId.toString()))
-        ) { r -> r.readClub() }
-    }
-
     fun Access.countMembers(clubId: UUID): Int {
         return queryOne(
-            """
-                select count(*) from $CLUB_MEMBERS 
-                where $CLUB_ID = ?
-                """.trimIndent(),
+            "select count(*) from $CLUB_MEMBERS where $CLUB_ID = ?",
             listOf(uuid(clubId))
         ) { it.int(1) }
     }
 
-    fun Access.isClubMember(clubId: UUID, userId: Int): Boolean {
-        return queryOne(
-            """
-                select count(*) from $CLUB_MEMBERS 
-                where $CLUB_ID = ? and $MEMBER_ID = ?
-                """.trimIndent(),
-            listOf(uuid(clubId), text(userId.toString()))
-        ) { it.int(1) } > 0
-    }
-
-    fun Access.addClubMember(clubId: UUID, memberId: UUID): Boolean {
+    fun Access.addClubMember(clubId: UUID, memberId: UUID, refs: JsonObject): Boolean {
         return execute(
             insertInto(CLUB_MEMBERS)
-                .set(CLUB_ID to uuid(clubId), MEMBER_ID to uuid(memberId))
+                .set(CLUB_ID to uuid(clubId), MEMBER_ID to uuid(memberId), REFS to jsonb(Json.encodeToString(refs)))
                 .onConflictDoNothing()
                 .build()
         ) > 0
