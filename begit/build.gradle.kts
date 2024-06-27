@@ -6,6 +6,7 @@ val kotlinLoggingVersion: String by project
 val logbackClassicVersion: String by project
 val postgresqlVersion: String by project
 val testcontainersVersion: String by project
+val mockkVersion: String by project
 
 dependencies {
     implementation("com.zaxxer:HikariCP:$hikariCpVersion")
@@ -21,4 +22,5 @@ dependencies {
 
     testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))
     testImplementation("org.testcontainers:postgresql")
+    testImplementation("io.mockk:mockk:$mockkVersion")
 }

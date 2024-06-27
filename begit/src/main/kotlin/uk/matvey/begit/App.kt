@@ -8,7 +8,8 @@ import org.flywaydb.core.Flyway
 import uk.matvey.begit.bot.startBot
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
-import uk.matvey.begit.member.MemberRepo
+import uk.matvey.begit.event.EventRepo
+import uk.matvey.begit.athlete.AthleteRepo
 import uk.matvey.slon.Repo
 import javax.sql.DataSource
 
@@ -33,9 +34,10 @@ fun main() {
 
     val repo = Repo(ds)
     val clubRepo = ClubRepo(repo)
-    val memberRepo = MemberRepo(repo)
+    val eventRepo = EventRepo(repo)
+    val athleteRepo = AthleteRepo(repo)
     val clubService = ClubService(repo)
-    startBot(config, clubRepo, memberRepo, clubService)
+    startBot(config, repo, clubRepo, eventRepo, athleteRepo, clubService)
 }
 
 private fun dataSource(config: Config): DataSource {

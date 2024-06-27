@@ -2,7 +2,6 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
@@ -22,40 +21,24 @@ object ClubSql {
     const val REFS = "refs"
     const val CREATED_AT = "created_at"
     const val UPDATED_AT = "updated_at"
-    const val TG_ID = "($REFS ->> 'tgId')"
+    const val TG_CHAT_ID = "($REFS ->> 'tgChatId')"
 
-    const val CLUB_MEMBERS = "begit.club_members"
-    const val CLUB_ID = "club_id"
-    const val MEMBER_ID = "member_id"
-
-    fun Access.ensureClub(name: String, tgId: Long): Club {
+    fun Access.ensureClub(name: String, tgChatId: Long): Club {
         return execute(insertInto(CLUBS)
             .set(
                 ID to genRandomUuid(),
                 NAME to text(name),
-                REFS to jsonb(Json.encodeToString(Club.Refs(tgId))),
+                REFS to jsonb(Json.encodeToString(Club.Refs(tgChatId))),
                 CREATED_AT to now(),
                 UPDATED_AT to now(),
             )
-            .onConflict("($TG_ID) do update set $NAME = '$name'")
-            .returning { r -> r.readClub() }
-        ).single()
+            .onConflict("($TG_CHAT_ID) do update set $NAME = '$name'")
+            .returningOne { r -> r.readClub() }
+        )
     }
 
-    fun Access.countMembers(clubId: UUID): Int {
-        return queryOne(
-            "select count(*) from $CLUB_MEMBERS where $CLUB_ID = ?",
-            listOf(uuid(clubId))
-        ) { it.int(1) }
-    }
-
-    fun Access.addClubMember(clubId: UUID, memberId: UUID, refs: JsonObject): Boolean {
-        return execute(
-            insertInto(CLUB_MEMBERS)
-                .set(CLUB_ID to uuid(clubId), MEMBER_ID to uuid(memberId), REFS to jsonb(Json.encodeToString(refs)))
-                .onConflictDoNothing()
-                .build()
-        ) > 0
+    fun Access.getClubById(id: UUID): Club {
+        return queryOne("select * from $CLUBS where $ID = ?", listOf(uuid(id))) { r -> r.readClub() }
     }
 
     fun RecordReader.readClub(): Club {

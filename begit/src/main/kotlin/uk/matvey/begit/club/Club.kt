@@ -15,6 +15,6 @@ data class Club(
 
     @Serializable
     data class Refs(
-        val tgId: Long,
+        val tgChatId: Long,
     )
 }

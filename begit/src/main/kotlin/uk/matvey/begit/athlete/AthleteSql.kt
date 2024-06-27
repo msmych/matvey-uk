@@ -1,4 +1,4 @@
-package uk.matvey.begit.member
+package uk.matvey.begit.athlete
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,34 +10,41 @@ import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 
-object MemberSql {
+object AthleteSql {
 
-    const val MEMBERS = "begit.members"
+    const val ATHLETES = "begit.athletes"
 
     const val ID = "id"
     const val NAME = "name"
     const val REFS = "refs"
     const val CREATED_AT = "created_at"
     const val UPDATED_AT = "updated_at"
-    const val TG_ID = "($REFS ->> 'tgId')"
+    const val TG_CHAT_ID = "($REFS ->> 'tgChatId')"
 
-    fun Access.ensureMember(tgId: Long, name: String): Member {
+    fun Access.ensureAthlete(tgChatId: Long, name: String): Athlete {
         return execute(
-            insertInto(MEMBERS)
+            insertInto(ATHLETES)
                 .set(
                     ID to genRandomUuid(),
                     NAME to text(name),
-                    REFS to jsonb(Json.encodeToString(Member.Refs(tgId))),
+                    REFS to jsonb(Json.encodeToString(Athlete.Refs(tgChatId))),
                     CREATED_AT to now(),
                     UPDATED_AT to now(),
                 )
-                .onConflict("($TG_ID) do update set $NAME = '$name'")
-                .returning { r -> r.readMember() }
-        ).single()
+                .onConflict("($TG_CHAT_ID) do update set $NAME = '$name'")
+                .returningOne { r -> r.readAthlete() }
+        )
     }
 
-    fun RecordReader.readMember(): Member {
-        return Member(
+    fun Access.getAthleteByTgChatId(tgChatId: Long): Athlete {
+        return queryOne(
+            "select * from $ATHLETES where $TG_CHAT_ID = ?",
+            listOf(text(tgChatId.toString()))
+        ) { it.readAthlete() }
+    }
+
+    fun RecordReader.readAthlete(): Athlete {
+        return Athlete(
             id = uuid(ID),
             name = string(NAME),
             refs = Json.decodeFromString(string(REFS)),

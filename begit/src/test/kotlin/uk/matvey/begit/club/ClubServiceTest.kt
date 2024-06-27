@@ -8,9 +8,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import uk.matvey.begit.TestContainerSetup
+import uk.matvey.begit.club.ClubMemberSql.CLUB_ID
+import uk.matvey.begit.club.ClubMemberSql.CLUB_MEMBERS
 import uk.matvey.begit.club.ClubSql.CLUBS
-import uk.matvey.begit.club.ClubSql.CLUB_ID
-import uk.matvey.begit.club.ClubSql.CLUB_MEMBERS
 import uk.matvey.begit.club.ClubSql.CREATED_AT
 import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.NAME
@@ -31,54 +31,54 @@ class ClubServiceTest : TestContainerSetup() {
     @Test
     fun `should add club`() {
         // given
-        val tgId = randomLong()
+        val tgChatId = randomLong()
 
         // when
-        val (club, count) = clubService.ensureClub("club1", tgId)
+        val (club, count) = clubService.ensureClub("club1", tgChatId)
 
         // then
         assertThat(club.name).isEqualTo("club1")
-        assertThat(club.refs.tgId).isEqualTo(tgId)
+        assertThat(club.refs.tgChatId).isEqualTo(tgChatId)
         assertThat(count).isEqualTo(0)
     }
 
     @Test
     fun `should update club name if already exists`() {
         // given
-        val tgId = randomLong()
+        val tgChatId = randomLong()
 
         repo.insertOne(
             CLUBS,
             ID to genRandomUuid(),
             NAME to text("club1"),
-            REFS to jsonb(Json.encodeToString(Club.Refs(tgId))),
+            REFS to jsonb(Json.encodeToString(Club.Refs(tgChatId))),
             CREATED_AT to now(),
             UPDATED_AT to now(),
         )
 
         // when
-        val (club, count) = clubService.ensureClub("club2", tgId)
+        val (club, count) = clubService.ensureClub("club2", tgChatId)
 
         // then
         assertThat(club.name).isEqualTo("club2")
-        assertThat(club.refs.tgId).isEqualTo(tgId)
+        assertThat(club.refs.tgChatId).isEqualTo(tgChatId)
         assertThat(count).isEqualTo(0)
     }
 
     @Test
     fun `should add member to club`() {
         // given
-        val clubTgId = randomLong()
-        val memberTgId = randomLong()
-        val memberName = randomStr(10)
-        val (club, _) = clubService.ensureClub("club1", clubTgId)
+        val clubTgChatId = randomLong()
+        val athleteTgChatId = randomLong()
+        val athleteName = randomStr(10)
+        val (club, _) = clubService.ensureClub("club1", clubTgChatId)
         val refs = buildJsonObject {
             put("tgChatId", randomLong())
             put("tgMessageId", randomInt())
         }
 
         // when
-        clubService.addClubMember(club.id, memberTgId, memberName, refs)
+        clubService.addClubMember(club.id, athleteTgChatId, athleteName, refs)
 
         // then
         val result = repo.queryOneNullable(

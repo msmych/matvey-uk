@@ -9,5 +9,7 @@ object TgSupport {
             .replace("-", "\\-")
             .replace("(", "\\(")
             .replace(")", "\\)")
+            .replace("[", "\\[")
+            .replace("]", "\\]")
     }
 }

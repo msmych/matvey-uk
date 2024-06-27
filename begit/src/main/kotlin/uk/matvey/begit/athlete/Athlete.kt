@@ -1,10 +1,10 @@
-package uk.matvey.begit.member
+package uk.matvey.begit.athlete
 
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.UUID
 
-data class Member(
+data class Athlete(
     val id: UUID,
     val name: String,
     val refs: Refs,
@@ -14,6 +14,6 @@ data class Member(
 
     @Serializable
     data class Refs(
-        val tgId: Long,
+        val tgChatId: Long,
     )
 }

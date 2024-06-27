@@ -6,18 +6,25 @@ import com.typesafe.config.Config
 import mu.KotlinLogging
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
-import uk.matvey.begit.member.MemberRepo
+import uk.matvey.begit.event.EventRepo
+import uk.matvey.begit.event.EventUpdateProcessor
+import uk.matvey.begit.athlete.AthleteRepo
+import uk.matvey.slon.Repo
 
 private val log = KotlinLogging.logger("startBot")
 
 fun startBot(
     config: Config,
+    repo: Repo,
     clubRepo: ClubRepo,
-    memberRepo: MemberRepo,
+    eventRepo: EventRepo,
+    athleteRepo: AthleteRepo,
     clubService: ClubService
 ) {
     val bot = TelegramBot(config.getString("tg.token"))
-    val updateProcessor = UpdateProcessor(clubService, clubRepo, memberRepo, bot)
+    val eventUpdateProcessor = EventUpdateProcessor(repo, eventRepo, bot)
+    val clubUpdateProcessor = ClubUpdateProcessor(clubService, clubRepo, athleteRepo, bot)
+    val updateProcessor = UpdateProcessor(repo, eventUpdateProcessor, clubUpdateProcessor, bot)
     bot.setUpdatesListener { updates ->
         updates.forEach { update ->
             try {

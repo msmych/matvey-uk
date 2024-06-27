@@ -2,36 +2,48 @@ package uk.matvey.begit.bot
 
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.Update
-import uk.matvey.begit.club.ClubRepo
-import uk.matvey.begit.club.ClubService
-import uk.matvey.begit.member.MemberRepo
+import uk.matvey.begit.event.EventUpdateProcessor
+import uk.matvey.begit.tg.TgSessionSql.findTgSessionByChatId
+import uk.matvey.slon.Repo
+import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 
 class UpdateProcessor(
-    clubService: ClubService,
-    clubRepo: ClubRepo,
-    memberRepo: MemberRepo,
-    bot: TelegramBot,
+    private val repo: Repo,
+    private val eventUpdateProcessor: EventUpdateProcessor,
+    private val clubUpdateProcessor: ClubUpdateProcessor,
+    private val bot: TelegramBot,
 ) {
 
-    private val clubUpdateProcessor = ClubUpdateProcessor(clubService, clubRepo, memberRepo, bot)
-
     fun process(update: Update) {
-        update.message()?.let { message ->
+        val message = update.message()
+        if (message != null) {
             val chat = message.chat()
             val chatId = chat.id()
             val title = chat.title()
-            message.text()?.let { text ->
-                if (text.startsWith("/club") && title != null) {
-                    clubUpdateProcessor.greetClub(title, chatId)
+            val text = message.text()
+            val fromId = message.from().id()
+            if (fromId == chatId) {
+                repo.access { a -> a.findTgSessionByChatId(chatId) }?.let { tgSession ->
+                    if (tgSession.data.awaitingAnswer != null) {
+                        eventUpdateProcessor.processAnswer(message, tgSession)
+                        return
+                    }
                 }
             }
+            when {
+                text.startsWith("/club") && title != null -> clubUpdateProcessor.greetClub(title, chatId)
+            }
+            return
         }
-        update.callbackQuery()?.let { callbackQuery ->
-            callbackQuery.data()?.let { data ->
-                if (data.startsWith("/clubs")) {
-                    clubUpdateProcessor.processCallback(update)
-                }
+        val callbackQuery = update.callbackQuery()
+        if (callbackQuery != null) {
+            val data = callbackQuery.data()
+            when {
+                data.startsWith("/clubs") -> clubUpdateProcessor.processCallback(callbackQuery)
+                data.startsWith("/events") -> eventUpdateProcessor.processCallback(callbackQuery)
             }
+            bot.answerCallbackQuery(callbackQuery.id())
+            return
         }
     }
 }
