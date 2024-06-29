@@ -31,6 +31,7 @@ create table if not exists club_members
 );
 
 create index if not exists club_members_club_id_idx on club_members (club_id);
+create index if not exists club_members_athlete_id_idx on club_members (athlete_id);
 
 create table if not exists events
 (

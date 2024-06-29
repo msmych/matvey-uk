@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.bot.amount.AmountTg
 import uk.matvey.drinki.drink.DrinkDetails
 import uk.matvey.drinki.drink.DrinkService
+import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgRequest
 import java.util.UUID
 
@@ -25,14 +26,11 @@ class DrinkTgService(
             .let { (c, o) -> c.single() to o }
         val messageText = DrinkTg.drinkDetailsText(DrinkDetails.from(drinkDetails.drink, otherDrinkIngredients)) +
             "\n\n${currentIngredient.name}:"
-        bot.execute(
-            EditMessageText(
+        bot.editMessage(
                 rq.userId(),
                 rq.messageId(),
-                messageText
-            )
-                .parseMode(MarkdownV2)
-                .replyMarkup(AmountTg.amountsKeyboard())
+                messageText,
+                AmountTg.amountsKeyboard()
         )
     }
 }

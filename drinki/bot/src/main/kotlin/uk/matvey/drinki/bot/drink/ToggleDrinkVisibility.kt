@@ -1,11 +1,10 @@
 package uk.matvey.drinki.bot.drink
 
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
-import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.drink.DrinkService
+import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgRequest
 
 class ToggleDrinkVisibility(
@@ -21,10 +20,11 @@ class ToggleDrinkVisibility(
             .toggleVisibility()
         drinkRepo.update(drink)
         val drinkDetails = drinkService.getDrinkDetails(drink.id)
-        bot.execute(
-            EditMessageText(rq.userId(), rq.messageId(), DrinkTg.drinkDetailsText(drinkDetails)).parseMode(
-                MarkdownV2
-            ).replyMarkup(DrinkTg.drinkActionsKeyboard(drinkDetails))
+        bot.editMessage(
+            rq.userId(),
+            rq.messageId(),
+            DrinkTg.drinkDetailsText(drinkDetails),
+            DrinkTg.drinkActionsKeyboard(drinkDetails)
         )
     }
 }

@@ -1,13 +1,12 @@
 package uk.matvey.drinki.bot.drink
 
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
-import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.bot.ingredient.IngredientTg
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgRequest
 
 class DeleteDrinkIngredient(
@@ -17,7 +16,7 @@ class DeleteDrinkIngredient(
     private val drinkService: DrinkService,
     private val bot: TelegramBot,
 ) {
-    
+
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
@@ -25,19 +24,14 @@ class DeleteDrinkIngredient(
         drinkRepo.update(drink)
         val drinkDetails = drinkService.getDrinkDetails(drink.id)
         val publicIngredients = ingredientRepo.publicIngredients()
-        bot.execute(
-            EditMessageText(
-                rq.userId(),
-                rq.messageId(),
-                DrinkTg.drinkDetailsText(drinkDetails)
+        bot.editMessage(
+            rq.userId(),
+            rq.messageId(),
+            DrinkTg.drinkDetailsText(drinkDetails),
+            IngredientTg.editDrinkIngredientsKeyboard(
+                drinkDetails.ingredients.keys.associateBy { it.id },
+                publicIngredients
             )
-                .parseMode(MarkdownV2)
-                .replyMarkup(
-                    IngredientTg.editDrinkIngredientsKeyboard(
-                        drinkDetails.ingredients.keys.associateBy { it.id },
-                        publicIngredients
-                    )
-                )
         )
     }
 }

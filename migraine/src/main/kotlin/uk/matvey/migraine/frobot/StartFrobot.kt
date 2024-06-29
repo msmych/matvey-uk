@@ -2,7 +2,6 @@ package uk.matvey.migraine.frobot
 
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
-import com.pengrad.telegrambot.request.AnswerCallbackQuery
 import com.typesafe.config.Config
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -12,6 +11,7 @@ import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
 import uk.matvey.slon.Repo
+import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
 import javax.sql.DataSource
 
@@ -38,7 +38,7 @@ fun startFrobot(config: Config) {
                 val rq = TgRequest(update)
                 botUpdateHandler.handle(rq)
                 if (rq.isCallbackQuery()) {
-                    bot.execute(AnswerCallbackQuery(rq.callbackQueryId()))
+                    bot.answerCallbackQuery(rq.callbackQueryId())
                 }
             } catch (e: Exception) {
                 log.error(e) { "Oops" }

@@ -16,6 +16,7 @@ import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.app.wishlist.WishlistTg
 import uk.matvey.slon.Repo
 import uk.matvey.telek.TgRequest
+import uk.matvey.telek.TgSendMessageSupport.sendMessage
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -31,13 +32,13 @@ fun startBot(config: Config) {
         updates.forEach { update ->
             try {
                 val rq = TgRequest(update)
-                
+
                 val (command, _) = rq.command()
-                
+
                 if (command == "start") {
-                    bot.execute(SendMessage(rq.userId(), "Ciao"))
+                    bot.sendMessage(rq.userId(), "Ciao")
                 }
-                
+
                 if (command == "wishlist") {
                     val items = wishlistRepo.findAllActive()
                     val text = WishlistTg.wishlistMessageText(items)
@@ -65,7 +66,7 @@ fun startBot(config: Config) {
                         )
                     }
                 }
-                
+
                 if (rq.isCallbackQuery()) {
                     bot.execute(AnswerCallbackQuery(rq.callbackQueryId()))
                 }

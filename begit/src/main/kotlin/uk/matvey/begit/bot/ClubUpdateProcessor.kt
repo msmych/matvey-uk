@@ -9,9 +9,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import uk.matvey.begit.athlete.AthleteRepo
+import uk.matvey.begit.club.Club
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
 import uk.matvey.telek.TgEditMessageSupport.editMessage
+import uk.matvey.telek.TgExecuteSupport.deleteMessage
 import uk.matvey.telek.TgSendMessageSupport.sendMessage
 import java.util.UUID
 
@@ -24,7 +26,10 @@ class ClubUpdateProcessor(
 
     fun greetClub(title: String, chatId: Long) {
         val (club, count) = clubService.ensureClub(title, chatId)
-        bot.sendMessage(
+        club.refs.tgChatMessageId?.let { (chatId, messageId) ->
+            bot.deleteMessage(chatId, messageId)
+        }
+        val sendResponse = bot.sendMessage(
             chatId,
             """Club *$title*
                 |
@@ -32,6 +37,7 @@ class ClubUpdateProcessor(
             """.trimMargin(),
             joinMarkup(club.id, count)
         )
+        clubService.updateClub(club.updateTgChatMessageId(sendResponse.message().messageId()))
     }
 
     fun processCallback(callbackQuery: CallbackQuery) {
@@ -42,13 +48,21 @@ class ClubUpdateProcessor(
         val from = callbackQuery.from()
         val userId = from.id()
         val username = from.username()
+        CLUBS_SHOW_REGEX.matchEntire(data)?.let { match ->
+            val clubId = UUID.fromString(match.groupValues[1])
+            val club = clubRepo.getById(clubId)
+            showClub(userId, messageId, club)
+            return
+        }
         CLUBS_JOIN_REGEX.matchEntire(data)?.let { match ->
             val clubId = UUID.fromString(match.groupValues[1])
             joinClub(chatId, clubId, userId, username, messageId)
+            return
         }
         CLUBS_LEAVE_REGEX.matchEntire(data)?.let { match ->
             val clubId = UUID.fromString(match.groupValues[1])
             leaveClub(clubId, userId)
+            return
         }
     }
 
@@ -69,14 +83,26 @@ class ClubUpdateProcessor(
             return
         }
         bot.sendMessage(
-            tgUserId, "Welcome to *${club.name}*",
+            tgUserId, "*${club.name}*",
             listOf(
-                listOf(InlineKeyboardButton("New event").callbackData("/events/new?clubId=$clubId")),
-                listOf(InlineKeyboardButton("Leave club").callbackData("/clubs/$clubId/leave")),
+                listOf(InlineKeyboardButton("New event").callbackData("/events/new?clubId=${club.id}")),
+                listOf(InlineKeyboardButton("Leave club").callbackData("/clubs/${club.id}/leave")),
             )
         )
         val count = clubRepo.countClubMembers(clubId)
         bot.editMessage(chatId, messageId, null, joinMarkup(clubId, count))
+    }
+
+    private fun showClub(userId: Long, messageId: Int, club: Club) {
+        bot.editMessage(
+            userId,
+            messageId,
+            "*${club.name}*",
+            listOf(
+                listOf(InlineKeyboardButton("New event").callbackData("/events/new?clubId=${club.id}")),
+                listOf(InlineKeyboardButton("Leave club").callbackData("/clubs/${club.id}/leave")),
+            )
+        )
     }
 
     private fun leaveClub(clubId: UUID, tgUserId: Long) {
@@ -106,6 +132,7 @@ class ClubUpdateProcessor(
 
         val UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}".toRegex()
         private val CLUBS_JOIN_REGEX = "/clubs/($UUID_REGEX)/join".toRegex()
+        private val CLUBS_SHOW_REGEX = "/clubs/($UUID_REGEX)/show".toRegex()
         private val CLUBS_LEAVE_REGEX = "/clubs/($UUID_REGEX)/leave".toRegex()
     }
 }

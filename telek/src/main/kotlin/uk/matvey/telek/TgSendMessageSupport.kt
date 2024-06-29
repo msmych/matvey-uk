@@ -18,9 +18,7 @@ object TgSendMessageSupport {
             SendMessage(chatId, text)
                 .parseMode(MarkdownV2)
                 .replyMarkup(
-                    markup.takeIf { it.isNotEmpty() }?.let {
-                        InlineKeyboardMarkup(*markup.map { it.toTypedArray() }.toTypedArray())
-                    }
+                    InlineKeyboardMarkup(*markup.map { it.toTypedArray() }.toTypedArray())
                 )
         )
     }

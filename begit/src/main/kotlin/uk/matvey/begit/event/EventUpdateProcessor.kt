@@ -5,12 +5,16 @@ import com.pengrad.telegrambot.model.CallbackQuery
 import com.pengrad.telegrambot.model.Message
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton
 import uk.matvey.begit.athlete.Athlete
+import uk.matvey.begit.athlete.AthleteSql.ensureAthlete
 import uk.matvey.begit.athlete.AthleteSql.getAthleteByTgChatId
 import uk.matvey.begit.bot.ClubUpdateProcessor.Companion.UUID_REGEX
 import uk.matvey.begit.club.Club
+import uk.matvey.begit.club.ClubMemberSql.isClubMember
 import uk.matvey.begit.club.ClubSql.getClubById
+import uk.matvey.begit.club.ClubSql.getClubByTgChatId
 import uk.matvey.begit.event.EventParticipantSql.addEventParticipant
 import uk.matvey.begit.event.EventParticipantSql.countEventParticipants
+import uk.matvey.begit.event.EventParticipantSql.deleteEventParticipant
 import uk.matvey.begit.event.EventSql.getEventById
 import uk.matvey.begit.event.EventSql.insertEvent
 import uk.matvey.begit.event.EventSql.updateEvent
@@ -41,71 +45,80 @@ class EventUpdateProcessor(
 ) {
     fun processCallback(callbackQuery: CallbackQuery) {
         val data = callbackQuery.data()
-        val tgFromId = callbackQuery.from().id()
-        val messageId = callbackQuery.maybeInaccessibleMessage().messageId()
+        val from = callbackQuery.from()
+        val fromId = from.id()
+        val username = from.username()
+        val message = callbackQuery.maybeInaccessibleMessage()
+        val chatId = message.chat().id()
+        val messageId = message.messageId()
         EVENTS_NEW_REGEX.matchEntire(data)?.let { match ->
             val clubId = UUID.fromString(match.groupValues[1])
-            createEvent(clubId, tgFromId, messageId)
+            createEvent(clubId, fromId, messageId)
             return
         }
         EVENTS_SHOW.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
             val event = eventRepo.getById(eventId)
-            showEvent(tgFromId, messageId, event)
+            showEvent(fromId, messageId, event)
             return
         }
         EVENTS_EDIT_DATE_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            askMonth(eventId, tgFromId, messageId)
+            askMonth(eventId, fromId, messageId)
             return
         }
         EVENTS_SET_MONTH_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
             val month = YearMonth.parse(match.groupValues[2])
-            setMonthAskDay(eventId, month, tgFromId, messageId)
+            setMonthAskDay(eventId, month, fromId, messageId)
             return
         }
         EVENTS_SET_DATE_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
             val date = LocalDate.parse(match.groupValues[2])
-            setDate(eventId, date, tgFromId, messageId)
+            setDate(eventId, date, fromId, messageId)
             return
         }
         EVENTS_EDIT_TIME_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            askPartOfDay(eventId, tgFromId, messageId)
+            askPartOfDay(eventId, fromId, messageId)
             return
         }
         EVENTS_SET_PART_OF_DAY_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
             val partOfDay = LocalTime.of(match.groupValues[2].toInt(), 0)
-            setPartOfDayAskTime(eventId, partOfDay, tgFromId, messageId)
+            setPartOfDayAskTime(eventId, partOfDay, fromId, messageId)
             return
         }
         EVENTS_SET_TIME_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
             val time = LocalTime.of(match.groupValues[2].toInt(), match.groupValues[3].toInt())
-            setTime(eventId, time, tgFromId, messageId)
+            setTime(eventId, time, fromId, messageId)
             return
         }
         EVENTS_EDIT_TITLE_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            askTitle(eventId, tgFromId, messageId)
+            askTitle(eventId, fromId, messageId)
             return
         }
         EVENTS_EDIT_DESCRIPTION_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            askDescription(eventId, tgFromId, messageId)
+            askDescription(eventId, fromId, messageId)
             return
         }
         EVENTS_PUBLISH_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            publish(eventId, tgFromId, messageId)
+            publish(eventId, fromId, messageId)
             return
         }
         EVENTS_JOIN_REGEX.matchEntire(data)?.let { match ->
             val eventId = UUID.fromString(match.groupValues[1])
-            joinEvent(eventId, tgFromId)
+            joinEvent(eventId, chatId, fromId, username)
+            return
+        }
+        EVENTS_LEAVE_REGEX.matchEntire(data)?.let { match ->
+            val eventId = UUID.fromString(match.groupValues[1])
+            leaveEvent(eventId, fromId, messageId)
             return
         }
     }
@@ -285,14 +298,22 @@ class EventUpdateProcessor(
             val count = a.countEventParticipants(eventId)
             Eco(event, club, organizer, count)
         }
+        event.refs.tgChatMessageId?.let { (chatId, messageId) ->
+            bot.deleteMessage(chatId, messageId)
+        }
         val eventStr = eventStr(event)
         val sendResponse = bot.sendMessage(
             club.refs.tgChatId,
-            "@${organizer.name} announced $eventStr",
+            """@${organizer.name} announced $eventStr
+                |
+                |${"Join the event by clicking the button below (make sure you joined the club first)".tgEscape()}
+            """.trimMargin(),
             joinEventMarkup(event, count)
         )
-        repo.access { a ->
-            a.updateEvent(event.updateTgChatMessageId(club.refs.tgChatId, sendResponse.message().messageId()))
+        val publishedEvent = repo.access { a ->
+            val e = event.updateTgChatMessageId(club.refs.tgChatId, sendResponse.message().messageId())
+            a.updateEvent(e)
+            e
         }
         bot.editMessage(
             tgFromId,
@@ -301,21 +322,46 @@ class EventUpdateProcessor(
             |
             |✅ Published
         """.trimMargin(),
-            eventActionsMarkup(event)
+            eventActionsMarkup(publishedEvent)
         )
+    }
+
+    private fun leaveEvent(eventId: UUID, tgFromId: Long, messageId: Int) {
+        val (event, count) = repo.access { a ->
+            val athlete = a.getAthleteByTgChatId(tgFromId)
+            a.deleteEventParticipant(eventId, athlete.id)
+            val event = a.getEventById(eventId)
+            val count = a.countEventParticipants(eventId)
+            event to count
+        }
+        bot.editMessage(
+            tgFromId,
+            messageId,
+            null,
+            joinEventMarkup(event, count),
+        )
+        bot.deleteMessage(tgFromId, messageId)
     }
 
     private fun joinEventMarkup(event: Event, count: Int): List<List<InlineKeyboardButton>> {
         return listOf(listOf(InlineKeyboardButton("Join event! ($count)").callbackData("/events/${event.id}/join")))
     }
 
-    private fun joinEvent(eventId: UUID, tgFromId: Long) {
-        val (event, count) = repo.access { a ->
-            val athlete = a.getAthleteByTgChatId(tgFromId)
-            a.addEventParticipant(eventId, athlete.id)
+    private fun joinEvent(eventId: UUID, tgChatId: Long, tgFromId: Long, username: String) {
+        val (athlete, isClubMember) = repo.access { a ->
+            val club = a.getClubByTgChatId(tgChatId)
+            val athlete = a.ensureAthlete(tgFromId, username)
+            athlete to a.isClubMember(club.id, athlete.id)
+        }
+        if (!isClubMember) {
+            return
+        }
+        data class Eca(val event: Event, val count: Int, val added: Boolean)
+        val (event, count, added) = repo.access { a ->
+            val added = a.addEventParticipant(eventId, athlete.id)
             val event = a.getEventById(eventId)
             val count = a.countEventParticipants(eventId)
-            event to count
+            Eca(event, count, added)
         }
         val (chatId, messageId) = event.refs.tgChatMessageId()
         bot.editMessage(
@@ -323,6 +369,16 @@ class EventUpdateProcessor(
             messageId,
             null,
             joinEventMarkup(event, count)
+        )
+        if (!added) {
+            return
+        }
+        bot.sendMessage(
+            tgFromId,
+            "You joined the event!",
+            listOf(
+                listOf(InlineKeyboardButton("Leave event").callbackData("/events/${event.id}/leave"))
+            )
         )
     }
 
@@ -336,20 +392,23 @@ class EventUpdateProcessor(
         return title + dateTime + description
     }
 
-    private fun eventActionsMarkup(event: Event) = listOf(
-        listOfNotNull(
-            InlineKeyboardButton("Edit date").callbackData("/events/${event.id}/edit-date"),
-            InlineKeyboardButton("Edit time").callbackData("/events/${event.id}/edit-time")
-                .takeIf { event.date != null }
-        ),
-        listOf(
-            InlineKeyboardButton("Edit name").callbackData("/events/${event.id}/edit-title"),
-            InlineKeyboardButton("Edit description").callbackData("/events/${event.id}/edit-description")
-        ),
-        listOf(
-            InlineKeyboardButton("Publish").callbackData("/events/${event.id}/publish"),
+    private fun eventActionsMarkup(event: Event): List<List<InlineKeyboardButton>> {
+        val publishLabel = if (event.refs.tgChatMessageId == null) "Publish" else "Re-publish"
+        return listOf(
+            listOfNotNull(
+                InlineKeyboardButton("Edit date").callbackData("/events/${event.id}/edit-date"),
+                InlineKeyboardButton("Edit time").callbackData("/events/${event.id}/edit-time")
+                    .takeIf { event.date != null }
+            ),
+            listOf(
+                InlineKeyboardButton("Edit name").callbackData("/events/${event.id}/edit-title"),
+                InlineKeyboardButton("Edit description").callbackData("/events/${event.id}/edit-description")
+            ),
+            listOf(
+                InlineKeyboardButton(publishLabel).callbackData("/events/${event.id}/publish"),
+            )
         )
-    )
+    }
 
     private fun monthPicker(event: Event): List<List<InlineKeyboardButton>> {
         return YearMonth.now().let { current ->
@@ -365,9 +424,9 @@ class EventUpdateProcessor(
     private fun dayPicker(event: Event, month: YearMonth): List<List<InlineKeyboardButton>> {
         val prefixDays = (1..<month.atDay(1).dayOfWeek.value).map { 0 }
         val isCurrentMonth = month == YearMonth.now()
-        val pastDays = if (isCurrentMonth) (1..LocalDate.now().dayOfMonth).map { 0 } else listOf()
+        val pastDays = if (isCurrentMonth) (1..<LocalDate.now().dayOfMonth).map { 0 } else listOf()
         val suffixDays = (month.atEndOfMonth().dayOfWeek.value..<7).map { 0 }
-        val firstDay = if (isCurrentMonth) LocalDate.now().dayOfMonth + 1 else 1
+        val firstDay = if (isCurrentMonth) LocalDate.now().dayOfMonth else 1
         return (prefixDays + pastDays + (firstDay..month.lengthOfMonth()) + suffixDays)
             .chunked(7).map { dayChunk ->
                 dayChunk.map { day ->
@@ -430,5 +489,6 @@ class EventUpdateProcessor(
         private val EVENTS_EDIT_DESCRIPTION_REGEX = "/events/(${UUID_REGEX})/edit-description".toRegex()
         private val EVENTS_PUBLISH_REGEX = "/events/(${UUID_REGEX})/publish".toRegex()
         private val EVENTS_JOIN_REGEX = "/events/(${UUID_REGEX})/join".toRegex()
+        private val EVENTS_LEAVE_REGEX = "/events/(${UUID_REGEX})/leave".toRegex()
     }
 }

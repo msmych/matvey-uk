@@ -2,7 +2,6 @@ package uk.matvey.drinki.bot
 
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
-import com.pengrad.telegrambot.request.AnswerCallbackQuery
 import com.typesafe.config.Config
 import mu.KotlinLogging
 import uk.matvey.drinki.DrinkiRepos
@@ -31,6 +30,7 @@ import uk.matvey.drinki.bot.ingredient.SetIngredientType
 import uk.matvey.drinki.bot.ingredient.ToggleIngredientVisibility
 import uk.matvey.drinki.drink.DrinkService
 import uk.matvey.drinki.migrate
+import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
 
 private val log = KotlinLogging.logger("drinki-bot")
@@ -81,7 +81,7 @@ fun startDrinkiBot(
                 val rq = TgRequest(update)
                 botUpdateHandler.handle(rq)
                 if (rq.isCallbackQuery()) {
-                    bot.execute(AnswerCallbackQuery(rq.callbackQueryId()))
+                    bot.answerCallbackQuery(rq.callbackQueryId())
                 }
             } catch (e: Exception) {
                 log.error(e) { "Oops" }

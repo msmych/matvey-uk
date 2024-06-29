@@ -1,12 +1,12 @@
 package uk.matvey.drinki.bot.ingredient
 
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.bot.ingredient.IngredientTg.ingredientActionsKeyboard
 import uk.matvey.drinki.ingredient.Ingredient
 import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgRequest
 
 class AddIngredient(
@@ -21,9 +21,11 @@ class AddIngredient(
         val ingredient = Ingredient.private(account.id, "New")
         ingredientRepo.add(ingredient)
         accountRepo.update(account.editingIngredient(ingredient.id, rq.messageId()))
-        bot.execute(
-            EditMessageText(rq.userId(), rq.messageId(), ingredient.name)
-                .replyMarkup(ingredientActionsKeyboard(ingredient))
+        bot.editMessage(
+            rq.userId(),
+            rq.messageId(),
+            ingredient.name,
+            ingredientActionsKeyboard(ingredient)
         )
     }
 }

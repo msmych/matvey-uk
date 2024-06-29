@@ -2,6 +2,7 @@ package uk.matvey.begit.bot
 
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.Update
+import uk.matvey.begit.athlete.AthleteUpdateProcessor
 import uk.matvey.begit.event.EventUpdateProcessor
 import uk.matvey.begit.tg.TgSessionSql.findTgSessionByChatId
 import uk.matvey.slon.Repo
@@ -9,6 +10,7 @@ import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 
 class UpdateProcessor(
     private val repo: Repo,
+    private val athleteUpdateProcessor: AthleteUpdateProcessor,
     private val eventUpdateProcessor: EventUpdateProcessor,
     private val clubUpdateProcessor: ClubUpdateProcessor,
     private val bot: TelegramBot,
@@ -32,6 +34,8 @@ class UpdateProcessor(
             }
             when {
                 text.startsWith("/club") && title != null -> clubUpdateProcessor.greetClub(title, chatId)
+                text.startsWith("/my_clubs") && fromId == chatId -> athleteUpdateProcessor.showMyClubs(message)
+                text.startsWith("/my_events") && fromId == chatId -> athleteUpdateProcessor.showMyEvents(message)
             }
             return
         }

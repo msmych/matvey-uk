@@ -1,5 +1,6 @@
 package uk.matvey.begit.bot
 
+import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.CallbackQuery
 import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.Message
@@ -10,6 +11,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import uk.matvey.begit.athlete.AthleteUpdateProcessor
 import uk.matvey.begit.event.EventUpdateProcessor
 import uk.matvey.dukt.random.RandomSupport.randomLong
 import uk.matvey.dukt.random.RandomSupport.randomStr
@@ -19,10 +21,18 @@ import uk.matvey.slon.Repo
 class UpdateProcessorTest {
 
     private val repo = mockk<Repo>(relaxed = true)
+    private val athleteUpdateProcessor = mockk<AthleteUpdateProcessor>(relaxed = true)
     private val eventUpdateProcessor = mockk<EventUpdateProcessor>(relaxed = true)
     private val clubUpdateProcessor = mockk<ClubUpdateProcessor>(relaxed = true)
+    private val bot = mockk<TelegramBot>(relaxed = true)
 
-    private val updateProcessor = UpdateProcessor(repo, eventUpdateProcessor, clubUpdateProcessor)
+    private val updateProcessor = UpdateProcessor(
+        repo,
+        athleteUpdateProcessor,
+        eventUpdateProcessor,
+        clubUpdateProcessor,
+        bot
+    )
 
     private val update = mockk<Update>()
     private val message = mockk<Message>()
@@ -32,17 +42,19 @@ class UpdateProcessorTest {
     private val chatId = randomLong()
     private val title = randomStr(12)
     private val userId = randomLong()
+    private val callbackQueryId = randomStr(10)
 
     @BeforeEach
     fun setup() {
         every { update.message() } returns null
         every { update.callbackQuery() } returns null
+        every { callbackQuery.id() } returns callbackQueryId
         every { message.chat() } returns chat
         every { chat.id() } returns chatId
         every { chat.title() } returns null
         every { message.from() } returns user
         every { user.id() } returns userId
-        every { repo.access(any<(Access) -> Any?>())} returns null
+        every { repo.access(any<(Access) -> Any?>()) } returns null
     }
 
     @Test

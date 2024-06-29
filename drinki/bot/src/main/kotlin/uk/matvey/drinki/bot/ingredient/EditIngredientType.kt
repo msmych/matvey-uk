@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
+import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgRequest
 
 class EditIngredientType(
@@ -15,9 +16,8 @@ class EditIngredientType(
     operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val ingredient = ingredientRepo.get(account.tgSession().ingredientEdit().ingredientId)
-        bot.execute(
-            EditMessageText(rq.userId(), account.tgSession().ingredientEdit().messageId, ingredient.name)
-                .replyMarkup(IngredientTg.ingredientTypeKeyboard())
+        bot.editMessage(rq.userId(), account.tgSession().ingredientEdit().messageId, ingredient.name,
+                IngredientTg.ingredientTypeKeyboard()
         )
     }
 }
