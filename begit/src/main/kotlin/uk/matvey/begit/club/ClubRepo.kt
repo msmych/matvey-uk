@@ -2,6 +2,7 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.json.JsonObject
 import uk.matvey.begit.club.ClubMemberSql.countClubMembers
+import uk.matvey.begit.club.ClubMemberSql.findAllClubsByAthleteId
 import uk.matvey.begit.club.ClubMemberSql.findClubMemberRefs
 import uk.matvey.begit.club.ClubSql.getClubById
 import uk.matvey.slon.Repo
@@ -21,5 +22,9 @@ class ClubRepo(
 
     fun findClubMemberRefs(clubId: UUID, memberId: UUID): JsonObject? {
         return repo.access { a -> a.findClubMemberRefs(clubId, memberId) }
+    }
+
+    fun findAllByAthleteId(athleteId: UUID): List<Club> {
+        return repo.access { a -> a.findAllClubsByAthleteId(athleteId) }
     }
 }

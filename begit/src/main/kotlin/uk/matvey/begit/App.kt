@@ -5,11 +5,12 @@ import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
+import uk.matvey.begit.athlete.AthleteRepo
 import uk.matvey.begit.bot.startBot
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
 import uk.matvey.begit.event.EventRepo
-import uk.matvey.begit.athlete.AthleteRepo
+import uk.matvey.begit.server.startServer
 import uk.matvey.slon.Repo
 import javax.sql.DataSource
 
@@ -37,6 +38,7 @@ fun main() {
     val eventRepo = EventRepo(repo)
     val athleteRepo = AthleteRepo(repo)
     val clubService = ClubService(repo)
+    startServer(athleteRepo, clubRepo, eventRepo)
     startBot(config, repo, clubRepo, eventRepo, athleteRepo, clubService)
 }
 

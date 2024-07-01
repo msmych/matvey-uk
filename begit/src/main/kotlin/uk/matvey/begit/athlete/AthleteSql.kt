@@ -9,6 +9,8 @@ import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.UuidParam.Companion.uuid
+import java.util.UUID
 
 object AthleteSql {
 
@@ -34,6 +36,10 @@ object AthleteSql {
                 .onConflict("($TG_CHAT_ID) do update set $NAME = '$name'")
                 .returningOne { r -> r.readAthlete() }
         )
+    }
+
+    fun Access.getAthleteById(athleteId: UUID): Athlete {
+        return queryOne("select * from $ATHLETES where id = ?", listOf(uuid(athleteId))) { it.readAthlete() }
     }
 
     fun Access.getAthleteByTgChatId(tgChatId: Long): Athlete {
