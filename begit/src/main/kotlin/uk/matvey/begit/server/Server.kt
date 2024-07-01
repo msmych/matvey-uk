@@ -12,6 +12,7 @@ import io.ktor.server.routing.routing
 import uk.matvey.begit.athlete.AthleteRepo
 import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.event.EventRepo
+import uk.matvey.begit.event.eventRouting
 
 fun startServer(
     athleteRepo: AthleteRepo,
@@ -29,7 +30,8 @@ fun startServer(
             get("/healthcheck") {
                 call.respondText("OK")
             }
-            begitRouting(athleteRepo, clubRepo, eventRepo)
+            begitRouting(athleteRepo, clubRepo)
+            eventRouting(eventRepo)
         }
     }.start(wait = false)
 }

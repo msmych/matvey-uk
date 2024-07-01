@@ -7,20 +7,8 @@
 </head>
 <body>
 <h1>Begit</h1>
-<div>
-    ${athlete.name}
-</div>
-<h2>Events</h2>
-<#list events as event>
-    <div>
-        ${event.title}
-    </div>
-</#list>
-<h2>Clubs 22</h2>
-<#list clubs as club>
-    <div>
-        ${club.name}
-    </div>
-</#list>
+<div hx-get="/me" hx-trigger="load" hx-swap="innerHTML"></div>
+<h2>Clubs</h2>
+<div hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </body>
 </html>

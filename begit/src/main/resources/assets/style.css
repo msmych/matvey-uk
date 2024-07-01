@@ -2,3 +2,32 @@ body {
     font-family: "Trebuchet MS", sans-serif;
     font-size: 18px;
 }
+
+.main {
+    margin: 60px auto 0;
+    width: 80%;
+    min-width: 400px;
+    max-width: 2000px;
+}
+
+.a-button {
+    text-decoration: none;
+}
+
+.v-stack {
+    display: flex;
+    flex-direction: column;
+}
+
+.h-stack {
+    display: flex;
+    flex-direction: row;
+}
+
+.gap-16 {
+    gap: 16px;
+}
+
+.gap-32 {
+    gap: 32px;
+}

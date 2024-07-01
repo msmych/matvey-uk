@@ -13,6 +13,7 @@ import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -32,15 +33,23 @@ object EventSql {
     const val CREATED_AT = "created_at"
     const val UPDATED_AT = "updated_at"
 
-    fun Access.insertEvent(clubId: UUID, organizedBy: UUID): Event {
+    fun Access.insertEvent(
+        clubId: UUID,
+        organizedBy: UUID,
+        title: String = "[New event]",
+        date: LocalDate? = null,
+        dateTime: Instant? = null,
+    ): Event {
         return execute(
             insertInto(EVENTS)
                 .set(
                     ID to genRandomUuid(),
                     CLUB_ID to uuid(clubId),
                     ORGANIZED_BY to uuid(organizedBy),
-                    TITLE to text("[New event]"),
+                    TITLE to text(title),
                     TYPE to text(Event.Type.RUN.name),
+                    DATE to date(date),
+                    DATE_TIME to timestamp(dateTime),
                     CREATED_AT to now(),
                     UPDATED_AT to now(),
                 )
@@ -58,6 +67,7 @@ object EventSql {
                         TITLE to text(event.title),
                         DESCRIPTION to text(event.description),
                         REFS to jsonb(Json.encodeToString(event.refs)),
+                        UPDATED_AT to now(),
                     )
                 )
                 .where("$ID = ? and $UPDATED_AT = ?", uuid(event.id), timestamp(event.updatedAt))
@@ -67,6 +77,13 @@ object EventSql {
 
     fun Access.getEventById(id: UUID): Event {
         return queryOne("select * from $EVENTS where $ID = ?", listOf(uuid(id))) { r -> r.readEvent() }
+    }
+
+    fun Access.findAllEventsByClubId(clubId: UUID): List<Event> {
+        return query(
+            "select * from $EVENTS where $CLUB_ID = ?",
+            listOf(uuid(clubId))
+        ) { it.readEvent() }
     }
 
     fun RecordReader.readEvent(): Event {
