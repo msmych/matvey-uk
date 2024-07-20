@@ -8,7 +8,6 @@ COPY gradle /app/gradle
 COPY app /app/app
 COPY drinki /app/drinki
 COPY migraine /app/migraine
-COPY dukt /app/dukt
 COPY telek /app/telek
 
 RUN ./gradlew app:shadowJar

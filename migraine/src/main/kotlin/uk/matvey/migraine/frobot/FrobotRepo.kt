@@ -1,7 +1,7 @@
 package uk.matvey.migraine.frobot
 
 import kotlinx.serialization.encodeToString
-import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.migraine.frobot.FrobotSql.CREATED_AT
 import uk.matvey.migraine.frobot.FrobotSql.FROBOT
 import uk.matvey.migraine.frobot.FrobotSql.ID

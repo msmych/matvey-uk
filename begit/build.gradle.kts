@@ -6,6 +6,7 @@ plugins {
 val typesafeConfigVersion: String by project
 val hikariCpVersion: String by project
 val flywayVersion: String by project
+val kitVersion: String by project
 val slonVersion: String by project
 val kotlinLoggingVersion: String by project
 val logbackClassicVersion: String by project
@@ -26,7 +27,6 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("uk.matvey:slon:$slonVersion")
 
-    implementation(project(":dukt"))
     implementation(project(":telek"))
 
     testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))

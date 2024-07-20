@@ -16,22 +16,20 @@ import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.NAME
 import uk.matvey.begit.club.ClubSql.REFS
 import uk.matvey.begit.club.ClubSql.UPDATED_AT
-import uk.matvey.dukt.random.RandomSupport.randomInt
-import uk.matvey.dukt.random.RandomSupport.randomLong
-import uk.matvey.dukt.random.RandomSupport.randomStr
 import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
+import kotlin.random.Random
 
 class ClubServiceTest : TestContainerSetup() {
 
     @Test
     fun `should add club`() {
         // given
-        val tgChatId = randomLong()
+        val tgChatId = Random.Default.nextLong()
 
         // when
         val (club, count) = clubService.ensureClub("club1", tgChatId)
@@ -45,7 +43,7 @@ class ClubServiceTest : TestContainerSetup() {
     @Test
     fun `should update club name if already exists`() {
         // given
-        val tgChatId = randomLong()
+        val tgChatId = Random.Default.nextLong()
 
         repo.insertOne(
             CLUBS,
@@ -68,13 +66,13 @@ class ClubServiceTest : TestContainerSetup() {
     @Test
     fun `should add member to club`() {
         // given
-        val clubTgChatId = randomLong()
-        val athleteTgChatId = randomLong()
-        val athleteName = randomStr(10)
+        val clubTgChatId = Random.Default.nextLong()
+        val athleteTgChatId = Random.Default.nextLong()
+        val athleteName = "athlete1"
         val (club, _) = clubService.ensureClub("club1", clubTgChatId)
         val refs = buildJsonObject {
-            put("tgChatId", randomLong())
-            put("tgMessageId", randomInt())
+            put("tgChatId", Random.Default.nextLong())
+            put("tgMessageId", Random.Default.nextLong())
         }
 
         // when

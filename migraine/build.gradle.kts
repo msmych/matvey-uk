@@ -3,6 +3,7 @@ plugins {
 }
 
 val typesafeConfigVersion: String by project
+val kitVersion: String by project
 val slonVersion: String by project
 
 dependencies {
@@ -10,7 +11,6 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("com.typesafe:config:$typesafeConfigVersion")
     implementation("uk.matvey:slon:$slonVersion")
-    
-    implementation(project(":dukt"))
+
     implementation(project(":telek"))
 }

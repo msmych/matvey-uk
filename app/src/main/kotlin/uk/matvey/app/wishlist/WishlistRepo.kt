@@ -12,7 +12,7 @@ import uk.matvey.app.wishlist.WishlistSql.TG
 import uk.matvey.app.wishlist.WishlistSql.UPDATED_AT
 import uk.matvey.app.wishlist.WishlistSql.URL
 import uk.matvey.app.wishlist.WishlistSql.WISHLIST
-import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
 import uk.matvey.slon.param.ArrayParam.Companion.textArray

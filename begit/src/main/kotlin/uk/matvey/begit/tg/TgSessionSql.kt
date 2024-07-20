@@ -1,7 +1,7 @@
 package uk.matvey.begit.tg
 
 import kotlinx.serialization.encodeToString
-import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader

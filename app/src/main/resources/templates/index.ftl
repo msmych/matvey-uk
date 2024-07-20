@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="${assets}/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="${assets}/favicons/favicon-16x16.png">
     <link rel="manifest" href="${assets}/favicons/site.webmanifest">
+    <link rel="preload" href="Mona-Sans.woff2" as="font" type="font/woff2" crossorigin>
     <script src="https://unpkg.com/htmx.org@1.9.10"
             integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
             crossorigin="anonymous"></script>

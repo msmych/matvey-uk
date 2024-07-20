@@ -5,6 +5,7 @@ plugins {
 
 val typesafeConfigVersion: String by project
 val slonVersion: String by project
+val kitVersion: String by project
 
 dependencies {
     implementation("io.ktor:ktor-server-core")
@@ -14,10 +15,9 @@ dependencies {
     implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("uk.matvey:slon:$slonVersion")
-    
+
     implementation("com.typesafe:config:$typesafeConfigVersion")
     
-    implementation(project(":dukt"))
     implementation(project(":drinki"))
     implementation(project(":drinki:bot"))
     implementation(project(":migraine"))

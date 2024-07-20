@@ -8,7 +8,7 @@ import uk.matvey.drinki.account.AccountSql.CREATED_AT
 import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
-import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text

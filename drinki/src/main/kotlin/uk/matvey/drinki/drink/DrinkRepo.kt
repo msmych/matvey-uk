@@ -15,7 +15,7 @@ import uk.matvey.drinki.drink.DrinkSql.UPDATED_AT
 import uk.matvey.drinki.drink.DrinkSql.VISIBILITY
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
-import uk.matvey.dukt.json.JsonSetup.JSON
+import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb

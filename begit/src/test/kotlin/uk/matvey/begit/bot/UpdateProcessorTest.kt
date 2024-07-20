@@ -13,10 +13,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.matvey.begit.athlete.AthleteUpdateProcessor
 import uk.matvey.begit.event.EventUpdateProcessor
-import uk.matvey.dukt.random.RandomSupport.randomLong
-import uk.matvey.dukt.random.RandomSupport.randomStr
 import uk.matvey.slon.Access
 import uk.matvey.slon.Repo
+import kotlin.random.Random
 
 class UpdateProcessorTest {
 
@@ -39,10 +38,10 @@ class UpdateProcessorTest {
     private val callbackQuery = mockk<CallbackQuery>()
     private val chat = mockk<Chat>()
     private val user = mockk<User>()
-    private val chatId = randomLong()
-    private val title = randomStr(12)
-    private val userId = randomLong()
-    private val callbackQueryId = randomStr(10)
+    private val chatId = Random.Default.nextLong()
+    private val title = "Club Title"
+    private val userId = Random.Default.nextLong()
+    private val callbackQueryId = "callbackQueryId"
 
     @BeforeEach
     fun setup() {
