@@ -8,9 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="${assets}/favicons/favicon-16x16.png">
     <link rel="manifest" href="${assets}/favicons/site.webmanifest">
     <link rel="preload" href="Mona-Sans.woff2" as="font" type="font/woff2" crossorigin>
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-            crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.1" integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="main v-stack gap-32">

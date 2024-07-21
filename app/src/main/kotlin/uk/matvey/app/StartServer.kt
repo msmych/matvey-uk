@@ -39,7 +39,8 @@ fun startServer(config: AppConfig, wait: Boolean) {
                 },
                 keyAlias = "matveyAppCert",
                 privateKeyPassword = { jksPass.toCharArray() },
-                keyStorePassword = { jksPass.toCharArray() }) {
+                keyStorePassword = { jksPass.toCharArray() }
+            ) {
                 port = 8443
                 keyStorePath = keyStoreFile
             }
@@ -61,7 +62,6 @@ fun startServer(config: AppConfig, wait: Boolean) {
                     call.respond(FreeMarkerContent("tech.ftl", null))
                 }
             }
-            
         }
     }
     embeddedServer(Netty, environment)

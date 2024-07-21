@@ -7,13 +7,12 @@ import com.pengrad.telegrambot.request.AnswerCallbackQuery
 import com.pengrad.telegrambot.request.EditMessageText
 import com.pengrad.telegrambot.request.SendMessage
 import com.typesafe.config.Config
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import uk.matvey.app.wishlist.WishlistItem.State
 import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.app.wishlist.WishlistTg
+import uk.matvey.slon.DataSourceKit.hikariDataSource
 import uk.matvey.slon.Repo
 import uk.matvey.telek.TgRequest
 import uk.matvey.telek.TgSendMessageSupport.sendMessage
@@ -24,7 +23,7 @@ private val log = KotlinLogging.logger("matvey-bot")
 
 fun startBot(config: Config) {
     val bot = TelegramBot(config.getString("bot.token"))
-    val ds = dataSource(config)
+    val ds = dataSource(config.getConfig("ds"))
     migrate(ds, System.getenv("CLEAN_DB") == "true")
     val repo = Repo(ds)
     val wishlistRepo = WishlistRepo(repo)
@@ -95,11 +94,9 @@ fun migrate(ds: DataSource, clean: Boolean) {
 }
 
 private fun dataSource(config: Config): DataSource {
-    val hikariConfig = HikariConfig()
-    hikariConfig.jdbcUrl = config.getString("ds.jdbcUrl")
-    hikariConfig.username = config.getString("ds.username")
-    hikariConfig.password = config.getString("ds.password")
-    hikariConfig.driverClassName = "org.postgresql.Driver"
-    val ds = HikariDataSource(hikariConfig)
-    return ds
+    return hikariDataSource(
+        config.getString("jdbcUrl"),
+        config.getString("username"),
+        config.getString("password"),
+    )
 }

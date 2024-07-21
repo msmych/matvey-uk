@@ -5,6 +5,14 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/msmych/kit")
+        credentials {
+            username = "GitHubPackages-RO"
+            password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
+        }
+    }
 }
 
 java {

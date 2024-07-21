@@ -2,7 +2,6 @@ package uk.matvey.begit
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import uk.matvey.begit.athlete.AthleteRepo
@@ -11,6 +10,7 @@ import uk.matvey.begit.club.ClubRepo
 import uk.matvey.begit.club.ClubService
 import uk.matvey.begit.event.EventRepo
 import uk.matvey.begit.server.startServer
+import uk.matvey.slon.DataSourceKit.hikariDataSource
 import uk.matvey.slon.Repo
 import javax.sql.DataSource
 
@@ -43,10 +43,9 @@ fun main() {
 }
 
 private fun dataSource(config: Config): DataSource {
-    return HikariDataSource().apply {
-        jdbcUrl = config.getString("jdbcUrl")
-        username = config.getString("username")
-        password = config.getString("password")
-        driverClassName = config.getString("driverClassName")
-    }
+    return hikariDataSource(
+        config.getString("jdbcUrl"),
+        config.getString("username"),
+        config.getString("password"),
+    )
 }

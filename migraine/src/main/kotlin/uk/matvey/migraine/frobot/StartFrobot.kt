@@ -3,13 +3,12 @@ package uk.matvey.migraine.frobot
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
 import com.typesafe.config.Config
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
+import uk.matvey.slon.DataSourceKit.hikariDataSource
 import uk.matvey.slon.Repo
 import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
@@ -19,7 +18,7 @@ private val log = KotlinLogging.logger("frobot")
 
 fun startFrobot(config: Config) {
     val bot = TelegramBot(config.getString("frobot.token"))
-    val ds = dataSource(config)
+    val ds = dataSource(config.getConfig("ds"))
     migrate(ds, System.getenv("CLEAN_DB") == "true")
     val repo = Repo(ds)
     val frobotRepo = FrobotRepo(repo)
@@ -65,11 +64,9 @@ fun migrate(ds: DataSource, clean: Boolean) {
 }
 
 private fun dataSource(config: Config): DataSource {
-    val hikariConfig = HikariConfig()
-    hikariConfig.jdbcUrl = config.getString("ds.jdbcUrl")
-    hikariConfig.username = config.getString("ds.username")
-    hikariConfig.password = config.getString("ds.password")
-    hikariConfig.driverClassName = "org.postgresql.Driver"
-    val ds = HikariDataSource(hikariConfig)
-    return ds
+    return hikariDataSource(
+        config.getString("jdbcUrl"),
+        config.getString("username"),
+        config.getString("password"),
+    )
 }
