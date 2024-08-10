@@ -2,7 +2,7 @@ FROM eclipse-temurin:22-jdk as builder
 
 WORKDIR /app
 
-COPY gradlew settings.gradle.kts build.gradle.kts /app/
+COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties /app/
 
 COPY gradle /app/gradle
 COPY app /app/app
