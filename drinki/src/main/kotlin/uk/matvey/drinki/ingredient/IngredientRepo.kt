@@ -11,18 +11,21 @@ import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.query
+import uk.matvey.slon.repo.RepoKit.queryOne
 import java.util.UUID
 
 class IngredientRepo(
     private val repo: Repo,
 ) {
 
-    fun add(ingredient: Ingredient) {
+    suspend fun add(ingredient: Ingredient) {
         repo.insertOne(
             INGREDIENTS,
             ID to uuid(ingredient.id),
@@ -35,7 +38,7 @@ class IngredientRepo(
         )
     }
 
-    fun update(ingredient: Ingredient) {
+    suspend fun update(ingredient: Ingredient) {
         repo.access { a ->
             a.execute(
                 update(INGREDIENTS)
@@ -45,7 +48,7 @@ class IngredientRepo(
         }
     }
 
-    fun get(ingredientId: UUID): Ingredient {
+    suspend fun get(ingredientId: UUID): Ingredient {
         return repo.queryOne(
             "select * from $INGREDIENTS where $ID = ?",
             listOf(uuid(ingredientId)),
@@ -53,7 +56,7 @@ class IngredientRepo(
         )
     }
 
-    fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
+    suspend fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
         return repo.query(
             """
@@ -66,11 +69,11 @@ class IngredientRepo(
         )
     }
 
-    fun publicIngredients(): List<Ingredient> {
+    suspend fun publicIngredients(): List<Ingredient> {
         return findAllByAccountId(null)
     }
 
-    fun findAllByDrink(drinkId: UUID): List<Ingredient> {
+    suspend fun findAllByDrink(drinkId: UUID): List<Ingredient> {
         return repo.query(
             """
             select * from $INGREDIENTS 

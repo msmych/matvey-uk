@@ -17,7 +17,7 @@ class DeleteDrinkIngredient(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(rq: TgRequest) {
+    suspend operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
             .deleteIngredient(account.tgSession().drinkEdit().ingredientId())

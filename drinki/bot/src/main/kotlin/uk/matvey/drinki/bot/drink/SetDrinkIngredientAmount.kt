@@ -18,7 +18,7 @@ class SetDrinkIngredientAmount(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(amount: Amount, rq: TgRequest) {
+    suspend operator fun invoke(amount: Amount, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drinkEdit = account.tgSession().drinkEdit()
         val drink = drinkRepo.get(drinkEdit.drinkId)

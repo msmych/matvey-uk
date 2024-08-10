@@ -2,9 +2,9 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.encodeToString
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
@@ -34,7 +34,7 @@ object ClubSql {
                 CREATED_AT to now(),
                 UPDATED_AT to now(),
             )
-            .onConflict("($TG_CHAT_ID) do update set $NAME = '$name'")
+            .onConflict(listOf("($TG_CHAT_ID)"), "update set $NAME = '$name'")
             .returningOne { r -> r.readClub() }
         )
     }
@@ -57,7 +57,10 @@ object ClubSql {
     }
 
     fun Access.getClubByTgChatId(tgChatId: Long): Club {
-        return queryOne("select * from $CLUBS where $TG_CHAT_ID = ?", listOf(text(tgChatId.toString()))) { r -> r.readClub() }
+        return queryOne(
+            "select * from $CLUBS where $TG_CHAT_ID = ?",
+            listOf(text(tgChatId.toString()))
+        ) { r -> r.readClub() }
     }
 
     fun RecordReader.readClub(): Club {

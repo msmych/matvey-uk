@@ -24,7 +24,7 @@ class ClubUpdateProcessor(
     private val bot: TelegramBot,
 ) {
 
-    fun greetClub(title: String, chatId: Long) {
+    suspend fun greetClub(title: String, chatId: Long) {
         val (club, count) = clubService.ensureClub(title, chatId)
         club.refs.tgChatMessageId?.let { (chatId, messageId) ->
             bot.deleteMessage(chatId, messageId)
@@ -40,7 +40,7 @@ class ClubUpdateProcessor(
         clubService.updateClub(club.updateTgChatMessageId(sendResponse.message().messageId()))
     }
 
-    fun processCallback(callbackQuery: CallbackQuery) {
+    suspend fun processCallback(callbackQuery: CallbackQuery) {
         val data = callbackQuery.data()
         val message = callbackQuery.maybeInaccessibleMessage()
         val messageId = message.messageId()
@@ -66,7 +66,7 @@ class ClubUpdateProcessor(
         }
     }
 
-    private fun joinClub(
+    private suspend fun joinClub(
         chatId: Long,
         clubId: UUID,
         tgUserId: Long,
@@ -105,7 +105,7 @@ class ClubUpdateProcessor(
         )
     }
 
-    private fun leaveClub(clubId: UUID, tgUserId: Long) {
+    private suspend fun leaveClub(clubId: UUID, tgUserId: Long) {
         val athlete = athleteRepo.getByTgChatId(tgUserId)
         clubRepo.findClubMemberRefs(clubId, athlete.id)?.let { clubMemberRefs ->
             val removed = clubService.removeClubMember(clubId, athlete.id)

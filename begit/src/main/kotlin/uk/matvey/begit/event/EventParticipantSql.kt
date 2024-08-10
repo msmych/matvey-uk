@@ -3,8 +3,8 @@ package uk.matvey.begit.event
 import uk.matvey.begit.event.EventSql.EVENTS
 import uk.matvey.begit.event.EventSql.ID
 import uk.matvey.begit.event.EventSql.readEvent
-import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
+import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.DeleteQuery.Builder.Companion.deleteFrom
 import java.util.UUID

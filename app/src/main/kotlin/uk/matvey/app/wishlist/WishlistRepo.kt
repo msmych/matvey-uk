@@ -13,20 +13,24 @@ import uk.matvey.app.wishlist.WishlistSql.UPDATED_AT
 import uk.matvey.app.wishlist.WishlistSql.URL
 import uk.matvey.app.wishlist.WishlistSql.WISHLIST
 import uk.matvey.kit.json.JsonKit.JSON
+import uk.matvey.kit.json.JsonKit.jsonDeserialize
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.ArrayParam.Companion.textArray
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.query
+import uk.matvey.slon.repo.RepoKit.queryOneNullable
 import java.net.URI
 import java.util.UUID
 
 class WishlistRepo(private val repo: Repo) {
 
-    fun add(wishlistItem: WishlistItem) {
+    suspend fun add(wishlistItem: WishlistItem) {
         repo.insertOne(
             WISHLIST,
             ID to uuid(wishlistItem.id),
@@ -41,7 +45,7 @@ class WishlistRepo(private val repo: Repo) {
         )
     }
 
-    fun update(wishlistItem: WishlistItem) {
+    suspend fun update(wishlistItem: WishlistItem) {
         repo.access { a ->
             a.execute(
                 update(WISHLIST)
@@ -59,7 +63,7 @@ class WishlistRepo(private val repo: Repo) {
         }
     }
 
-    fun findById(id: UUID): WishlistItem? {
+    suspend fun findById(id: UUID): WishlistItem? {
         return repo.queryOneNullable(
             "select * from $WISHLIST where $ID = ?",
             listOf(uuid(id)),
@@ -67,7 +71,7 @@ class WishlistRepo(private val repo: Repo) {
         )
     }
 
-    fun findAllActive(): List<WishlistItem> {
+    suspend fun findAllActive(): List<WishlistItem> {
         return repo.query(
             "select * from $WISHLIST where $STATE in ('WANTED', 'LOCKED') order by $CREATED_AT desc",
             listOf(),
@@ -83,7 +87,7 @@ class WishlistRepo(private val repo: Repo) {
             tags = reader.stringList(TAGS).map(WishlistItem.Tag::valueOf).toSet(),
             description = reader.nullableString(DESCRIPTION),
             url = reader.nullableString(URL)?.let(::URI),
-            tg = JSON.decodeFromString(reader.string(TG)),
+            tg = jsonDeserialize(reader.string(TG)),
             createdAt = reader.instant(CREATED_AT),
             updatedAt = reader.instant(UPDATED_AT),
         )

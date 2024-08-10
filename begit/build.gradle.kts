@@ -4,30 +4,37 @@ plugins {
 }
 
 val typesafeConfigVersion: String by project
-val flywayVersion: String by project
 val kitVersion: String by project
 val slonVersion: String by project
 val kotlinLoggingVersion: String by project
 val logbackClassicVersion: String by project
 val testcontainersVersion: String by project
+val junitVersion: String by project
 val mockkVersion: String by project
+val assertjVersion: String by project
+val coroutinesVersion: String by project
+val kotestVersion: String by project
 
 dependencies {
-    implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
     implementation("com.typesafe:config:$typesafeConfigVersion")
-    implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")
     implementation("io.ktor:ktor-network-tls-certificates")
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-freemarker")
     implementation("io.ktor:ktor-server-netty")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("uk.matvey:kit:$kitVersion")
     implementation("uk.matvey:slon:$slonVersion")
 
     implementation(project(":telek"))
 
+    testImplementation(platform("org.junit:junit-bom:$junitVersion"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation(testFixtures("uk.matvey:slon:$slonVersion"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
     testImplementation(platform("org.testcontainers:testcontainers-bom:$testcontainersVersion"))
     testImplementation("org.testcontainers:postgresql")
-    testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
 application {

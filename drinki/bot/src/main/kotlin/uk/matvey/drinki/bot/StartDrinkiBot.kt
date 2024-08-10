@@ -3,6 +3,11 @@ package uk.matvey.drinki.bot
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
 import com.typesafe.config.Config
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import mu.KotlinLogging
 import uk.matvey.drinki.DrinkiRepos
 import uk.matvey.drinki.account.AccountService
@@ -35,6 +40,7 @@ import uk.matvey.telek.TgRequest
 
 private val log = KotlinLogging.logger("drinki-bot")
 
+@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 fun startDrinkiBot(
     config: Config,
     repos: DrinkiRepos,
@@ -43,12 +49,12 @@ fun startDrinkiBot(
 ) {
     migrate(repos, System.getenv("CLEAN_DB") == "true")
     val bot = TelegramBot(config.getString("bot.token"))
-    
+
     val drinkTgService = DrinkTgService(drinkService, bot)
     val accountRepo = repos.accountRepo
     val drinkRepo = repos.drinkRepo
     val ingredientRepo = repos.ingredientRepo
-    
+
     val botUpdateHandler = BotUpdateHandler(
         Greet(bot),
         AddDrink(accountService, accountRepo, drinkRepo, bot),
@@ -72,21 +78,25 @@ fun startDrinkiBot(
         SetIngredientType(accountRepo, ingredientRepo, bot),
         ToggleIngredientVisibility(accountRepo, ingredientRepo, bot),
         SearchDrinks(accountRepo, drinkRepo, drinkService, bot),
-        
+
         accountService,
     )
-    bot.setUpdatesListener { updates ->
-        updates.forEach { update ->
-            try {
-                val rq = TgRequest(update)
-                botUpdateHandler.handle(rq)
-                if (rq.isCallbackQuery()) {
-                    bot.answerCallbackQuery(rq.callbackQueryId())
+    CoroutineScope(newSingleThreadContext("bot")).launch {
+        bot.setUpdatesListener { updates ->
+            updates.forEach { update ->
+                try {
+                    val rq = TgRequest(update)
+                    launch {
+                        botUpdateHandler.handle(rq)
+                    }
+                    if (rq.isCallbackQuery()) {
+                        bot.answerCallbackQuery(rq.callbackQueryId())
+                    }
+                } catch (e: Exception) {
+                    log.error(e) { "Oops" }
                 }
-            } catch (e: Exception) {
-                log.error(e) { "Oops" }
             }
+            CONFIRMED_UPDATES_ALL
         }
-        CONFIRMED_UPDATES_ALL
     }
 }

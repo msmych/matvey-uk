@@ -6,15 +6,15 @@ import com.pengrad.telegrambot.model.Chat
 import com.pengrad.telegrambot.model.Message
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.User
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.matvey.begit.athlete.AthleteUpdateProcessor
 import uk.matvey.begit.event.EventUpdateProcessor
-import uk.matvey.slon.Access
-import uk.matvey.slon.Repo
+import uk.matvey.slon.repo.Repo
 import kotlin.random.Random
 
 class UpdateProcessorTest {
@@ -44,20 +44,23 @@ class UpdateProcessorTest {
     private val callbackQueryId = "callbackQueryId"
 
     @BeforeEach
-    fun setup() {
+    fun setUp() {
         every { update.message() } returns null
         every { update.callbackQuery() } returns null
         every { callbackQuery.id() } returns callbackQueryId
+        every { callbackQuery.from() } returns user
+        every { callbackQuery.maybeInaccessibleMessage() } returns message
         every { message.chat() } returns chat
+        every { message.from() } returns user
+        every { message.messageId() } returns Random.Default.nextInt()
         every { chat.id() } returns chatId
         every { chat.title() } returns null
-        every { message.from() } returns user
         every { user.id() } returns userId
-        every { repo.access(any<(Access) -> Any?>()) } returns null
+        every { user.username() } returns "username"
     }
 
     @Test
-    fun `should greet club`() {
+    fun `should greet club`() = runTest {
         // given
         every { update.message() } returns message
         every { chat.title() } returns title
@@ -67,12 +70,11 @@ class UpdateProcessorTest {
         updateProcessor.process(update)
 
         // then
-
-        verify { clubUpdateProcessor.greetClub(title, chatId) }
+        coVerify { clubUpdateProcessor.greetClub(title, chatId) }
     }
 
     @Test
-    fun `should handle clubs callback`() {
+    fun `should handle clubs callback`() = runTest {
         // given
         every { update.callbackQuery() } returns callbackQuery
         every { callbackQuery.data() } returns "/clubs/..."
@@ -81,11 +83,11 @@ class UpdateProcessorTest {
         updateProcessor.process(update)
 
         // then
-        verify { clubUpdateProcessor.processCallback(callbackQuery) }
+        coVerify { clubUpdateProcessor.processCallback(callbackQuery) }
     }
 
     @Test
-    fun `should handle events callback`() {
+    fun `should handle events callback`() = runTest {
         // given
         every { update.callbackQuery() } returns callbackQuery
         every { callbackQuery.data() } returns "/events/..."
@@ -94,6 +96,6 @@ class UpdateProcessorTest {
         updateProcessor.process(update)
 
         // then
-        verify { eventUpdateProcessor.processCallback(callbackQuery) }
+        coVerify { eventUpdateProcessor.processCallback(callbackQuery) }
     }
 }

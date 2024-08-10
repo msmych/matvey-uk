@@ -7,8 +7,8 @@ import kotlinx.serialization.json.jsonObject
 import uk.matvey.begit.club.ClubSql.CLUBS
 import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.readClub
-import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
+import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import java.util.UUID

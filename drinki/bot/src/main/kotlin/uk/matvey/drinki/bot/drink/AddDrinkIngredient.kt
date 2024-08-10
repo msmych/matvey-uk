@@ -12,7 +12,7 @@ class AddDrinkIngredient(
     private val drinkTgService: DrinkTgService,
 ) {
     
-    operator fun invoke(ingredientId: UUID, rq: TgRequest) {
+    suspend operator fun invoke(ingredientId: UUID, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
             .setIngredient(ingredientId, Amount.Some)

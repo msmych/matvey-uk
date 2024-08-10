@@ -12,7 +12,7 @@ class DeleteDrink(
     private val bot: TelegramBot,
 ) {
     
-    operator fun invoke(rq: TgRequest) {
+    suspend operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         drinkRepo.delete(account.tgSession().drinkEdit().drinkId)
         bot.execute(EditMessageText(rq.userId(), account.tgSession().drinkEdit().messageId, "Deleted"))

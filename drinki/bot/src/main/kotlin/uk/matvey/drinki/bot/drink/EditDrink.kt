@@ -14,7 +14,7 @@ class EditDrink(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(drinkId: UUID?, rq: TgRequest) {
+    suspend operator fun invoke(drinkId: UUID?, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drinkDetails = drinkService.getDrinkDetails(drinkId ?: account.tgSession().drinkEdit().drinkId)
         if (drinkId != null) {

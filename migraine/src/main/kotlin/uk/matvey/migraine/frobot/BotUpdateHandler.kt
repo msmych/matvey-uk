@@ -19,7 +19,7 @@ class BotUpdateHandler(
     
     private val log = KotlinLogging.logger {}
     
-    fun handle(rq: TgRequest) {
+    suspend fun handle(rq: TgRequest) {
         log.info { rq.update }
         val frobot = frobotRepo.findByTgUserId(rq.userId()) ?: frobotRepo.add(Frobot.frobot(rq.userId()))
             .run { requireNotNull(frobotRepo.findByTgUserId(rq.userId())) }

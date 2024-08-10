@@ -4,7 +4,7 @@ class AccountService(
     private val accountRepo: AccountRepo,
 ) {
     
-    fun ensureTgAccount(tgUserId: Long): Account {
+    suspend fun ensureTgAccount(tgUserId: Long): Account {
         val existingAccount = accountRepo.findByTgUserId(tgUserId)
         if (existingAccount != null) {
             return existingAccount

@@ -13,7 +13,7 @@ class SetIngredientType(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(type: Ingredient.Type, rq: TgRequest) {
+    suspend operator fun invoke(type: Ingredient.Type, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val ingredient = ingredientRepo.get(account.tgSession().ingredientEdit().ingredientId)
             .setType(type)

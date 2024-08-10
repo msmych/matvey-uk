@@ -9,16 +9,18 @@ import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.queryOneNullable
 
 class AccountRepo(private val repo: Repo) {
 
-    fun add(account: Account) {
+    suspend fun add(account: Account) {
         repo.insertOne(
             ACCOUNTS,
             ID to uuid(account.id),
@@ -28,7 +30,7 @@ class AccountRepo(private val repo: Repo) {
         )
     }
 
-    fun update(account: Account) {
+    suspend fun update(account: Account) {
         repo.access { a ->
             a.execute(
                 update(ACCOUNTS)
@@ -38,7 +40,7 @@ class AccountRepo(private val repo: Repo) {
         }
     }
 
-    fun findByTgUserId(tgUserId: Long): Account? {
+    suspend fun findByTgUserId(tgUserId: Long): Account? {
         return repo.queryOneNullable(
             "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
             listOf(text(tgUserId.toString()))
@@ -54,5 +56,5 @@ class AccountRepo(private val repo: Repo) {
         }
     }
 
-    fun getByTgUserId(tgUserId: Long): Account = requireNotNull(findByTgUserId(tgUserId))
+    suspend fun getByTgUserId(tgUserId: Long): Account = requireNotNull(findByTgUserId(tgUserId))
 }

@@ -3,20 +3,27 @@ package uk.matvey.migraine.frobot
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL
 import com.typesafe.config.Config
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import mu.KotlinLogging
-import org.flywaydb.core.Flyway
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
 import uk.matvey.slon.DataSourceKit.hikariDataSource
-import uk.matvey.slon.Repo
+import uk.matvey.slon.FlywayKit.flywayConfig
+import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
 import javax.sql.DataSource
 
 private val log = KotlinLogging.logger("frobot")
 
+@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 fun startFrobot(config: Config) {
+    uk.matvey.slon.DataSourceKit
     val bot = TelegramBot(config.getString("frobot.token"))
     val ds = dataSource(config.getConfig("ds"))
     migrate(ds, System.getenv("CLEAN_DB") == "true")
@@ -31,36 +38,38 @@ fun startFrobot(config: Config) {
         rockGardenStart,
         rockGardenJump
     )
-    bot.setUpdatesListener { updates ->
-        updates.forEach { update ->
-            try {
-                val rq = TgRequest(update)
-                botUpdateHandler.handle(rq)
-                if (rq.isCallbackQuery()) {
-                    bot.answerCallbackQuery(rq.callbackQueryId())
+    CoroutineScope(newSingleThreadContext("bot")).launch {
+        bot.setUpdatesListener { updates ->
+            updates.forEach { update ->
+                try {
+                    val rq = TgRequest(update)
+                    launch {
+                        botUpdateHandler.handle(rq)
+                    }
+                    if (rq.isCallbackQuery()) {
+                        bot.answerCallbackQuery(rq.callbackQueryId())
+                    }
+                } catch (e: Exception) {
+                    log.error(e) { "Oops" }
                 }
-            } catch (e: Exception) {
-                log.error(e) { "Oops" }
             }
+            CONFIRMED_UPDATES_ALL
         }
-        CONFIRMED_UPDATES_ALL
     }
 }
 
 fun migrate(ds: DataSource, clean: Boolean) {
-    val flyway = Flyway.configure()
-        .dataSource(ds)
-        .schemas("migraine")
-        .locations("classpath:db/migration/migraine")
-        .defaultSchema("migraine")
-        .createSchemas(true)
-        .cleanDisabled(!clean)
-        .load()
+    val flyway = flywayConfig(
+        dataSource = ds,
+        schema = "migraine",
+        location = "classpath:db/migration/migraine",
+        createSchema = true,
+        cleanDisabled = !clean,
+    ).load()
     if (clean) {
         flyway.clean()
     }
-    flyway
-        .migrate()
+    flyway.migrate()
 }
 
 private fun dataSource(config: Config): DataSource {

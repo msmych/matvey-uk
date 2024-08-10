@@ -24,7 +24,7 @@ import uk.matvey.begit.tg.TgSession.Data.AwaitingAnswer.EVENT_TITLE
 import uk.matvey.begit.tg.TgSessionSql.ensureTgSession
 import uk.matvey.begit.tg.TgSessionSql.getTgSessionByChatId
 import uk.matvey.begit.tg.TgSessionSql.updateTgSession
-import uk.matvey.slon.Repo
+import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgEditMessageSupport.editMessage
 import uk.matvey.telek.TgExecuteSupport.deleteMessage
 import uk.matvey.telek.TgSendMessageSupport.sendMessage
@@ -43,7 +43,8 @@ class EventUpdateProcessor(
     private val eventRepo: EventRepo,
     private val bot: TelegramBot,
 ) {
-    fun processCallback(callbackQuery: CallbackQuery) {
+
+    suspend fun processCallback(callbackQuery: CallbackQuery) {
         val data = callbackQuery.data()
         val from = callbackQuery.from()
         val fromId = from.id()
@@ -123,7 +124,7 @@ class EventUpdateProcessor(
         }
     }
 
-    fun processAnswer(message: Message, tgSession: TgSession) {
+    suspend fun processAnswer(message: Message, tgSession: TgSession) {
         val text = message.text()
         val messageId = message.messageId()
         when (tgSession.data.awaitingAnswer) {
@@ -133,7 +134,7 @@ class EventUpdateProcessor(
         }
     }
 
-    private fun createEvent(clubId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun createEvent(clubId: UUID, tgFromId: Long, messageId: Int) {
         val event = repo.access { a ->
             val athlete = a.getAthleteByTgChatId(tgFromId)
             val tgSession = a.ensureTgSession(tgFromId)
@@ -155,7 +156,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun askMonth(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun askMonth(eventId: UUID, tgFromId: Long, messageId: Int) {
         val event = eventRepo.getById(eventId)
         bot.editMessage(
             tgFromId, messageId,
@@ -166,7 +167,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setMonthAskDay(eventId: UUID, month: YearMonth, tgFromId: Long, messageId: Int) {
+    private suspend fun setMonthAskDay(eventId: UUID, month: YearMonth, tgFromId: Long, messageId: Int) {
         val event = eventRepo.getById(eventId)
         bot.editMessage(
             tgFromId,
@@ -180,7 +181,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setDate(eventId: UUID, date: LocalDate, tgFromId: Long, messageId: Int) {
+    private suspend fun setDate(eventId: UUID, date: LocalDate, tgFromId: Long, messageId: Int) {
         val event = repo.access { a ->
             val event = a.getEventById(eventId)
                 .updateDate(date)
@@ -190,7 +191,7 @@ class EventUpdateProcessor(
         showEvent(tgFromId, messageId, event)
     }
 
-    private fun askPartOfDay(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun askPartOfDay(eventId: UUID, tgFromId: Long, messageId: Int) {
         val event = eventRepo.getById(eventId)
         bot.editMessage(
             tgFromId,
@@ -203,7 +204,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setPartOfDayAskTime(eventId: UUID, partOfDay: LocalTime, tgFromId: Long, messageId: Int) {
+    private suspend fun setPartOfDayAskTime(eventId: UUID, partOfDay: LocalTime, tgFromId: Long, messageId: Int) {
         val event = eventRepo.getById(eventId)
         bot.editMessage(
             tgFromId,
@@ -216,7 +217,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setTime(eventId: UUID, time: LocalTime, tgFromId: Long, messageId: Int) {
+    private suspend fun setTime(eventId: UUID, time: LocalTime, tgFromId: Long, messageId: Int) {
         val event = repo.access { a ->
             val event = a.getEventById(eventId).run {
                 updateTime(date().atTime(time).toInstant(ZoneOffset.UTC))
@@ -227,7 +228,7 @@ class EventUpdateProcessor(
         showEvent(tgFromId, messageId, event)
     }
 
-    private fun askTitle(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun askTitle(eventId: UUID, tgFromId: Long, messageId: Int) {
         val event = repo.access { a ->
             val tgSession = a.getTgSessionByChatId(tgFromId)
                 .updateAwaitingAnswer(eventId, EVENT_TITLE)
@@ -244,7 +245,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setTitle(title: String, tgSession: TgSession, answerMessageId: Int) {
+    private suspend fun setTitle(title: String, tgSession: TgSession, answerMessageId: Int) {
         val eventId = tgSession.data.eventId()
         val event = repo.access { a ->
             val event = a.getEventById(eventId)
@@ -258,7 +259,7 @@ class EventUpdateProcessor(
         bot.deleteMessage(chatId, answerMessageId)
     }
 
-    private fun askDescription(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun askDescription(eventId: UUID, tgFromId: Long, messageId: Int) {
         val event = repo.access { a ->
             val tgSession = a.getTgSessionByChatId(tgFromId)
                 .updateAwaitingAnswer(eventId, EVENT_DESCRIPTION)
@@ -275,7 +276,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun setDescription(description: String, tgSession: TgSession, answerMessageId: Int) {
+    private suspend fun setDescription(description: String, tgSession: TgSession, answerMessageId: Int) {
         val eventId = tgSession.data.eventId()
         val event = repo.access { a ->
             val event = a.getEventById(eventId)
@@ -289,7 +290,7 @@ class EventUpdateProcessor(
         bot.deleteMessage(chatId, answerMessageId)
     }
 
-    private fun publish(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun publish(eventId: UUID, tgFromId: Long, messageId: Int) {
         data class Eco(val event: Event, val club: Club, val athlete: Athlete, val count: Int)
         val (event, club, organizer, count) = repo.access { a ->
             val event = a.getEventById(eventId)
@@ -326,7 +327,7 @@ class EventUpdateProcessor(
         )
     }
 
-    private fun leaveEvent(eventId: UUID, tgFromId: Long, messageId: Int) {
+    private suspend fun leaveEvent(eventId: UUID, tgFromId: Long, messageId: Int) {
         val (event, count) = repo.access { a ->
             val athlete = a.getAthleteByTgChatId(tgFromId)
             a.deleteEventParticipant(eventId, athlete.id)
@@ -347,7 +348,7 @@ class EventUpdateProcessor(
         return listOf(listOf(InlineKeyboardButton("Join event! ($count)").callbackData("/events/${event.id}/join")))
     }
 
-    private fun joinEvent(eventId: UUID, tgChatId: Long, tgFromId: Long, username: String) {
+    private suspend fun joinEvent(eventId: UUID, tgChatId: Long, tgFromId: Long, username: String) {
         val (athlete, isClubMember) = repo.access { a ->
             val club = a.getClubByTgChatId(tgChatId)
             val athlete = a.ensureAthlete(tgFromId, username)

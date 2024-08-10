@@ -1,5 +1,6 @@
 package uk.matvey.begit.club
 
+import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -16,18 +17,20 @@ import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.NAME
 import uk.matvey.begit.club.ClubSql.REFS
 import uk.matvey.begit.club.ClubSql.UPDATED_AT
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.queryOneNullable
 import kotlin.random.Random
 
 class ClubServiceTest : TestContainerSetup() {
 
     @Test
-    fun `should add club`() {
+    fun `should add club`() = runTest {
         // given
         val tgChatId = Random.Default.nextLong()
 
@@ -41,7 +44,7 @@ class ClubServiceTest : TestContainerSetup() {
     }
 
     @Test
-    fun `should update club name if already exists`() {
+    fun `should update club name if already exists`() = runTest {
         // given
         val tgChatId = Random.Default.nextLong()
 
@@ -64,7 +67,7 @@ class ClubServiceTest : TestContainerSetup() {
     }
 
     @Test
-    fun `should add member to club`() {
+    fun `should add member to club`() = runTest {
         // given
         val clubTgChatId = Random.Default.nextLong()
         val athleteTgChatId = Random.Default.nextLong()

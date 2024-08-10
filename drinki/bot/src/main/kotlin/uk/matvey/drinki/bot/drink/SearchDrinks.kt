@@ -18,7 +18,7 @@ class SearchDrinks(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(query: String, rq: TgRequest) {
+    suspend operator fun invoke(query: String, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drinks = drinkRepo.search(account.id, query)
         when (drinks.size) {

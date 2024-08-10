@@ -15,7 +15,7 @@ class SetDrinkName(
     private val bot: TelegramBot,
 ) {
 
-    operator fun invoke(name: String, rq: TgRequest) {
+    suspend operator fun invoke(name: String, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val drink = drinkRepo.get(account.tgSession().drinkEdit().drinkId)
             .setName(name)

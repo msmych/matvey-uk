@@ -11,8 +11,8 @@ class HandleMessageWithLowBattery(
     private val frobotRepo: FrobotRepo,
     private val bot: TelegramBot,
 ) {
-    
-    operator fun invoke(rq: TgRequest, frobotId: UUID) {
+
+    suspend operator fun invoke(rq: TgRequest, frobotId: UUID) {
         val text = rq.messageText()
         when (text) {
             in INSECTS -> {
@@ -30,10 +30,10 @@ class HandleMessageWithLowBattery(
             }
         }
     }
-    
+
     companion object {
         private val INSECTS = setOf("🦋", "🐝", "🐞", "🐜", "🦟", "🪰")
-        
+
         private val ELECTRICITY = setOf("🔌", "⚡️")
     }
 }

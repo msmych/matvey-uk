@@ -57,7 +57,7 @@ class BotUpdateHandler(
     
     private val log = KotlinLogging.logger {}
     
-    fun handle(rq: TgRequest) {
+    suspend fun handle(rq: TgRequest) {
         log.info { rq.update }
         val (command, _) = rq.command()
         when (command) {

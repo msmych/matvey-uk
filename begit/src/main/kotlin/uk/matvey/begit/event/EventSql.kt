@@ -2,9 +2,9 @@ package uk.matvey.begit.event
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.DateParam.Companion.date
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid

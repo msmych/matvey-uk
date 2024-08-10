@@ -3,7 +3,7 @@ package uk.matvey.drinki
 import uk.matvey.drinki.account.AccountRepo
 import uk.matvey.drinki.drink.DrinkRepo
 import uk.matvey.drinki.ingredient.IngredientRepo
-import uk.matvey.slon.Repo
+import uk.matvey.slon.repo.Repo
 import javax.sql.DataSource
 
 class DrinkiRepos(

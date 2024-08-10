@@ -16,8 +16,8 @@ class AddDrink(
     private val drinkRepo: DrinkRepo,
     private val bot: TelegramBot,
 ) {
-    
-    operator fun invoke(rq: TgRequest) {
+
+    suspend operator fun invoke(rq: TgRequest) {
         val account = accountService.ensureTgAccount(rq.userId())
         val drink = Drink.new(account.id)
         drinkRepo.add(drink)

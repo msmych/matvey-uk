@@ -9,12 +9,15 @@ import uk.matvey.migraine.frobot.FrobotSql.STATE
 import uk.matvey.migraine.frobot.FrobotSql.TG
 import uk.matvey.migraine.frobot.FrobotSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.repo.RepoKit.queryOneNullable
 import java.time.Instant
 import java.util.UUID
 
@@ -22,7 +25,7 @@ class FrobotRepo(
     private val repo: Repo,
 ) {
 
-    fun add(frobot: Frobot) {
+    suspend fun add(frobot: Frobot) {
         repo.insertOne(
             FROBOT,
             ID to uuid(frobot.id),
@@ -33,7 +36,7 @@ class FrobotRepo(
         )
     }
 
-    fun update(frobot: Frobot) {
+    suspend fun update(frobot: Frobot) {
         repo.access { a ->
             a.execute(
                 update(FROBOT)
@@ -51,7 +54,7 @@ class FrobotRepo(
         }
     }
 
-    fun get(id: UUID): Frobot {
+    suspend fun get(id: UUID): Frobot {
         return repo.queryOne(
             "select * from $FROBOT where $ID = ?",
             listOf(uuid(id)),
@@ -59,7 +62,7 @@ class FrobotRepo(
         )
     }
 
-    fun findByTgUserId(userId: Long): Frobot? {
+    suspend fun findByTgUserId(userId: Long): Frobot? {
         return repo.queryOneNullable(
             "select * from $FROBOT where $TG ->> 'userId' = ?",
             listOf(text(userId.toString())),

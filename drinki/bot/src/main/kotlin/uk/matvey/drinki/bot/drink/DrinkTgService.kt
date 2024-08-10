@@ -1,8 +1,6 @@
 package uk.matvey.drinki.bot.drink
 
 import com.pengrad.telegrambot.TelegramBot
-import com.pengrad.telegrambot.model.request.ParseMode.MarkdownV2
-import com.pengrad.telegrambot.request.EditMessageText
 import uk.matvey.drinki.bot.amount.AmountTg
 import uk.matvey.drinki.drink.DrinkDetails
 import uk.matvey.drinki.drink.DrinkService
@@ -15,7 +13,7 @@ class DrinkTgService(
     private val bot: TelegramBot,
 ) {
     
-    fun editMessageDrinkDetailsIngredientSelected(
+    suspend fun editMessageDrinkDetailsIngredientSelected(
         drinkId: UUID,
         currentIngredientId: UUID,
         rq: TgRequest

@@ -9,7 +9,7 @@ class EditDrinkIngredientAmount(
     private val drinkTgService: DrinkTgService,
 ) {
     
-    operator fun invoke(ingredientId: UUID, rq: TgRequest) {
+    suspend operator fun invoke(ingredientId: UUID, rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
             .updateTgEditDrinkIngredient(ingredientId)
         accountRepo.update(account)

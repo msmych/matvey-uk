@@ -5,7 +5,7 @@ import com.pengrad.telegrambot.model.Update
 import uk.matvey.begit.athlete.AthleteUpdateProcessor
 import uk.matvey.begit.event.EventUpdateProcessor
 import uk.matvey.begit.tg.TgSessionSql.findTgSessionByChatId
-import uk.matvey.slon.Repo
+import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 
 class UpdateProcessor(
@@ -16,7 +16,7 @@ class UpdateProcessor(
     private val bot: TelegramBot,
 ) {
 
-    fun process(update: Update) {
+    suspend fun process(update: Update) {
         val message = update.message()
         if (message != null) {
             val chat = message.chat()

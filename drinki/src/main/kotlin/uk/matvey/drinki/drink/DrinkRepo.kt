@@ -17,20 +17,24 @@ import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.Repo
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.query.update.DeleteQuery.Builder.Companion.deleteFrom
 import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.execute
+import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.query
+import uk.matvey.slon.repo.RepoKit.queryOne
 import java.util.UUID
 
 class DrinkRepo(
     private val repo: Repo,
 ) {
 
-    fun add(drink: Drink) {
+    suspend fun add(drink: Drink) {
         repo.insertOne(
             DRINKS,
             ID to uuid(drink.id),
@@ -44,7 +48,7 @@ class DrinkRepo(
         )
     }
 
-    fun update(drink: Drink) {
+    suspend fun update(drink: Drink) {
         repo.execute(
             update(DRINKS)
                 .set(
@@ -57,11 +61,11 @@ class DrinkRepo(
         )
     }
 
-    fun delete(id: UUID) {
+    suspend fun delete(id: UUID) {
         repo.access { a -> a.execute(deleteFrom(DRINKS).where("$ID = ?", uuid(id))) }
     }
 
-    fun get(id: UUID): Drink {
+    suspend fun get(id: UUID): Drink {
         return repo.queryOne(
             "select * from $DRINKS where $ID = ?",
             listOf(uuid(id)),
@@ -69,7 +73,7 @@ class DrinkRepo(
         )
     }
 
-    fun search(accountId: UUID, query: String): List<Drink> {
+    suspend fun search(accountId: UUID, query: String): List<Drink> {
         return repo.query(
             """
                 select * from $DRINKS 

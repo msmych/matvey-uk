@@ -2,9 +2,9 @@ package uk.matvey.begit.tg
 
 import kotlinx.serialization.encodeToString
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.Access
 import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.IntParam.Companion.int
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.now
