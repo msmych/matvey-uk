@@ -20,46 +20,42 @@ import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.query
 import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.update
 import java.net.URI
 import java.util.UUID
 
 class WishlistRepo(private val repo: Repo) {
 
     suspend fun add(wishlistItem: WishlistItem) {
-        repo.insertOne(
-            WISHLIST,
-            ID to uuid(wishlistItem.id),
-            NAME to text(wishlistItem.name),
-            STATE to text(wishlistItem.state.name),
-            TAGS to textArray(wishlistItem.tags.map { it.toString() }),
-            DESCRIPTION to text(wishlistItem.description),
-            URL to text(wishlistItem.url?.toString()),
-            TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
-            CREATED_AT to timestamp(wishlistItem.createdAt),
-            UPDATED_AT to timestamp(wishlistItem.updatedAt),
-        )
+        repo.insertInto(WISHLIST) {
+            set(
+                ID to uuid(wishlistItem.id),
+                NAME to text(wishlistItem.name),
+                STATE to text(wishlistItem.state.name),
+                TAGS to textArray(wishlistItem.tags.map { it.toString() }),
+                DESCRIPTION to text(wishlistItem.description),
+                URL to text(wishlistItem.url?.toString()),
+                TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
+                CREATED_AT to timestamp(wishlistItem.createdAt),
+                UPDATED_AT to timestamp(wishlistItem.updatedAt),
+            )
+        }
     }
 
     suspend fun update(wishlistItem: WishlistItem) {
-        repo.access { a ->
-            a.execute(
-                update(WISHLIST)
-                    .set(
-                        NAME to text(wishlistItem.name),
-                        STATE to text(wishlistItem.state.name),
-                        TAGS to textArray(wishlistItem.tags.map { it.toString() }),
-                        DESCRIPTION to text(wishlistItem.description),
-                        URL to text(wishlistItem.url?.toString()),
-                        TG to jsonb(JSON.encodeToString(wishlistItem.tg)),
-                        UPDATED_AT to timestamp(wishlistItem.updatedAt)
-                    )
-                    .where("$ID = ?", uuid(wishlistItem.id))
-            )
+        repo.update(WISHLIST) {
+            set(NAME, text(wishlistItem.name))
+            set(STATE, text(wishlistItem.state.name))
+            set(TAGS, textArray(wishlistItem.tags.map { it.toString() }))
+            set(DESCRIPTION, text(wishlistItem.description))
+            set(URL, text(wishlistItem.url?.toString()))
+            set(TG, jsonb(JSON.encodeToString(wishlistItem.tg)))
+            set(UPDATED_AT, timestamp(wishlistItem.updatedAt))
+            where("$ID = ?", uuid(wishlistItem.id))
         }
     }
 

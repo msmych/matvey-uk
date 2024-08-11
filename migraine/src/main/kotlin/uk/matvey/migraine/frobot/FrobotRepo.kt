@@ -13,11 +13,11 @@ import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.update
 import java.time.Instant
 import java.util.UUID
 
@@ -26,30 +26,26 @@ class FrobotRepo(
 ) {
 
     suspend fun add(frobot: Frobot) {
-        repo.insertOne(
-            FROBOT,
-            ID to uuid(frobot.id),
-            STATE to text(frobot.state.name),
-            TG to jsonb(JSON.encodeToString(frobot.tg)),
-            CREATED_AT to timestamp(frobot.createdAt),
-            UPDATED_AT to timestamp(frobot.updatedAt),
-        )
+        repo.insertInto(FROBOT) {
+            set(
+                ID to uuid(frobot.id),
+                STATE to text(frobot.state.name),
+                TG to jsonb(JSON.encodeToString(frobot.tg)),
+                CREATED_AT to timestamp(frobot.createdAt),
+                UPDATED_AT to timestamp(frobot.updatedAt),
+            )
+        }
     }
 
     suspend fun update(frobot: Frobot) {
-        repo.access { a ->
-            a.execute(
-                update(FROBOT)
-                    .set(
-                        STATE to text(frobot.state.name),
-                        TG to jsonb(JSON.encodeToString(frobot.tg)),
-                        UPDATED_AT to timestamp(Instant.now())
-                    )
-                    .where(
-                        "$ID = ? and $UPDATED_AT = ?",
-                        uuid(frobot.id),
-                        timestamp(frobot.updatedAt)
-                    )
+        repo.update(FROBOT) {
+            set(STATE, text(frobot.state.name))
+            set(TG, jsonb(JSON.encodeToString(frobot.tg)))
+            set(UPDATED_AT, timestamp(Instant.now()))
+            where(
+                "$ID = ? and $UPDATED_AT = ?",
+                uuid(frobot.id),
+                timestamp(frobot.updatedAt)
             )
         }
     }

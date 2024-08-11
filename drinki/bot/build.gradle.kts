@@ -1,7 +1,3 @@
-plugins {
-    id("org.flywaydb.flyway") version "9.22.3"
-}
-
 val kitVersion: String by project
 val slonVersion: String by project
 val coroutinesVersion: String by project

@@ -2,9 +2,9 @@ package uk.matvey.begit.athlete
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.insertReturningOne
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
@@ -24,18 +24,17 @@ object AthleteSql {
     const val TG_CHAT_ID = "($REFS ->> 'tgChatId')"
 
     fun Access.ensureAthlete(tgChatId: Long, name: String): Athlete {
-        return execute(
-            insertInto(ATHLETES)
-                .set(
-                    ID to genRandomUuid(),
-                    NAME to text(name),
-                    REFS to jsonb(Json.encodeToString(Athlete.Refs(tgChatId))),
-                    CREATED_AT to now(),
-                    UPDATED_AT to now(),
-                )
-                .onConflict(listOf("($TG_CHAT_ID)"), "update set $NAME = '$name'")
-                .returningOne { r -> r.readAthlete() }
-        )
+        return insertReturningOne(ATHLETES) {
+            set(
+                ID to genRandomUuid(),
+                NAME to text(name),
+                REFS to jsonb(Json.encodeToString(Athlete.Refs(tgChatId))),
+                CREATED_AT to now(),
+                UPDATED_AT to now(),
+            )
+            onConflict(listOf("($TG_CHAT_ID)"), "update set $NAME = '$name'")
+            returning { r -> r.readAthlete() }
+        }
     }
 
     fun Access.getAthleteById(athleteId: UUID): Athlete {

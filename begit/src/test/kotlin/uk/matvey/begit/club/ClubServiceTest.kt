@@ -23,7 +23,7 @@ import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOneNullable
 import kotlin.random.Random
 
@@ -48,14 +48,15 @@ class ClubServiceTest : TestContainerSetup() {
         // given
         val tgChatId = Random.Default.nextLong()
 
-        repo.insertOne(
-            CLUBS,
-            ID to genRandomUuid(),
-            NAME to text("club1"),
-            REFS to jsonb(Json.encodeToString(Club.Refs(tgChatId))),
-            CREATED_AT to now(),
-            UPDATED_AT to now(),
-        )
+        repo.insertInto(CLUBS) {
+            set(
+                ID to genRandomUuid(),
+                NAME to text("club1"),
+                REFS to jsonb(Json.encodeToString(Club.Refs(tgChatId))),
+                CREATED_AT to now(),
+                UPDATED_AT to now(),
+            )
+        }
 
         // when
         val (club, count) = clubService.ensureClub("club2", tgChatId)

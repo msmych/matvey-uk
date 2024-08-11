@@ -7,10 +7,10 @@ import kotlinx.serialization.json.jsonObject
 import uk.matvey.begit.club.ClubSql.CLUBS
 import uk.matvey.begit.club.ClubSql.ID
 import uk.matvey.begit.club.ClubSql.readClub
-import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.InsertQueryBuilder
 import java.util.UUID
 
 object ClubMemberSql {
@@ -30,10 +30,14 @@ object ClubMemberSql {
 
     fun Access.addClubMember(clubId: UUID, athleteId: UUID, refs: JsonObject): Boolean {
         return execute(
-            insertInto(CLUB_MEMBERS)
-                .set(CLUB_ID to uuid(clubId), ATHLETE_ID to uuid(athleteId), REFS to jsonb(Json.encodeToString(refs)))
-                .onConflictDoNothing()
-                .build()
+            InsertQueryBuilder(CLUB_MEMBERS).apply {
+                set(
+                    CLUB_ID to uuid(clubId),
+                    ATHLETE_ID to uuid(athleteId),
+                    REFS to jsonb(Json.encodeToString(refs))
+                )
+                onConflictDoNothing()
+            }.build()
         ) > 0
     }
 

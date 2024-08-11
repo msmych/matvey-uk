@@ -14,11 +14,11 @@ import uk.matvey.slon.RecordReader
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.query
 import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.repo.RepoKit.update
 import java.util.UUID
 
 class IngredientRepo(
@@ -26,25 +26,23 @@ class IngredientRepo(
 ) {
 
     suspend fun add(ingredient: Ingredient) {
-        repo.insertOne(
-            INGREDIENTS,
-            ID to uuid(ingredient.id),
-            ACCOUNT_ID to uuid(ingredient.accountId),
-            TYPE to text(ingredient.type?.name),
-            NAME to text(ingredient.name),
-            VISIBILITY to text(ingredient.visibility.name),
-            CREATED_AT to timestamp(ingredient.createdAt),
-            UPDATED_AT to timestamp(ingredient.updatedAt),
-        )
+        repo.insertInto(INGREDIENTS) {
+            set(
+                ID to uuid(ingredient.id),
+                ACCOUNT_ID to uuid(ingredient.accountId),
+                TYPE to text(ingredient.type?.name),
+                NAME to text(ingredient.name),
+                VISIBILITY to text(ingredient.visibility.name),
+                CREATED_AT to timestamp(ingredient.createdAt),
+                UPDATED_AT to timestamp(ingredient.updatedAt),
+            )
+        }
     }
 
     suspend fun update(ingredient: Ingredient) {
-        repo.access { a ->
-            a.execute(
-                update(INGREDIENTS)
-                    .set(NAME to text(ingredient.name))
-                    .where("$ID = ?", uuid(ingredient.id))
-            )
+        repo.update(INGREDIENTS) {
+            set(NAME, text(ingredient.name))
+            where("$ID = ?", uuid(ingredient.id))
         }
     }
 

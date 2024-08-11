@@ -13,30 +13,28 @@ import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.update
 
 class AccountRepo(private val repo: Repo) {
 
     suspend fun add(account: Account) {
-        repo.insertOne(
-            ACCOUNTS,
-            ID to uuid(account.id),
-            TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
-            CREATED_AT to timestamp(account.createdAt),
-            UPDATED_AT to timestamp(account.updatedAt),
-        )
+        repo.insertInto(ACCOUNTS) {
+            set(
+                ID to uuid(account.id),
+                TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
+                CREATED_AT to timestamp(account.createdAt),
+                UPDATED_AT to timestamp(account.updatedAt),
+            )
+        }
     }
 
     suspend fun update(account: Account) {
-        repo.access { a ->
-            a.execute(
-                update(ACCOUNTS)
-                    .set(TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)))
-                    .where("$ID = ?", uuid(account.id))
-            )
+        repo.update(ACCOUNTS) {
+            set(TG_SESSION, jsonb(JSON.encodeToString(account.tgSession)))
+            where("$ID = ?", uuid(account.id))
         }
     }
 

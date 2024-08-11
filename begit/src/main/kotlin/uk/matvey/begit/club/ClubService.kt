@@ -13,7 +13,7 @@ import uk.matvey.begit.event.EventParticipantSql.EVENT_PARTICIPANTS
 import uk.matvey.begit.event.EventSql
 import uk.matvey.begit.event.EventSql.EVENTS
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.DeleteQuery.Builder.Companion.deleteFrom
+import uk.matvey.slon.query.update.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.repo.Repo
 import java.util.UUID
 

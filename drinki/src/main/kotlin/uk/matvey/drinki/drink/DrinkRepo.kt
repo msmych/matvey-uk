@@ -21,13 +21,13 @@ import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.DeleteQuery.Builder.Companion.deleteFrom
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.query.update.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.execute
-import uk.matvey.slon.repo.RepoKit.insertOne
+import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.query
 import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.repo.RepoKit.update
 import java.util.UUID
 
 class DrinkRepo(
@@ -35,34 +35,32 @@ class DrinkRepo(
 ) {
 
     suspend fun add(drink: Drink) {
-        repo.insertOne(
-            DRINKS,
-            ID to uuid(drink.id),
-            ACCOUNT_ID to uuid(drink.accountId),
-            NAME to text(drink.name),
-            INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
-            RECIPE to text(drink.recipe),
-            VISIBILITY to text(drink.visibility.name),
-            CREATED_AT to timestamp(drink.createdAt),
-            UPDATED_AT to timestamp(drink.updatedAt),
-        )
+        repo.insertInto(DRINKS) {
+            set(
+                ID to uuid(drink.id),
+                ACCOUNT_ID to uuid(drink.accountId),
+                NAME to text(drink.name),
+                INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
+                RECIPE to text(drink.recipe),
+                VISIBILITY to text(drink.visibility.name),
+                CREATED_AT to timestamp(drink.createdAt),
+                UPDATED_AT to timestamp(drink.updatedAt),
+            )
+        }
     }
 
     suspend fun update(drink: Drink) {
-        repo.execute(
-            update(DRINKS)
-                .set(
-                    NAME to text(drink.name),
-                    INGREDIENTS to jsonb(JSON.encodeToString(drink.ingredientsJson())),
-                    RECIPE to text(drink.recipe),
-                    VISIBILITY to text(drink.visibility.name)
-                )
-                .where("$ID = ?", uuid(drink.id))
-        )
+        repo.update(DRINKS) {
+            set(NAME, text(drink.name))
+            set(INGREDIENTS, jsonb(JSON.encodeToString(drink.ingredientsJson())))
+            set(RECIPE, text(drink.recipe))
+            set(VISIBILITY, text(drink.visibility.name))
+            where("$ID = ?", uuid(drink.id))
+        }
     }
 
     suspend fun delete(id: UUID) {
-        repo.access { a -> a.execute(deleteFrom(DRINKS).where("$ID = ?", uuid(id))) }
+        repo.execute(deleteFrom(DRINKS).where("$ID = ?", uuid(id)))
     }
 
     suspend fun get(id: UUID): Drink {

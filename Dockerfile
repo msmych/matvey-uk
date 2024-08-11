@@ -1,4 +1,4 @@
-FROM eclipse-temurin:22-jdk as builder
+FROM eclipse-temurin:21-jdk as builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY telek /app/telek
 
 RUN ./gradlew app:shadowJar
 
-FROM eclipse-temurin:22-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 

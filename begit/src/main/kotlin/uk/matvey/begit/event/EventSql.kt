@@ -2,9 +2,9 @@ package uk.matvey.begit.event
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.insertReturningOne
 import uk.matvey.slon.param.DateParam.Companion.date
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
@@ -12,7 +12,7 @@ import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
+import uk.matvey.slon.query.update.UpdateQueryBuilder
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -40,36 +40,32 @@ object EventSql {
         date: LocalDate? = null,
         dateTime: Instant? = null,
     ): Event {
-        return execute(
-            insertInto(EVENTS)
-                .set(
-                    ID to genRandomUuid(),
-                    CLUB_ID to uuid(clubId),
-                    ORGANIZED_BY to uuid(organizedBy),
-                    TITLE to text(title),
-                    TYPE to text(Event.Type.RUN.name),
-                    DATE to date(date),
-                    DATE_TIME to timestamp(dateTime),
-                    CREATED_AT to now(),
-                    UPDATED_AT to now(),
-                )
-                .returningOne { r -> r.readEvent() }
-        )
+        return insertReturningOne(EVENTS) {
+            set(
+                ID to genRandomUuid(),
+                CLUB_ID to uuid(clubId),
+                ORGANIZED_BY to uuid(organizedBy),
+                TITLE to text(title),
+                TYPE to text(Event.Type.RUN.name),
+                DATE to date(date),
+                DATE_TIME to timestamp(dateTime),
+                CREATED_AT to now(),
+                UPDATED_AT to now(),
+            )
+            returning { r -> r.readEvent() }
+        }
     }
 
     fun Access.updateEvent(event: Event) {
         execute(
-            update(EVENTS)
-                .set(
-                    listOf(
-                        DATE to date(event.date),
-                        DATE_TIME to timestamp(event.dateTime),
-                        TITLE to text(event.title),
-                        DESCRIPTION to text(event.description),
-                        REFS to jsonb(Json.encodeToString(event.refs)),
-                        UPDATED_AT to now(),
-                    )
-                )
+            UpdateQueryBuilder(EVENTS).apply {
+                set(DATE, date(event.date))
+                set(DATE_TIME, timestamp(event.dateTime))
+                set(TITLE, text(event.title))
+                set(DESCRIPTION, text(event.description))
+                set(REFS, jsonb(Json.encodeToString(event.refs)))
+                set(UPDATED_AT, now())
+            }
                 .where("$ID = ? and $UPDATED_AT = ?", uuid(event.id), timestamp(event.updatedAt))
                 .optimistic()
         )

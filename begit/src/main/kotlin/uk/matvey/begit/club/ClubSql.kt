@@ -2,16 +2,16 @@ package uk.matvey.begit.club
 
 import kotlinx.serialization.encodeToString
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.InsertBuilder.Companion.insertInto
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.insertReturningOne
+import uk.matvey.slon.access.AccessKit.update
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.genRandomUuid
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.query.update.UpdateQuery.Builder.Companion.update
 import java.util.UUID
 
 object ClubSql {
@@ -26,30 +26,27 @@ object ClubSql {
     const val TG_CHAT_ID = "($REFS ->> 'tgChatId')"
 
     fun Access.ensureClub(name: String, tgChatId: Long): Club {
-        return execute(insertInto(CLUBS)
-            .set(
+        return insertReturningOne(CLUBS) {
+            set(
                 ID to genRandomUuid(),
                 NAME to text(name),
                 REFS to jsonb(JSON.encodeToString(Club.Refs(tgChatId))),
                 CREATED_AT to now(),
                 UPDATED_AT to now(),
             )
-            .onConflict(listOf("($TG_CHAT_ID)"), "update set $NAME = '$name'")
-            .returningOne { r -> r.readClub() }
-        )
+            onConflict(listOf("($TG_CHAT_ID)"), "update set $NAME = '$name'")
+            returning { r -> r.readClub() }
+        }
     }
 
     fun Access.updateClub(club: Club) {
-        execute(
-            update(CLUBS)
-                .set(
-                    NAME to text(club.name),
-                    DESCRIPTION to text(club.description),
-                    REFS to jsonb(JSON.encodeToString(club.refs)),
-                    UPDATED_AT to now()
-                )
-                .where("$ID = ? and $UPDATED_AT = ?", uuid(club.id), timestamp(club.updatedAt))
-        )
+        update(CLUBS) {
+            set(NAME, text(club.name))
+            set(DESCRIPTION, text(club.description))
+            set(REFS, jsonb(JSON.encodeToString(club.refs)))
+            set(UPDATED_AT, now())
+            where("$ID = ? and $UPDATED_AT = ?", uuid(club.id), timestamp(club.updatedAt))
+        }
     }
 
     fun Access.getClubById(id: UUID): Club {
