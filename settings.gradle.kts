@@ -2,7 +2,7 @@ rootProject.name = "matvey-uk"
 
 include(
     "app",
-    "begit",
+    "corsa",
     "drinki",
     "drinki:app",
     "drinki:bot",

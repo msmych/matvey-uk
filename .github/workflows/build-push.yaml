@@ -23,9 +23,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.4.2
-
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -42,8 +39,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t
-            -e GH_PACKAGES_RO_TOKEN=${{ secrets.GH_PACKAGES_RO_TOKEN }}
+          docker build -t \
+            -e GH_PACKAGES_RO_TOKEN=${{ secrets.GH_PACKAGES_RO_TOKEN }} \
             $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
