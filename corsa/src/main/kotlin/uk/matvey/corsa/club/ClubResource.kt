@@ -6,11 +6,12 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import uk.matvey.voron.Resource
 import java.util.UUID.randomUUID
 
-class ClubResource {
+class ClubResource : Resource {
 
-    fun Route.routing() {
+    override fun Route.routing() {
         route("/clubs") {
             getClubs()
         }
