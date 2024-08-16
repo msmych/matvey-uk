@@ -8,11 +8,14 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import uk.matvey.corsa.club.ClubResource
 import uk.matvey.corsa.event.EventResource
+import uk.matvey.slon.repo.Repo
 import uk.matvey.voron.KtorKit.respondFtl
 
-fun Application.setupRouting() {
+fun Application.setupRouting(
+    repo: Repo,
+) {
     val resources = listOf(
-        ClubResource(),
+        ClubResource(repo),
         EventResource(),
     )
     routing {
@@ -23,6 +26,6 @@ fun Application.setupRouting() {
         get {
             call.respondFtl("index")
         }
-        resources.forEach { with(it) { routing() } }
+        resources.forEach { resource -> with(resource) { routing() } }
     }
 }

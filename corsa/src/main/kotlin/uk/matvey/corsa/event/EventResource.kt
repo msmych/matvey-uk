@@ -24,7 +24,7 @@ class EventResource : Resource {
                 "Sunday run" to "2024-08-18",
             )
                 .map { (name, date) -> Event(randomUUID(), name, LocalDate.parse(date)) }
-            call.respondFtl("event/events") { mapOf("events" to events) }
+            call.respondFtl("event/events", mapOf("events" to events))
         }
     }
 }
