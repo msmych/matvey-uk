@@ -16,7 +16,7 @@ import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
-import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.queryOneOrNull
 import uk.matvey.slon.repo.RepoKit.update
 import java.time.Instant
 import java.util.UUID
@@ -59,7 +59,7 @@ class FrobotRepo(
     }
 
     suspend fun findByTgUserId(userId: Long): Frobot? {
-        return repo.queryOneNullable(
+        return repo.queryOneOrNull(
             "select * from $FROBOT where $TG ->> 'userId' = ?",
             listOf(text(userId.toString())),
             ::frobotFrom

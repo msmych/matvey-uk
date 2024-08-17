@@ -15,7 +15,7 @@ import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
-import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.queryOneOrNull
 import uk.matvey.slon.repo.RepoKit.update
 
 class AccountRepo(private val repo: Repo) {
@@ -39,7 +39,7 @@ class AccountRepo(private val repo: Repo) {
     }
 
     suspend fun findByTgUserId(tgUserId: Long): Account? {
-        return repo.queryOneNullable(
+        return repo.queryOneOrNull(
             "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
             listOf(text(tgUserId.toString()))
         ) { reader ->

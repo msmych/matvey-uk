@@ -88,8 +88,8 @@ class IngredientRepo(
     private fun ingredient(reader: RecordReader): Ingredient {
         return Ingredient(
             reader.uuid(ID),
-            reader.nullableUuid(ACCOUNT_ID),
-            reader.nullableString(TYPE)?.let(Ingredient.Type::valueOf),
+            reader.uuidOrNull(ACCOUNT_ID),
+            reader.stringOrNull(TYPE)?.let(Ingredient.Type::valueOf),
             reader.string(NAME),
             Visibility.valueOf(reader.string(VISIBILITY)),
             reader.instant(CREATED_AT),

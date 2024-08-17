@@ -101,7 +101,7 @@ class DrinkRepo(
                     ingredientsId to amount
                 }
         ),
-        reader.nullableString(RECIPE),
+        reader.stringOrNull(RECIPE),
         Visibility.valueOf(reader.string(VISIBILITY)),
         reader.instant(CREATED_AT),
         reader.instant(UPDATED_AT),

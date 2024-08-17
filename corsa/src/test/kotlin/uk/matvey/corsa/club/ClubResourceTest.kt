@@ -1,5 +1,6 @@
 package uk.matvey.corsa.club
 
+import io.ktor.client.request.delete
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
@@ -13,10 +14,12 @@ import io.ktor.server.testing.testApplication
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.matvey.corsa.TestSetup
+import uk.matvey.corsa.club.ClubSql.addClub
 import uk.matvey.corsa.club.ClubTestData.aClub
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
@@ -96,6 +99,24 @@ class ClubResourceTest : TestSetup() {
             .contains(">$name<")
         repo().queryOne("select count(*) from clubs where name = ?", listOf(text(name))) {
             assertThat(it.int(1)).isGreaterThan(0)
+        }
+    }
+
+    @Test
+    fun `should remove club`() = testApplication {
+        // given
+        application {
+            serverModule()
+        }
+        val club = repo().access { a -> a.addClub(randomAlphabetic()) }
+
+        // when
+        val rs = client.delete("/clubs/${club.id}")
+
+        // then
+        assertThat(rs.status).isEqualTo(OK)
+        repo().queryOne("select count(*) from clubs where id = ?", listOf(uuid(club.id))) {
+            assertThat(it.int(1)).isEqualTo(0)
         }
     }
 }

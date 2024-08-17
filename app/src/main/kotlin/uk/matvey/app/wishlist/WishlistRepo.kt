@@ -23,7 +23,7 @@ import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.query
-import uk.matvey.slon.repo.RepoKit.queryOneNullable
+import uk.matvey.slon.repo.RepoKit.queryOneOrNull
 import uk.matvey.slon.repo.RepoKit.update
 import java.net.URI
 import java.util.UUID
@@ -60,7 +60,7 @@ class WishlistRepo(private val repo: Repo) {
     }
 
     suspend fun findById(id: UUID): WishlistItem? {
-        return repo.queryOneNullable(
+        return repo.queryOneOrNull(
             "select * from $WISHLIST where $ID = ?",
             listOf(uuid(id)),
             ::toWishlistItem
@@ -81,8 +81,8 @@ class WishlistRepo(private val repo: Repo) {
             name = reader.string(NAME),
             state = State.valueOf(reader.string(STATE)),
             tags = reader.stringList(TAGS).map(WishlistItem.Tag::valueOf).toSet(),
-            description = reader.nullableString(DESCRIPTION),
-            url = reader.nullableString(URL)?.let(::URI),
+            description = reader.stringOrNull(DESCRIPTION),
+            url = reader.stringOrNull(URL)?.let(::URI),
             tg = jsonDeserialize(reader.string(TG)),
             createdAt = reader.instant(CREATED_AT),
             updatedAt = reader.instant(UPDATED_AT),
