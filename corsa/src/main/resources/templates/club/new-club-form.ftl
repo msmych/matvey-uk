@@ -2,7 +2,7 @@
 <form hx-post="/clubs" hx-target="#new-club">
     <label>
         Club name:
-        <input type="text" name="name" placeholder="Club name">
+        <input type="text" name="name" placeholder="Club name" required>
     </label>
     <button type="submit">Add club</button>
 </form>

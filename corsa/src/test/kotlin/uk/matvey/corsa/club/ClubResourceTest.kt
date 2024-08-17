@@ -1,17 +1,25 @@
 package uk.matvey.corsa.club
 
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.OK
+import io.ktor.http.Parameters
+import io.ktor.http.contentType
 import io.ktor.server.testing.testApplication
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.matvey.corsa.TestSetup
 import uk.matvey.corsa.club.ClubTestData.aClub
+import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
+import uk.matvey.slon.repo.RepoKit.queryOne
 
 class ClubResourceTest : TestSetup() {
 
@@ -60,5 +68,34 @@ class ClubResourceTest : TestSetup() {
         // then
         assertThat(rs.status).isEqualTo(OK)
         assertThat(rs.bodyAsText()).contains("<h3>New club</h3>")
+    }
+
+    @Test
+    fun `should add club`() = testApplication {
+        // given
+        application {
+            serverModule()
+        }
+        val name = randomAlphabetic()
+
+        // when
+        val rs = client.submitForm("/clubs") {
+            contentType(ContentType.Application.FormUrlEncoded)
+            setBody(
+                FormDataContent(
+                    Parameters.build {
+                        append("name", name)
+                    }
+                )
+            )
+        }
+
+        // then
+        assertThat(rs.status).isEqualTo(OK)
+        assertThat(rs.bodyAsText())
+            .contains(">$name<")
+        repo().queryOne("select count(*) from clubs where name = ?", listOf(text(name))) {
+            assertThat(it.int(1)).isGreaterThan(0)
+        }
     }
 }
