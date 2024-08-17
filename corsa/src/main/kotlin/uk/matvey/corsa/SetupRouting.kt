@@ -7,16 +7,18 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import uk.matvey.corsa.club.ClubResource
+import uk.matvey.corsa.club.ClubService
 import uk.matvey.corsa.event.EventResource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.voron.KtorKit.respondFtl
 
 fun Application.setupRouting(
     repo: Repo,
+    clubService: ClubService,
 ) {
     val resources = listOf(
-        ClubResource(repo),
-        EventResource(repo),
+        ClubResource(repo, clubService),
+        EventResource(repo, clubService),
     )
     routing {
         staticResources("/assets", "/assets")

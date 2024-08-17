@@ -9,7 +9,9 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-<h1>Corsa</h1>
-<div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
+<div class="main">
+    <h1>Corsa</h1>
+    <div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
+</div>
 </body>
 </html>

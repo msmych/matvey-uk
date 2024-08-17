@@ -2,6 +2,7 @@ package uk.matvey.corsa
 
 import com.typesafe.config.ConfigFactory
 import mu.KotlinLogging
+import uk.matvey.corsa.club.ClubService
 import uk.matvey.slon.repo.Repo
 
 private val log = KotlinLogging.logger("Corsa")
@@ -12,5 +13,6 @@ fun main() {
     val ds = dataSource(config.getConfig("dataSource"))
     migrate(ds, clean = false)
     val repo = Repo(ds)
-    startServer(repo)
+    val clubService = ClubService(repo)
+    startServer(repo, clubService)
 }
