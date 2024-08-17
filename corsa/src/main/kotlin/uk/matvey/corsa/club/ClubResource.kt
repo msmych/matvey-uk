@@ -16,6 +16,7 @@ class ClubResource(
     override fun Route.routing() {
         route("/clubs") {
             getClubs()
+            newClubForm()
         }
     }
 
@@ -25,6 +26,12 @@ class ClubResource(
                 Club(it.uuid("id"), it.string("name"))
             }
             call.respondFtl("club/clubs", mapOf("clubs" to clubs))
+        }
+    }
+
+    private fun Route.newClubForm() {
+        get("/new-club-form") {
+            call.respondFtl("club/new-club-form")
         }
     }
 }

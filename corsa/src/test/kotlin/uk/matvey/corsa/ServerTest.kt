@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.matvey.slon.repo.Repo
 
-class ServerTest : TestContainersSetup() {
+class ServerTest : TestSetup() {
 
     @Test
     fun `should start server`() = testApplication {

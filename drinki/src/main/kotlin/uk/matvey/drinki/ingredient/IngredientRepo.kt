@@ -27,7 +27,7 @@ class IngredientRepo(
 
     suspend fun add(ingredient: Ingredient) {
         repo.insertInto(INGREDIENTS) {
-            set(
+            values(
                 ID to uuid(ingredient.id),
                 ACCOUNT_ID to uuid(ingredient.accountId),
                 TYPE to text(ingredient.type?.name),

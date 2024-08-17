@@ -17,7 +17,7 @@ import org.flywaydb.core.Flyway
 import uk.matvey.app.wishlist.WishlistItem.State
 import uk.matvey.app.wishlist.WishlistRepo
 import uk.matvey.app.wishlist.WishlistTg
-import uk.matvey.slon.DataSourceKit.hikariDataSource
+import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgRequest
 import uk.matvey.telek.TgSendMessageSupport.sendMessage

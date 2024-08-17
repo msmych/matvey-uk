@@ -9,21 +9,15 @@ import uk.matvey.drinki.ingredient.Ingredient.Type.SPIRIT
 import uk.matvey.drinki.ingredient.Ingredient.Type.SYRUP
 import uk.matvey.drinki.ingredient.Ingredient.Type.TONIC
 import uk.matvey.drinki.ingredient.Ingredient.Type.WINE
-import uk.matvey.slon.FlywayKit
+import uk.matvey.slon.FlywayKit.flywayMigrate
 
 fun migrate(drinkiRepos: DrinkiRepos, clean: Boolean) {
-    val flyway = FlywayKit.flywayConfig(
+    flywayMigrate(
         dataSource = drinkiRepos.ds,
         schema = "drinki",
         location = "classpath:db/migration/drinki",
-        createSchema = true,
-        cleanDisabled = !clean,
-    ).load()
-    if (clean) {
-        flyway.clean()
-    }
-    flyway
-        .migrate()
+        clean = clean,
+    )
     migratePublicIngredients(drinkiRepos)
 }
 

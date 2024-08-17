@@ -32,7 +32,7 @@ class WishlistRepo(private val repo: Repo) {
 
     suspend fun add(wishlistItem: WishlistItem) {
         repo.insertInto(WISHLIST) {
-            set(
+            values(
                 ID to uuid(wishlistItem.id),
                 NAME to text(wishlistItem.name),
                 STATE to text(wishlistItem.state.name),

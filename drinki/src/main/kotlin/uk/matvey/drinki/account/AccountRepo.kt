@@ -22,7 +22,7 @@ class AccountRepo(private val repo: Repo) {
 
     suspend fun add(account: Account) {
         repo.insertInto(ACCOUNTS) {
-            set(
+            values(
                 ID to uuid(account.id),
                 TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
                 CREATED_AT to timestamp(account.createdAt),

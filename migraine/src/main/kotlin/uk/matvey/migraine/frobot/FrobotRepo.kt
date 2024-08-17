@@ -27,7 +27,7 @@ class FrobotRepo(
 
     suspend fun add(frobot: Frobot) {
         repo.insertInto(FROBOT) {
-            set(
+            values(
                 ID to uuid(frobot.id),
                 STATE to text(frobot.state.name),
                 TG to jsonb(JSON.encodeToString(frobot.tg)),

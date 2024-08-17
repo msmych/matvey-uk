@@ -36,7 +36,7 @@ class DrinkRepo(
 
     suspend fun add(drink: Drink) {
         repo.insertInto(DRINKS) {
-            set(
+            values(
                 ID to uuid(drink.id),
                 ACCOUNT_ID to uuid(drink.accountId),
                 NAME to text(drink.name),

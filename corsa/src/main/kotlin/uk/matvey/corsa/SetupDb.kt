@@ -1,8 +1,8 @@
 package uk.matvey.corsa
 
 import com.typesafe.config.Config
-import uk.matvey.slon.DataSourceKit.hikariDataSource
 import uk.matvey.slon.FlywayKit.flywayMigrate
+import uk.matvey.slon.HikariKit.hikariDataSource
 import javax.sql.DataSource
 
 fun dataSource(config: Config): DataSource {
@@ -15,10 +15,7 @@ fun dataSource(config: Config): DataSource {
 
 fun migrate(dataSource: DataSource, clean: Boolean = false) {
     flywayMigrate(
-        dataSource,
-        schema = "public",
-        location = "classpath:db/migration",
-        createSchema = false,
+        dataSource = dataSource,
         clean = clean,
     )
 }

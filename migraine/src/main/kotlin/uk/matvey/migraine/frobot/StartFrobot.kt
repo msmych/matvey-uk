@@ -12,8 +12,8 @@ import mu.KotlinLogging
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
-import uk.matvey.slon.DataSourceKit.hikariDataSource
-import uk.matvey.slon.FlywayKit.flywayConfig
+import uk.matvey.slon.FlywayKit.flywayMigrate
+import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
@@ -23,7 +23,6 @@ private val log = KotlinLogging.logger("frobot")
 
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 fun startFrobot(config: Config) {
-    uk.matvey.slon.DataSourceKit
     val bot = TelegramBot(config.getString("frobot.token"))
     val ds = dataSource(config.getConfig("ds"))
     migrate(ds, System.getenv("CLEAN_DB") == "true")
@@ -59,17 +58,12 @@ fun startFrobot(config: Config) {
 }
 
 fun migrate(ds: DataSource, clean: Boolean) {
-    val flyway = flywayConfig(
+    flywayMigrate(
         dataSource = ds,
         schema = "migraine",
         location = "classpath:db/migration/migraine",
-        createSchema = true,
-        cleanDisabled = !clean,
-    ).load()
-    if (clean) {
-        flyway.clean()
-    }
-    flyway.migrate()
+        clean = clean,
+    )
 }
 
 private fun dataSource(config: Config): DataSource {
