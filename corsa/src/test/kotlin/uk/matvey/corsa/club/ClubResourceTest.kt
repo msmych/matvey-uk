@@ -1,16 +1,10 @@
 package uk.matvey.corsa.club
 
 import io.ktor.client.request.delete
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode.Companion.OK
-import io.ktor.http.Parameters
-import io.ktor.http.contentType
-import io.ktor.server.testing.testApplication
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.matvey.corsa.TestSetup
@@ -20,19 +14,15 @@ import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.voron.KtorKit.setFormData
 
 class ClubResourceTest : TestSetup() {
 
     @Test
-    fun `should return clubs`() = testApplication {
+    fun `should return clubs`() = testApp {
         // given
-        val repo = Repo(dataSource())
-        application {
-            serverModule()
-        }
         val club1 = aClub()
         val club2 = aClub()
         repo.insertInto("clubs") {
@@ -59,12 +49,7 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should return new club form`() = testApplication {
-        // given
-        application {
-            serverModule()
-        }
-
+    fun `should return new club form`() = testApp {
         // when
         val rs = client.get("/clubs/new-club-form")
 
@@ -74,49 +59,50 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should add club`() = testApplication {
+    fun `should add club`() = testApp {
         // given
-        application {
-            serverModule()
-        }
         val name = randomAlphabetic()
 
         // when
         val rs = client.submitForm("/clubs") {
-            contentType(ContentType.Application.FormUrlEncoded)
-            setBody(
-                FormDataContent(
-                    Parameters.build {
-                        append("name", name)
-                    }
-                )
-            )
+            setFormData("name" to name)
         }
 
         // then
         assertThat(rs.status).isEqualTo(OK)
         assertThat(rs.bodyAsText())
             .contains(">$name<")
-        repo().queryOne("select count(*) from clubs where name = ?", listOf(text(name))) {
+        repo.queryOne("select count(*) from clubs where name = ?", listOf(text(name))) {
             assertThat(it.int(1)).isGreaterThan(0)
         }
     }
 
     @Test
-    fun `should remove club`() = testApplication {
+    fun `should remove club`() = testApp {
         // given
-        application {
-            serverModule()
-        }
-        val club = repo().access { a -> a.addClub(randomAlphabetic()) }
+        val club = repo.access { a -> a.addClub(randomAlphabetic()) }
 
         // when
         val rs = client.delete("/clubs/${club.id}")
 
         // then
         assertThat(rs.status).isEqualTo(OK)
-        repo().queryOne("select count(*) from clubs where id = ?", listOf(uuid(club.id))) {
+        repo.queryOne("select count(*) from clubs where id = ?", listOf(uuid(club.id))) {
             assertThat(it.int(1)).isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `should return club details`() = testApp {
+        // given
+        val club = repo.access { a -> a.addClub(randomAlphabetic()) }
+
+        // when
+        val rs = client.get("/clubs/${club.id}")
+
+        // then
+        assertThat(rs.status).isEqualTo(OK)
+        assertThat(rs.bodyAsText())
+            .contains(">${club.name}<")
     }
 }

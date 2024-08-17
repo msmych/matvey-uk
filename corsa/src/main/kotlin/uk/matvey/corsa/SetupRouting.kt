@@ -16,7 +16,7 @@ fun Application.setupRouting(
 ) {
     val resources = listOf(
         ClubResource(repo),
-        EventResource(),
+        EventResource(repo),
     )
     routing {
         staticResources("/assets", "/assets")

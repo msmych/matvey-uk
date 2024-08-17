@@ -8,9 +8,13 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import kotlinx.coroutines.async
 import uk.matvey.corsa.club.ClubSql.addClub
+import uk.matvey.corsa.club.ClubSql.getClub
 import uk.matvey.corsa.club.ClubSql.readClub
 import uk.matvey.corsa.club.ClubSql.removeClub
+import uk.matvey.corsa.event.Event
+import uk.matvey.corsa.event.EventSql.getEventsByClubId
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.query
 import uk.matvey.voron.KtorKit.pathParam
@@ -29,6 +33,7 @@ class ClubResource(
             newClubForm()
             addClub()
             route("/{id}") {
+                getClubDetails()
                 removeClub()
             }
         }
@@ -61,6 +66,18 @@ class ClubResource(
             val clubId = UUID.fromString(call.pathParam("id"))
             repo.access { a -> a.removeClub(clubId) }
             call.respond(OK)
+        }
+    }
+
+    private fun Route.getClubDetails() {
+        data class ClubEvents(val club: Club, val events: List<Event>)
+
+        get {
+            val clubId = UUID.fromString(call.pathParam("id"))
+            val club = async { repo.access { a -> a.getClub(clubId) } }
+            val events = async { repo.access { a -> a.getEventsByClubId(clubId) } }
+            val clubEvents = ClubEvents(club.await(), events.await())
+            call.respondFtl("club/details", clubEvents)
         }
     }
 }

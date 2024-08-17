@@ -1,6 +1,7 @@
 package uk.matvey.corsa
 
-import io.ktor.server.application.Application
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import uk.matvey.slon.PostgresTestContainer
@@ -12,16 +13,23 @@ open class TestSetup {
 
         private val postgres = PostgresTestContainer()
 
+        lateinit var repo: Repo
+
         fun dataSource() = postgres.dataSource()
 
-        fun repo() = Repo(dataSource())
+        fun testApp(block: suspend ApplicationTestBuilder.() -> Unit) = testApplication {
+            application {
+                serverModule(repo)
+            }
 
-        fun Application.serverModule() = serverModule(repo())
+            block()
+        }
 
         @BeforeAll
         @JvmStatic
         fun globalSetup() {
             postgres.start()
+            repo = Repo(dataSource())
             migrate(dataSource(), clean = true)
         }
 

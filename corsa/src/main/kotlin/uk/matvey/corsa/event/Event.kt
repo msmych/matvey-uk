@@ -5,6 +5,7 @@ import java.util.UUID
 
 data class Event(
     val id: UUID,
+    val clubId: UUID,
     val name: String,
     val date: LocalDate,
 )

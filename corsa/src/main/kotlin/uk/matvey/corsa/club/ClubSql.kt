@@ -31,6 +31,10 @@ object ClubSql {
         deleteFrom(CLUBS, "$ID = ?", uuid(id))
     }
 
+    fun Access.getClub(id: UUID): Club {
+        return queryOne("select * from $CLUBS where $ID = ?", listOf(uuid(id))) { readClub(it) }
+    }
+
     fun readClub(r: RecordReader) = Club(
         r.uuid(ID),
         r.string(NAME)
