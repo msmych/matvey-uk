@@ -9,9 +9,17 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="main">
+<div id="home">
     <h1>Corsa</h1>
     <div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </div>
 </body>
+<style>
+    #home {
+        margin: 60px auto 0;
+        width: 80%;
+        min-width: 400px;
+        max-width: 2000px;
+    }
+</style>
 </html>

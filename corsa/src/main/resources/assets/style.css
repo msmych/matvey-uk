@@ -5,17 +5,16 @@ body {
 button {
     height: 24px;
     max-width: 256px;
+    background-color: transparent;
+    border: black 2px solid;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 input {
     height: 24px;
-}
-
-.main {
-    margin: 60px auto 0;
-    width: 80%;
-    min-width: 400px;
-    max-width: 2000px;
+    border: dimgray 2px solid;
+    border-radius: 4px;
 }
 
 .col {
@@ -26,6 +25,7 @@ input {
 .row {
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .gap-8 {
@@ -39,4 +39,16 @@ input {
 .naked {
     background-color: transparent;
     border: none;
+}
+
+.click {
+    cursor: pointer;
+}
+
+.click:hover {
+    background-color: lightgrey;
+}
+
+button:hover {
+    background-color: lightgrey;
 }

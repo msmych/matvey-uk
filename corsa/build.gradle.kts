@@ -4,12 +4,14 @@ plugins {
 }
 
 val slonVersion: String by project
+val telekVersion: String by project
 val voronVersion: String by project
 val junitVersion: String by project
 val assertjVersion: String by project
 
 dependencies {
     implementation("uk.matvey:slon:$slonVersion")
+    implementation("uk.matvey:telek:$telekVersion")
     implementation("uk.matvey:voron:$voronVersion")
 
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))

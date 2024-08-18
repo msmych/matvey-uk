@@ -1,5 +1,6 @@
 package uk.matvey.corsa
 
+import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
 import mu.KotlinLogging
 import uk.matvey.corsa.club.ClubService
@@ -14,5 +15,8 @@ fun main() {
     migrate(ds, clean = false)
     val repo = Repo(ds)
     val clubService = ClubService(repo)
-    startServer(repo, clubService)
+    val serverConfig = config.getConfig("server")
+    val algorithm = Algorithm.HMAC256(serverConfig.getString("jwtSecret"))
+    startTgBot(config.getConfig("tgBot"), serverConfig, algorithm)
+    startServer(serverConfig, repo, clubService, algorithm)
 }
