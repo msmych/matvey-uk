@@ -16,6 +16,7 @@ import uk.matvey.drinki.drink.DrinkSql.VISIBILITY
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.kit.json.JsonKit.JSON
+import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.TextParam.Companion.text
@@ -96,7 +97,7 @@ class DrinkRepo(
                 .jsonArray
                 .map { it.jsonObject }
                 .associate {
-                    val ingredientsId = UUID.fromString(it.getValue("ingredientId").jsonPrimitive.content)
+                    val ingredientsId = it.getValue("ingredientId").jsonPrimitive.content.toUuid()
                     val amount = Amount.parse(it.getValue("amount").jsonPrimitive.content)
                     ingredientsId to amount
                 }

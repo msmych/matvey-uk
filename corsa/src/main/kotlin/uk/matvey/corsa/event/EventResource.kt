@@ -11,6 +11,7 @@ import io.ktor.server.routing.route
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.corsa.event.EventSql.removeEvent
+import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.voron.KtorKit.pathParam
 import uk.matvey.voron.KtorKit.queryParam
@@ -18,7 +19,6 @@ import uk.matvey.voron.KtorKit.receiveParamsMap
 import uk.matvey.voron.KtorKit.respondFtl
 import uk.matvey.voron.Resource
 import java.time.LocalDate
-import java.util.UUID
 
 class EventResource(
     private val repo: Repo,
@@ -45,7 +45,7 @@ class EventResource(
     private fun Route.addEvent() {
         post {
             val params = call.receiveParamsMap()
-            val clubId = UUID.fromString(params.getValue("clubId"))
+            val clubId = params.getValue("clubId").toUuid()
             val name = params.getValue("name")
             val date = LocalDate.parse(params.getValue("date"))
             repo.access { a -> a.addEvent(clubId, name, date) }
@@ -56,7 +56,7 @@ class EventResource(
 
     private fun Route.removeEvent() {
         delete {
-            val eventId = UUID.fromString(call.pathParam("id"))
+            val eventId = call.pathParam("id").toUuid()
             repo.access { a -> a.removeEvent(eventId) }
             call.respond(OK)
         }

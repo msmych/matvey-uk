@@ -1,5 +1,5 @@
 <h2>Clubs</h2>
-<div class="col gap16">
+<div class="col gap-8">
     <#list clubs as club>
         <#include "club.ftl">
     </#list>

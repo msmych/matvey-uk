@@ -2,6 +2,15 @@ body {
     font-family: "Mona Sans", sans-serif;
 }
 
+button {
+    height: 24px;
+    max-width: 256px;
+}
+
+input {
+    height: 24px;
+}
+
 .main {
     margin: 60px auto 0;
     width: 80%;
@@ -19,6 +28,15 @@ body {
     flex-direction: row;
 }
 
-.gap16 {
+.gap-8 {
+    gap: 8px;
+}
+
+.gap-16 {
     gap: 16px;
+}
+
+.naked {
+    background-color: transparent;
+    border: none;
 }

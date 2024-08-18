@@ -1,6 +1,6 @@
 <h2>${club.name}</h2>
 <h2>Events</h2>
-<div class="col gap16">
+<div class="col gap-8">
     <#list events as event>
         <#include "../event/event.ftl">
     </#list>
