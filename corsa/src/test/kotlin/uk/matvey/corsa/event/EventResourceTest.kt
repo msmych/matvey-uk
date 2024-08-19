@@ -11,6 +11,7 @@ import uk.matvey.corsa.TestSetup
 import uk.matvey.corsa.club.ClubSql.addClub
 import uk.matvey.corsa.event.EventSql.CLUB_ID
 import uk.matvey.corsa.event.EventSql.DATE
+import uk.matvey.corsa.event.EventSql.DATE_TIME
 import uk.matvey.corsa.event.EventSql.NAME
 import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
@@ -19,6 +20,9 @@ import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.voron.KtorKit.setFormData
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset.UTC
 import java.util.UUID.randomUUID
 
 class EventResourceTest : TestSetup() {
@@ -42,13 +46,15 @@ class EventResourceTest : TestSetup() {
         val club = repo.access { a -> a.addClub(randomAlphabetic()) }
         val name = randomAlphabetic()
         val date = LocalDate.now()
+        val time = LocalTime.now()
 
         // when
         val rs = client.submitForm("/events") {
             setFormData(
                 "clubId" to club.id.toString(),
                 "name" to name,
-                "date" to date.toString()
+                "date" to date.toString(),
+                "time" to time.toString(),
             )
         }
 
@@ -60,13 +66,14 @@ class EventResourceTest : TestSetup() {
             assertThat(r.uuid(CLUB_ID)).isEqualTo(club.id)
             assertThat(r.string(NAME)).isEqualTo(name)
             assertThat(r.localDate(DATE)).isEqualTo(date)
+            assertThat(r.instant(DATE_TIME)).isEqualTo(LocalDateTime.of(date, time).toInstant(UTC))
         }
     }
 
     @Test
     fun `should remove event`() = testApp {
         // given
-        val event = repo.access { a -> a.addEvent(randomUUID(), randomAlphabetic(), LocalDate.now()) }
+        val event = repo.access { a -> a.addEvent(randomUUID(), randomAlphabetic(), LocalDate.now(), LocalTime.now()) }
 
         // when
         val rs = client.delete("/events/${event.id}") {}

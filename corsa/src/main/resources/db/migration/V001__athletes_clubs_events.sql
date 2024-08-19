@@ -1,3 +1,14 @@
+create table if not exists athletes
+(
+    id         uuid         not null default gen_random_uuid() primary key,
+    name       varchar(255) not null,
+    refs       jsonb        not null default '{}',
+    created_at timestamp    not null default now(),
+    updated_at timestamp    not null
+);
+
+create unique index if not exists athletes_refs_tg_idx on athletes ((refs -> 'tg'));
+
 create table if not exists clubs
 (
     id         uuid         not null default gen_random_uuid() primary key,

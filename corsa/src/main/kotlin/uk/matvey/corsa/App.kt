@@ -17,6 +17,6 @@ fun main(vararg args: String) {
     val clubService = ClubService(repo)
     val serverConfig = config.getConfig("server")
     val algorithm = Algorithm.HMAC256(serverConfig.getString("jwtSecret"))
-    startTgBot(config.getConfig("tgBot"), serverConfig, algorithm)
+    startTgBot(config.getConfig("tgBot"), serverConfig, algorithm, repo)
     startServer(serverConfig, repo, clubService, algorithm)
 }
