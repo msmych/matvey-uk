@@ -3,7 +3,7 @@ package uk.matvey.corsa.event
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.deleteFrom
-import uk.matvey.slon.access.AccessKit.insertOneReturning
+import uk.matvey.slon.access.AccessKit.insertReturningOne
 import uk.matvey.slon.param.DateParam.Companion.date
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
@@ -31,7 +31,7 @@ object EventSql {
         date: LocalDate,
         time: LocalTime?,
     ): Event {
-        return insertOneReturning(EVENTS) {
+        return insertReturningOne(EVENTS) {
             values(
                 CLUB_ID to uuid(clubId),
                 NAME to text(name),

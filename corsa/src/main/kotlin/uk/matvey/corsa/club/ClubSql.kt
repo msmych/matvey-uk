@@ -3,7 +3,7 @@ package uk.matvey.corsa.club
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.deleteFrom
-import uk.matvey.slon.access.AccessKit.insertOneReturning
+import uk.matvey.slon.access.AccessKit.insertReturningOne
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
@@ -18,7 +18,7 @@ object ClubSql {
     const val UPDATED_AT = "updated_at"
 
     fun Access.addClub(name: String): Club {
-        return insertOneReturning(CLUBS) {
+        return insertReturningOne(CLUBS) {
             values(
                 NAME to text(name),
                 UPDATED_AT to now(),

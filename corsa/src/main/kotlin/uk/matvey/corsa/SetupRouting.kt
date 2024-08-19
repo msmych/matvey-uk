@@ -3,6 +3,7 @@ package uk.matvey.corsa
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -32,6 +33,12 @@ fun Application.setupRouting(
             call.respondFtl("index")
         }
         with(auth) { authRouting() }
-        resources.forEach { resource -> with(resource) { routing() } }
+        resources.forEach { resource ->
+            with(resource) {
+                authenticate("jwt") {
+                    routing()
+                }
+            }
+        }
     }
 }

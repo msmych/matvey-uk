@@ -4,7 +4,7 @@ import uk.matvey.kit.json.JsonKit
 import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.insertInto
+import uk.matvey.slon.access.AccessKit.insertReturningOne
 import uk.matvey.slon.param.IntParam.Companion.int
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.now
@@ -21,19 +21,19 @@ object AthleteSql {
     const val UPDATED_AT = "updated_at"
 
     fun Access.ensureAthlete(tg: Long, name: String): Athlete {
-        insertInto(ATHLETES) {
+        return queryOneOrNull(
+            "select * from $ATHLETES where $TG = ?",
+            listOf(int(tg)),
+            ::readAthlete,
+        ) ?: insertReturningOne(ATHLETES) {
             values(
                 NAME to text(name),
                 REFS to jsonb(jsonSerialize(Athlete.Refs(tg))),
                 UPDATED_AT to now(),
             )
             onConflictDoNothing()
+            returning { readAthlete(it) }
         }
-        return queryOne(
-            "select * from $ATHLETES where $TG = ?",
-            listOf(int(tg)),
-            ::readAthlete,
-        )
     }
 
     fun readAthlete(reader: RecordReader): Athlete {
