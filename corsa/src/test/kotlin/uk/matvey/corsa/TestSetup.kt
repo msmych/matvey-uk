@@ -1,5 +1,6 @@
 package uk.matvey.corsa
 
+import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.AfterAll
@@ -20,8 +21,9 @@ open class TestSetup {
 
         fun testApp(block: suspend ApplicationTestBuilder.() -> Unit) = testApplication {
             val clubService = ClubService(repo)
+            val algorithm = Algorithm.HMAC256("jwtSecret")
             application {
-                serverModule(repo, clubService)
+                serverModule(repo, clubService, algorithm)
             }
 
             block()

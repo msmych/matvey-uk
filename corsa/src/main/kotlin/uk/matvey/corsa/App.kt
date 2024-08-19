@@ -8,11 +8,11 @@ import uk.matvey.slon.repo.Repo
 
 private val log = KotlinLogging.logger("Corsa")
 
-fun main() {
+fun main(vararg args: String) {
     log.info { "Hello, Corsa!" }
     val config = ConfigFactory.load("config/local.conf")
     val ds = dataSource(config.getConfig("dataSource"))
-    migrate(ds, clean = false)
+    migrate(ds, clean = args.any { it == "--clean" })
     val repo = Repo(ds)
     val clubService = ClubService(repo)
     val serverConfig = config.getConfig("server")

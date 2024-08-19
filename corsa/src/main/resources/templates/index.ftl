@@ -10,7 +10,7 @@
 </head>
 <body>
 <div id="home">
-    <h1>Corsa</h1>
+    <h1 class="click" hx-get="/clubs" hx-target="#main" hx-swap="innerHTML">Corsa</h1>
     <div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </div>
 </body>

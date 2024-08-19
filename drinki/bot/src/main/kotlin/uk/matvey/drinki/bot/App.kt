@@ -8,7 +8,7 @@ import mu.KotlinLogging
 import uk.matvey.drinki.DrinkiRepos
 import uk.matvey.drinki.account.AccountService
 import uk.matvey.drinki.drink.DrinkService
-import uk.matvey.slon.DataSourceKit.hikariDataSource
+import uk.matvey.slon.HikariKit.hikariDataSource
 import javax.sql.DataSource
 
 private val log = KotlinLogging.logger("drinki-bot")

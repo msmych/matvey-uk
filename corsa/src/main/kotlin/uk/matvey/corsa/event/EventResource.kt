@@ -19,6 +19,7 @@ import uk.matvey.voron.KtorKit.receiveParamsMap
 import uk.matvey.voron.KtorKit.respondFtl
 import uk.matvey.voron.Resource
 import java.time.LocalDate
+import java.time.LocalTime
 
 class EventResource(
     private val repo: Repo,
@@ -48,7 +49,8 @@ class EventResource(
             val clubId = params.getValue("clubId").toUuid()
             val name = params.getValue("name")
             val date = LocalDate.parse(params.getValue("date"))
-            repo.access { a -> a.addEvent(clubId, name, date) }
+            val time = params["time"]?.let(LocalTime::parse)
+            repo.access { a -> a.addEvent(clubId, name, date, time) }
             val clubDetails = clubService.getClubDetails(clubId)
             call.respondFtl("club/details", clubDetails)
         }

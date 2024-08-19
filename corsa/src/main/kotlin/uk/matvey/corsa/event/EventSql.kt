@@ -7,8 +7,11 @@ import uk.matvey.slon.access.AccessKit.insertOneReturning
 import uk.matvey.slon.param.DateParam.Companion.date
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.TimestampParam.Companion.timestamp
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset.UTC
 import java.util.UUID
 
 object EventSql {
@@ -19,14 +22,21 @@ object EventSql {
     const val CLUB_ID = "club_id"
     const val NAME = "name"
     const val DATE = "date"
+    const val DATE_TIME = "date_time"
     const val UPDATED_AT = "updated_at"
 
-    fun Access.addEvent(clubId: UUID, name: String, date: LocalDate): Event {
+    fun Access.addEvent(
+        clubId: UUID,
+        name: String,
+        date: LocalDate,
+        time: LocalTime?,
+    ): Event {
         return insertOneReturning(EVENTS) {
             values(
                 CLUB_ID to uuid(clubId),
                 NAME to text(name),
                 DATE to date(date),
+                DATE_TIME to timestamp(time?.let { date.atTime(it) }?.toInstant(UTC)),
                 UPDATED_AT to now(),
             )
             returning { readEvent(it) }
@@ -47,6 +57,7 @@ object EventSql {
             clubId = r.uuid(CLUB_ID),
             name = r.string(NAME),
             date = r.localDate(DATE),
+            dateTime = r.instantOrNull(DATE_TIME),
         )
     }
 }

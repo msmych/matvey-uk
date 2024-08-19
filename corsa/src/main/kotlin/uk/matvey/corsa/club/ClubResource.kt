@@ -11,6 +11,8 @@ import io.ktor.server.routing.route
 import uk.matvey.corsa.club.ClubSql.addClub
 import uk.matvey.corsa.club.ClubSql.readClub
 import uk.matvey.corsa.club.ClubSql.removeClub
+import uk.matvey.corsa.event.EventSql.getEventsByClubId
+import uk.matvey.corsa.event.EventSql.removeEvent
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.query
@@ -61,7 +63,12 @@ class ClubResource(
     private fun Route.removeClub() {
         delete {
             val clubId = call.pathParam("id").toUuid()
-            repo.access { a -> a.removeClub(clubId) }
+            repo.access { a ->
+                a.getEventsByClubId(clubId).forEach { event ->
+                    a.removeEvent(event.id)
+                }
+                a.removeClub(clubId)
+            }
             call.respond(OK)
         }
     }

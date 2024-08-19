@@ -9,5 +9,9 @@
         Date:
         <input name="date" type="date" required>
     </label>
+    <label class="row gap-8">
+        Time:
+        <input name="time" type="time">
+    </label>
     <button type="submit">Add event</button>
 </form>
