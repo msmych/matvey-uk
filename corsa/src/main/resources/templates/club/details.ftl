@@ -9,3 +9,5 @@
         </button>
     </div>
 </div>
+<div id="clubs" class="box click" hx-swap-oob="true">Clubs</div>
+<div id="events" class="box click u" hx-swap-oob="true">Events</div>
