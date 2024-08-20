@@ -9,34 +9,21 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.matvey.corsa.TestSetup
 import uk.matvey.corsa.club.ClubSql.addClub
-import uk.matvey.corsa.club.ClubTestData.aClub
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
-import uk.matvey.slon.param.PlainParam.Companion.now
+import uk.matvey.kit.random.RandomKit.randomName
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.voron.KtorKit.setFormData
+import java.util.UUID.randomUUID
 
 class ClubResourceTest : TestSetup() {
 
     @Test
-    fun `should return clubs`() = testApp {
+    fun `should return clubs`() = testApp { client ->
         // given
-        val club1 = aClub()
-        val club2 = aClub()
-        repo.insertInto("clubs") {
-            values(
-                "name" to text(club1.name),
-                "updated_at" to now()
-            )
-        }
-        repo.insertInto("clubs") {
-            values(
-                "name" to text(club2.name),
-                "updated_at" to now()
-            )
-        }
+        val club1 = repo.access { a -> a.addClub(randomName(), athleteId) }
+        val club2 = repo.access { a -> a.addClub(randomName(), athleteId) }
 
         // when
         val rs = client.get("/clubs")
@@ -49,7 +36,7 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should return new club form`() = testApp {
+    fun `should return new club form`() = testApp { client ->
         // when
         val rs = client.get("/clubs/new-club-form")
 
@@ -59,7 +46,7 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should add club`() = testApp {
+    fun `should add club`() = testApp { client ->
         // given
         val name = randomAlphabetic()
 
@@ -78,9 +65,9 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should remove club`() = testApp {
+    fun `should remove club`() = testApp { client ->
         // given
-        val club = repo.access { a -> a.addClub(randomAlphabetic()) }
+        val club = repo.access { a -> a.addClub(randomAlphabetic(), randomUUID()) }
 
         // when
         val rs = client.delete("/clubs/${club.id}")
@@ -93,9 +80,9 @@ class ClubResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should return club details`() = testApp {
+    fun `should return club details`() = testApp { client ->
         // given
-        val club = repo.access { a -> a.addClub(randomAlphabetic()) }
+        val club = repo.access { a -> a.addClub(randomAlphabetic(), randomUUID()) }
 
         // when
         val rs = client.get("/clubs/${club.id}")

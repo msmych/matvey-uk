@@ -12,11 +12,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.voron.KtorKit.queryParam
+import java.util.UUID
 
 class ServerAuth(private val algorithm: Algorithm) {
 
-    class AthletePrincipal(val tgUserId: Long) : Principal
+    class AthletePrincipal(val id: UUID, val name: String) : Principal
 
     class Provider(private val algorithm: Algorithm) : AuthenticationProvider(Config) {
 
@@ -34,7 +36,8 @@ class ServerAuth(private val algorithm: Algorithm) {
                 return context.call.respond(Unauthorized)
             }
             val principal = AthletePrincipal(
-                decoded.subject.substringAfter("tg-").toLong()
+                decoded.subject.toUuid(),
+                decoded.getClaim("name").asString(),
             )
             context.principal(principal)
         }

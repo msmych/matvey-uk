@@ -1,13 +1,17 @@
 package uk.matvey.corsa
 
 import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.principal
 import io.ktor.server.http.content.staticResources
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import uk.matvey.corsa.ServerAuth.AthletePrincipal
 import uk.matvey.corsa.club.ClubResource
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.corsa.event.EventResource
@@ -31,6 +35,15 @@ fun Application.setupRouting(
         }
         get {
             call.respondFtl("index")
+        }
+        authenticate("jwt") {
+            get("/me") {
+                val athlete = call.principal<AthletePrincipal>() ?: return@get call.respond(Unauthorized)
+                call.respondFtl("me", "name" to athlete.name)
+            }
+        }
+        get("/login") {
+            call.respondFtl("login")
         }
         with(auth) { authRouting() }
         resources.forEach { resource ->

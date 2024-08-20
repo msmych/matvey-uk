@@ -1,5 +1,7 @@
 package uk.matvey.corsa.event
 
+import uk.matvey.corsa.CorsaSql.ID
+import uk.matvey.corsa.CorsaSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.deleteFrom
@@ -18,12 +20,10 @@ object EventSql {
 
     const val EVENTS = "events"
 
-    const val ID = "id"
     const val CLUB_ID = "club_id"
     const val NAME = "name"
     const val DATE = "date"
     const val DATE_TIME = "date_time"
-    const val UPDATED_AT = "updated_at"
 
     fun Access.addEvent(
         clubId: UUID,

@@ -11,6 +11,7 @@
 <body>
 <div id="home">
     <h1 class="click" hx-get="/clubs" hx-target="#main" hx-swap="innerHTML">Corsa</h1>
+    <div id="me" hx-get="/me" hx-trigger="load" hx-swap="innerHTML"></div>
     <div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </div>
 </body>
@@ -22,4 +23,13 @@
         max-width: 2000px;
     }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('htmx:responseError', e => {
+            if (e.detail.xhr.status === 401) {
+                window.location.href = '/login'
+            }
+        })
+    })
+</script>
 </html>

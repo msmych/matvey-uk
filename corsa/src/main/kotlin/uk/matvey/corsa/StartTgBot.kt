@@ -25,16 +25,17 @@ fun startTgBot(
                 ?.let {
                     val from = it.from()
                     val tgUserId = from.id
+                    val athlete = repo.access { a -> a.ensureAthlete(tgUserId, from.firstName) }
                     val now = Instant.now()
                     val jwt = JWT.create()
                         .withIssuer("corsa")
-                        .withSubject("tg-$tgUserId")
+                        .withSubject(athlete.id.toString())
                         .withIssuedAt(now)
                         .withExpiresAt(now.plusSeconds(600))
+                        .withClaim("name", athlete.name)
                         .sign(algorithm)
                     val host = serverConfig.getString("host")
                     val port = serverConfig.getInt("port")
-                    repo.access { a -> a.ensureAthlete(tgUserId, from.firstName) }
                     tgBot.sendMessage(tgUserId, "$host:$port/auth?token=$jwt")
                 }
         }

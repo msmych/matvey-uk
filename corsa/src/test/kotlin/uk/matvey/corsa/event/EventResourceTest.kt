@@ -28,7 +28,7 @@ import java.util.UUID.randomUUID
 class EventResourceTest : TestSetup() {
 
     @Test
-    fun `should return new event form`() = testApp {
+    fun `should return new event form`() = testApp { client ->
         // given
         val clubId = randomUUID()
 
@@ -41,9 +41,9 @@ class EventResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should add event`() = testApp {
+    fun `should add event`() = testApp { client ->
         // given
-        val club = repo.access { a -> a.addClub(randomAlphabetic()) }
+        val club = repo.access { a -> a.addClub(randomAlphabetic(), randomUUID()) }
         val name = randomAlphabetic()
         val date = LocalDate.now()
         val time = LocalTime.now()
@@ -71,7 +71,7 @@ class EventResourceTest : TestSetup() {
     }
 
     @Test
-    fun `should remove event`() = testApp {
+    fun `should remove event`() = testApp { client ->
         // given
         val event = repo.access { a -> a.addEvent(randomUUID(), randomAlphabetic(), LocalDate.now(), LocalTime.now()) }
 
