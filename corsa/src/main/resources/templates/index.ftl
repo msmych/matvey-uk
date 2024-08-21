@@ -9,15 +9,7 @@
 </head>
 <body>
 <div id="home" class="col gap-8">
-    <div class="split">
-        <div id="menu" class="row gap-8">
-            <button class="naked" hx-get="/clubs" hx-target="#page" hx-swap="innerHTML">Clubs</button>
-            <button class="naked" hx-get="/events" hx-target="#page" hx-swap="innerHTML">Events</button>
-        </div>
-        <div class="row gap-8">
-            <div id="me" hx-get="/me" hx-trigger="load" hx-swap="innerHTML"></div>
-        </div>
-    </div>
+    <#include "components/menu.ftl">
     <div id="page" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </div>
 </body>
@@ -27,6 +19,14 @@
         width: 80%;
         min-width: 400px;
         max-width: 2000px;
+    }
+
+    #page {
+        margin-top: 32px;
+    }
+
+    form {
+        max-width: 300px;
     }
 </style>
 <script>

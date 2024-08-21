@@ -9,24 +9,42 @@ body {
 button {
     padding: 8px 16px;
     font-size: 1em;
-    background-color: transparent;
-    border: black 2px solid;
     border-radius: 4px;
     cursor: pointer;
+}
+
+button.primary {
+    background-color: darkcyan;
+    color: white;
+    border: none;
+}
+
+[disabled] {
+    background-color: lightgray;
+    color: gray;
+    cursor: not-allowed;
 }
 
 input {
     padding: 8px 16px;
     font-size: 1em;
-    border: dimgray 2px solid;
+    border: lightgray 2px solid;
     border-radius: 4px;
 }
 
 .t1 {
     font-size: 2em;
     font-weight: bold;
-    text-decoration: none;
-    color: black;
+}
+
+.t3 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.hint {
+    font-size: 0.8em;
+    color: gray;
 }
 
 .col {
@@ -46,6 +64,20 @@ input {
     justify-content: space-between;
 }
 
+.mh-8 {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.mh-16 {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+.gap-2 {
+    gap: 2px;
+}
+
 .gap-8 {
     gap: 8px;
 }
@@ -54,28 +86,20 @@ input {
     gap: 16px;
 }
 
-.naked {
-    background-color: transparent;
-    border: none;
+.gap-32 {
+    gap: 16px;
 }
 
-.b {
-    font-weight: bold;
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
-.box {
-    padding: 8px 16px;
-    border-radius: 4px;
-}
-
-.click {
-    cursor: pointer;
-}
-
-.click:hover {
-    background-color: lightgrey;
-}
-
-button:hover {
-    background-color: lightgrey;
+.htmx-indicator {
+    display: inline-block;
+    animation: spin 2s linear infinite;
 }

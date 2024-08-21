@@ -16,8 +16,3 @@
         </button>
     </div>
 </div>
-
-<div id="menu" class="row gap-8" hx-swap-oob="true">
-    <button class="naked" hx-get="/clubs" hx-target="#page" hx-swap="innerHTML">Clubs</button>
-    <button class="naked b" hx-get="/events" hx-target="#page" hx-swap="innerHTML">Events</button>
-</div>

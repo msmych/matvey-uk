@@ -1,3 +1,3 @@
 <div class="row gap-8">
-    <button class="naked" hx-get="/clubs/${club.id}" hx-target="#page">${club.name}</button>
+    <div class="click" hx-get="/clubs/${club.id}" hx-target="#page">${club.name}</div>
 </div>

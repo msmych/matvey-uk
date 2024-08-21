@@ -1,10 +1,8 @@
-<h3>New club</h3>
-<form class="col gap-16" hx-post="/clubs" hx-target="#page">
-    <label class="row gap-8">
-        Name:
-        <input type="text" name="name" placeholder="Club name" required>
-    </label>
+<form class="col gap-32" hx-post="/clubs" hx-target="#page">
+    <div class="t3">New club</div>
+    <#import "../components/form-item.ftl" as formItem>
+    <@formItem.item id="name" label="Name" name="name" placeholder="Dream Chasers"/>
     <div class="row gap-8">
-        <button type="submit">Add club</button>
+        <button type="submit" class="primary">Add club</button>
     </div>
 </form>

@@ -10,11 +10,15 @@
         <div>No clubs</div>
     </#if>
     <div class="row gap-8">
-        <button hx-get="/clubs/new-club-form" hx-target="#page" hx-swap="innerHTML">Add club</button>
+        <button class="primary"
+                hx-get="/clubs/new-club-form"
+                hx-target="#page"
+                hx-swap="innerHTML"
+                hx-indicator=".htmx-indicator"
+                hx-disabled-elt="this"
+        >
+            Add club
+        </button>
+        <div class="htmx-indicator">👾</div>
     </div>
-</div>
-
-<div id="menu" class="row gap-8" hx-swap-oob="true">
-    <button class="naked b" hx-get="/clubs" hx-target="#page" hx-swap="innerHTML">Clubs</button>
-    <button class="naked" hx-get="/events" hx-target="#page" hx-swap="innerHTML">Events</button>
 </div>
