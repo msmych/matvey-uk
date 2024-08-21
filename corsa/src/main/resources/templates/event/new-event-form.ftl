@@ -7,11 +7,13 @@
     </label>
     <label class="row gap-8">
         Date:
-        <input name="date" type="date" required>
+        <input name="date" type="text" placeholder="Event date" required>
     </label>
     <label class="row gap-8">
         Time:
-        <input name="time" type="time">
+        <input name="time" type="text" placeholder="Event time">
     </label>
-    <button type="submit">Add event</button>
+    <div class="row gap-8">
+        <button type="submit">Add event</button>
+    </div>
 </form>

@@ -1,3 +1,7 @@
+/*:root {*/
+/*    filter: invert(1);*/
+/*}*/
+
 body {
     font-family: "Mona Sans", sans-serif;
 }
@@ -55,7 +59,7 @@ input {
     border: none;
 }
 
-.u {
+.b {
     font-weight: bold;
 }
 

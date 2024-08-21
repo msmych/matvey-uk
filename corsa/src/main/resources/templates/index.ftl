@@ -10,16 +10,15 @@
 <body>
 <div id="home" class="col gap-8">
     <div class="split">
-        <div class="row gap-8">
-            <div class="box click" hx-get="/clubs" hx-target="#main" hx-swap="innerHTML">Corsa</div>
-            <div id="clubs" class="box click" hx-get="/clubs" hx-target="#main" hx-swap="innerHTML">Clubs</div>
-            <div id="events" class="box click" hx-get="/events" hx-target="#main" hx-swap="innerHTML">Events</div>
+        <div id="menu" class="row gap-8">
+            <button class="naked" hx-get="/clubs" hx-target="#page" hx-swap="innerHTML">Clubs</button>
+            <button class="naked" hx-get="/events" hx-target="#page" hx-swap="innerHTML">Events</button>
         </div>
         <div class="row gap-8">
             <div id="me" hx-get="/me" hx-trigger="load" hx-swap="innerHTML"></div>
         </div>
     </div>
-    <div id="main" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
+    <div id="page" hx-get="/clubs" hx-trigger="load" hx-swap="innerHTML"></div>
 </div>
 </body>
 <style>

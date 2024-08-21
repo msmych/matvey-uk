@@ -31,7 +31,7 @@ fun startTgBot(
                         .withIssuer("corsa")
                         .withSubject(athlete.id.toString())
                         .withIssuedAt(now)
-                        .withExpiresAt(now.plusSeconds(600))
+                        .withExpiresAt(now.plusSeconds(3600))
                         .withClaim("name", athlete.name)
                         .sign(algorithm)
                     val host = serverConfig.getString("host")
