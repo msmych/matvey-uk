@@ -2,6 +2,7 @@ package uk.matvey.migraine.frobot
 
 import kotlinx.serialization.encodeToString
 import uk.matvey.kit.json.JsonKit.JSON
+import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.migraine.frobot.FrobotSql.CREATED_AT
 import uk.matvey.migraine.frobot.FrobotSql.FROBOT
 import uk.matvey.migraine.frobot.FrobotSql.ID
@@ -18,7 +19,6 @@ import uk.matvey.slon.repo.RepoKit.insertInto
 import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.slon.repo.RepoKit.queryOneOrNull
 import uk.matvey.slon.repo.RepoKit.update
-import java.time.Instant
 import java.util.UUID
 
 class FrobotRepo(
@@ -41,7 +41,7 @@ class FrobotRepo(
         repo.update(FROBOT) {
             set(STATE, text(frobot.state.name))
             set(TG, jsonb(JSON.encodeToString(frobot.tg)))
-            set(UPDATED_AT, timestamp(Instant.now()))
+            set(UPDATED_AT, timestamp(instant()))
             where(
                 "$ID = ? and $UPDATED_AT = ?",
                 uuid(frobot.id),

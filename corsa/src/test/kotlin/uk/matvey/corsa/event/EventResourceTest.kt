@@ -15,11 +15,11 @@ import uk.matvey.corsa.event.EventSql.DATE_TIME
 import uk.matvey.corsa.event.EventSql.NAME
 import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
+import uk.matvey.kit.time.TimeKit.localDate
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.voron.KtorKit.setFormData
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset.UTC
@@ -45,7 +45,7 @@ class EventResourceTest : TestSetup() {
         // given
         val club = repo.access { a -> a.addClub(randomAlphabetic(), randomUUID()) }
         val name = randomAlphabetic()
-        val date = LocalDate.now()
+        val date = localDate()
         val time = LocalTime.now()
 
         // when
@@ -73,7 +73,7 @@ class EventResourceTest : TestSetup() {
     @Test
     fun `should remove event`() = testApp { client ->
         // given
-        val event = repo.access { a -> a.addEvent(randomUUID(), randomAlphabetic(), LocalDate.now(), LocalTime.now()) }
+        val event = repo.access { a -> a.addEvent(randomUUID(), randomAlphabetic(), localDate(), LocalTime.now()) }
 
         // when
         val rs = client.delete("/events/${event.id}") {}

@@ -11,9 +11,9 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.kit.random.RandomKit.randomName
+import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.slon.PostgresTestContainer
 import uk.matvey.slon.repo.Repo
-import java.time.Instant
 import java.util.UUID.randomUUID
 
 open class TestSetup {
@@ -42,8 +42,8 @@ open class TestSetup {
                         "token", JWT.create()
                             .withIssuer("corsa")
                             .withSubject(athleteId.toString())
-                            .withIssuedAt(Instant.now())
-                            .withExpiresAt(Instant.now().plusSeconds(600))
+                            .withIssuedAt(instant())
+                            .withExpiresAt(instant())
                             .withClaim("name", athleteName)
                             .sign(algorithm)
                     )

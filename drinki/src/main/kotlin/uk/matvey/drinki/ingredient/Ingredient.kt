@@ -1,6 +1,7 @@
 package uk.matvey.drinki.ingredient
 
 import uk.matvey.drinki.types.Visibility
+import uk.matvey.kit.time.TimeKit.instant
 import java.time.Instant
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -47,7 +48,7 @@ data class Ingredient(
     companion object {
         
         fun public(type: Type, name: String): Ingredient {
-            val now = Instant.now()
+            val now = instant()
             return Ingredient(
                 randomUUID(),
                 null,
@@ -60,7 +61,7 @@ data class Ingredient(
         }
         
         fun private(accountId: UUID, name: String): Ingredient {
-            val now = Instant.now()
+            val now = instant()
             return Ingredient(
                 randomUUID(),
                 accountId,

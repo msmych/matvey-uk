@@ -7,9 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uk.matvey.corsa.athlete.AthleteSql.ensureAthlete
+import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgBot
-import java.time.Instant
 
 fun startTgBot(
     tgBotConfig: Config,
@@ -26,7 +26,7 @@ fun startTgBot(
                     val from = it.from()
                     val tgUserId = from.id
                     val athlete = repo.access { a -> a.ensureAthlete(tgUserId, from.firstName) }
-                    val now = Instant.now()
+                    val now = instant()
                     val jwt = JWT.create()
                         .withIssuer("corsa")
                         .withSubject(athlete.id.toString())

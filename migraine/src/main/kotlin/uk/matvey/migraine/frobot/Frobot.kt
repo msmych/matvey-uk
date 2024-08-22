@@ -1,6 +1,7 @@
 package uk.matvey.migraine.frobot
 
 import kotlinx.serialization.Serializable
+import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.migraine.frobot.Frobot.State.BATTERY_LOW
 import java.time.Instant
 import java.util.UUID
@@ -41,7 +42,7 @@ data class Frobot(
         
         fun frobot(userId: Long): Frobot {
             val id = randomUUID()
-            val now = Instant.now()
+            val now = instant()
             return Frobot(id, BATTERY_LOW, Tg(userId,null), now, now)
         }
     }

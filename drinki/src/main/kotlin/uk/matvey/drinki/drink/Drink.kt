@@ -6,6 +6,7 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 import uk.matvey.drinki.types.Amount
 import uk.matvey.drinki.types.Visibility
+import uk.matvey.kit.time.TimeKit.instant
 import java.time.Instant
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -66,7 +67,7 @@ data class Drink(
     
     companion object {
         fun new(accountId: UUID): Drink {
-            val now = Instant.now()
+            val now = instant()
             return Drink(
                 randomUUID(),
                 accountId,

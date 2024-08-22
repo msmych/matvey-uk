@@ -3,6 +3,7 @@ package uk.matvey.drinki.account
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import uk.matvey.drinki.account.Account.TgSession.DrinkEdit
+import uk.matvey.kit.time.TimeKit.instant
 import java.time.Instant
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -13,14 +14,14 @@ data class Account(
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
-    
+
     @Serializable
     data class TgSession(
         val userId: Long,
         val drinkEdit: DrinkEdit?,
         val ingredientEdit: IngredientEdit?,
     ) {
-        
+
         @Serializable
         data class DrinkEdit(
             val drinkId: @Contextual UUID,
@@ -31,21 +32,21 @@ data class Account(
         ) {
             fun ingredientId() = requireNotNull(ingredientId)
         }
-        
+
         @Serializable
         data class IngredientEdit(
             val ingredientId: @Contextual UUID,
             val messageId: Int,
             val editingName: Boolean,
         )
-        
+
         fun drinkEdit() = requireNotNull(drinkEdit)
-        
+
         fun ingredientEdit() = requireNotNull(ingredientEdit)
     }
-    
+
     fun tgSession() = requireNotNull(tgSession)
-    
+
     fun editingDrink(drinkId: UUID, tgMessageId: Int): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -53,7 +54,7 @@ data class Account(
             )
         )
     }
-    
+
     fun editingDrinkName(): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -63,7 +64,7 @@ data class Account(
             )
         )
     }
-    
+
     fun editingDrinkRecipe(): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -73,7 +74,7 @@ data class Account(
             )
         )
     }
-    
+
     fun updateTgEditDrinkIngredient(ingredientId: UUID): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -83,7 +84,7 @@ data class Account(
             )
         )
     }
-    
+
     fun editingIngredient(ingredientId: UUID, messageId: Int): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -95,7 +96,7 @@ data class Account(
             )
         )
     }
-    
+
     fun editingIngredientName(): Account {
         return this.copy(
             tgSession = this.tgSession?.copy(
@@ -105,11 +106,11 @@ data class Account(
             )
         )
     }
-    
+
     companion object {
-        
+
         fun tgAccount(tgUserId: Long): Account {
-            val now = Instant.now()
+            val now = instant()
             return Account(
                 randomUUID(),
                 TgSession(tgUserId, null, null),
