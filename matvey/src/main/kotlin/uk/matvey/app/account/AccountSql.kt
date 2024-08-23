@@ -5,10 +5,13 @@ import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.insertReturningOne
+import uk.matvey.slon.access.AccessKit.update
 import uk.matvey.slon.param.IntParam.Companion.int
 import uk.matvey.slon.param.JsonbParam.Companion.jsonb
 import uk.matvey.slon.param.PlainParam.Companion.now
 import uk.matvey.slon.param.TextParam.Companion.text
+import uk.matvey.slon.param.UuidParam.Companion.uuid
+import java.util.UUID
 
 object AccountSql {
 
@@ -37,6 +40,21 @@ object AccountSql {
                 onConflictDoNothing()
                 returning(::readAccount)
             }
+    }
+
+    fun Access.getAccountByTgUserId(tgUserId: Long): Account {
+        return queryOne(
+            "select * from $ACCOUNTS where $TG = ?",
+            listOf(int(tgUserId)),
+            ::readAccount
+        )
+    }
+
+    fun Access.updateAccountStatus(id: UUID, state: Account.State) {
+        update(ACCOUNTS) {
+            set(STATE to text(state.name))
+            where("id = ?", uuid(id))
+        }
     }
 
     fun readAccount(r: RecordReader): Account {

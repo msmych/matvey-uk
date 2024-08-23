@@ -14,6 +14,7 @@ data class Account(
     enum class State {
         ACTIVE,
         PENDING,
+        DISABLED,
     }
 
     enum class Tag {
