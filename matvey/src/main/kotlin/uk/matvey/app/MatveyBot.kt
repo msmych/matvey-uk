@@ -11,21 +11,40 @@ import uk.matvey.app.account.AccountSql.getAccountByTgUserId
 import uk.matvey.app.account.AccountSql.updateAccountStatus
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgBot
+import uk.matvey.telek.TgInlineKeyboardButton
 import uk.matvey.telek.TgInlineKeyboardButton.Companion.callbackData
 import uk.matvey.telek.TgUpdate
 
 class MatveyBot(
-    config: Config,
+    tgConfig: Config,
+    private val serverConfig: Config,
     private val repo: Repo,
+    private val matveyAuth: MatveyAuth,
+    private val profile: Profile,
 ) {
-    private val bot = TgBot(config.getString("botToken"), config.getInt("longPollingSeconds"))
-    private val adminGroupId = config.getLong("adminGroupId")
+    private val bot = TgBot(tgConfig.getString("botToken"), tgConfig.getInt("longPollingSeconds"))
+    private val adminGroupId = tgConfig.getLong("adminGroupId")
 
     fun start(): Job {
         return CoroutineScope(Dispatchers.IO).launch {
             bot.start { update ->
                 processUpdate(update)
             }
+        }
+    }
+
+    private suspend fun processUpdate(update: TgUpdate) {
+        if (update.message?.text == "/start") {
+            processStartCommand(update)
+            return
+        }
+        if (update.message?.text == "/login") {
+            processLoginCommand(update)
+            return
+        }
+        if (update.callbackQuery?.data?.startsWith("accounts/") == true) {
+            processAccountActions(update)
+            return
         }
     }
 
@@ -56,33 +75,47 @@ class MatveyBot(
         }
     }
 
-    private suspend fun processUpdate(update: TgUpdate) {
-        if (update.message?.text == "/start") {
-            processStartCommand(update)
-            return
+    private suspend fun processLoginCommand(update: TgUpdate) {
+        val tgUserId = update.message().from().id
+        val account = repo.access { a -> a.getAccountByTgUserId(tgUserId) }
+        if (account.state == Account.State.ACTIVE) {
+            val token = matveyAuth.issueJwt(account)
+            val url = "${serverConfig.getString("host")}:${serverConfig.getInt("port")}/auth?token=$token"
+            if (profile == Profile.PROD) {
+                bot.sendMessage(
+                    chatId = tgUserId,
+                    text = "Login",
+                    inlineKeyboard = listOf(listOf(TgInlineKeyboardButton.url("Go", url)))
+                )
+            } else {
+                bot.sendMessage(
+                    chatId = tgUserId,
+                    text = url
+                )
+            }
         }
-        if (update.callbackQuery?.data?.startsWith("accounts/") == true) {
-            val callbackQuery = update.callbackQuery()
-            val parts = callbackQuery.data!!.split("/")
-            val tgUserId = parts[1].toLong()
-            when (parts[2]) {
-                "approve" -> {
-                    repo.access { a ->
-                        val account = a.getAccountByTgUserId(tgUserId)
-                        a.updateAccountStatus(account.id, Account.State.ACTIVE)
-                    }
-                    bot.sendMessage(tgUserId, "Your signup request is approved")
-                    bot.updateMessageInlineKeyboard(callbackQuery.message, listOf())
+    }
+
+    private suspend fun processAccountActions(update: TgUpdate) {
+        val callbackQuery = update.callbackQuery()
+        val parts = callbackQuery.data!!.split("/")
+        val tgUserId = parts[1].toLong()
+        when (parts[2]) {
+            "approve" -> {
+                repo.access { a ->
+                    val account = a.getAccountByTgUserId(tgUserId)
+                    a.updateAccountStatus(account.id, Account.State.ACTIVE)
                 }
-                "reject" -> {
-                    repo.access { a ->
-                        val account = a.getAccountByTgUserId(tgUserId)
-                        a.updateAccountStatus(account.id, Account.State.DISABLED)
-                    }
+                bot.sendMessage(tgUserId, "Your signup request is approved")
+            }
+            "reject" -> {
+                repo.access { a ->
+                    val account = a.getAccountByTgUserId(tgUserId)
+                    a.updateAccountStatus(account.id, Account.State.DISABLED)
                 }
             }
-            bot.answerCallbackQuery(callbackQuery.id)
-            return
         }
+        bot.updateMessageInlineKeyboard(callbackQuery.message, listOf())
+        bot.answerCallbackQuery(callbackQuery.id)
     }
 }
