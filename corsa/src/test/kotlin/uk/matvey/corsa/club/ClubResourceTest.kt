@@ -42,7 +42,7 @@ class ClubResourceTest : TestSetup() {
 
         // then
         assertThat(rs.status).isEqualTo(OK)
-        assertThat(rs.bodyAsText()).contains("<h3>New club</h3>")
+        assertThat(rs.bodyAsText()).contains(">New club<")
     }
 
     @Test
@@ -90,6 +90,6 @@ class ClubResourceTest : TestSetup() {
         // then
         assertThat(rs.status).isEqualTo(OK)
         assertThat(rs.bodyAsText())
-            .contains(">${club.name}<")
+            .contains("No events")
     }
 }

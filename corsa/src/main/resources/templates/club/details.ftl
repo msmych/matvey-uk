@@ -1,6 +1,6 @@
 <div class="col gap-8">
     <#if events?size gt 0>
-        <div class="t1">${club.name}</div>
+        <t1>${club.name}</t1>
         <div class="col gap-8">
             <#list events as event>
                 <#include "../event/event.ftl">

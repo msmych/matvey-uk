@@ -23,3 +23,7 @@ dependencies {
 
     testImplementation(testFixtures("uk.matvey:slon:$slonVersion"))
 }
+
+tasks.shadowJar {
+    enabled = false
+}

@@ -15,3 +15,7 @@ dependencies {
     
     implementation(project(":drinki"))
 }
+
+tasks.shadowJar {
+    enabled = false
+}

@@ -43,7 +43,7 @@ open class TestSetup {
                             .withIssuer("corsa")
                             .withSubject(athleteId.toString())
                             .withIssuedAt(instant())
-                            .withExpiresAt(instant())
+                            .withExpiresAt(instant().plusSeconds(600))
                             .withClaim("name", athleteName)
                             .sign(algorithm)
                     )
