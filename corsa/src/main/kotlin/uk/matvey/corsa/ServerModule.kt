@@ -6,7 +6,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.slon.repo.Repo
-import uk.matvey.voron.KtorKit.installFreeMarker
+import uk.matvey.utka.ktor.ftl.FreeMarkerKit.installFreeMarker
 
 fun Application.serverModule(
     repo: Repo,

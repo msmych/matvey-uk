@@ -1,0 +1,18 @@
+body {
+    font-family: "Mona Sans", sans-serif;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.split {
+    justify-content: space-between;
+}

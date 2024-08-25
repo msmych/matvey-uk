@@ -14,7 +14,7 @@ import uk.matvey.kit.random.RandomKit.randomName
 import uk.matvey.slon.param.TextParam.Companion.text
 import uk.matvey.slon.param.UuidParam.Companion.uuid
 import uk.matvey.slon.repo.RepoKit.queryOne
-import uk.matvey.voron.KtorKit.setFormData
+import uk.matvey.utka.ktor.KtorKit.setFormData
 import java.util.UUID.randomUUID
 
 class ClubResourceTest : TestSetup() {

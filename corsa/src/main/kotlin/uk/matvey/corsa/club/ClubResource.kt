@@ -17,10 +17,10 @@ import uk.matvey.corsa.event.EventSql.getEventsByClubId
 import uk.matvey.corsa.event.EventSql.removeEvent
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
-import uk.matvey.voron.KtorKit.pathParam
-import uk.matvey.voron.KtorKit.receiveParamsMap
-import uk.matvey.voron.KtorKit.respondFtl
-import uk.matvey.voron.Resource
+import uk.matvey.utka.Resource
+import uk.matvey.utka.ktor.KtorKit.pathParam
+import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
+import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 class ClubResource(
     private val repo: Repo,

@@ -42,6 +42,14 @@ object AccountSql {
             }
     }
 
+    fun Access.getAccountById(id: UUID): Account {
+        return queryOne(
+            "select * from $ACCOUNTS where id = ?",
+            listOf(uuid(id)),
+            ::readAccount
+        )
+    }
+
     fun Access.getAccountByTgUserId(tgUserId: Long): Account {
         return queryOne(
             "select * from $ACCOUNTS where $TG = ?",

@@ -115,7 +115,7 @@ class MatveyBot(
                 }
             }
         }
-        bot.updateMessageInlineKeyboard(callbackQuery.message, listOf())
+        bot.editMessage(callbackQuery.message, inlineKeyboard = listOf())
         bot.answerCallbackQuery(callbackQuery.id)
     }
 }

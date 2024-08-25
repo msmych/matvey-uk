@@ -13,11 +13,11 @@ import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.corsa.event.EventSql.removeEvent
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
-import uk.matvey.voron.KtorKit.pathParam
-import uk.matvey.voron.KtorKit.queryParam
-import uk.matvey.voron.KtorKit.receiveParamsMap
-import uk.matvey.voron.KtorKit.respondFtl
-import uk.matvey.voron.Resource
+import uk.matvey.utka.Resource
+import uk.matvey.utka.ktor.KtorKit.pathParam
+import uk.matvey.utka.ktor.KtorKit.queryParam
+import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
+import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 import java.time.LocalDate
 import java.time.LocalTime
 

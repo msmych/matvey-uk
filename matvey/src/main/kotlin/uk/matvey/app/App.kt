@@ -30,15 +30,21 @@ fun main(args: Array<String>) {
     }
     val repo = Repo(ds)
     val algorithm = Algorithm.HMAC256(config.getString("jwtSecret"))
-    val matveyAuth = MatveyAuth(algorithm)
+    val auth = MatveyAuth(algorithm)
     val serverConfig = config.getConfig("server")
     runBlocking {
         MatveyBot(
             tgConfig = tgConfig,
             serverConfig = serverConfig,
             repo = repo,
-            matveyAuth = matveyAuth,
+            matveyAuth = auth,
             profile = profile
-        ).start().join()
+        ).start()
     }
+    startServer(
+        serverConfig = serverConfig,
+        profile = profile,
+        auth = auth,
+        repo = repo,
+    )
 }

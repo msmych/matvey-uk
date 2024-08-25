@@ -13,7 +13,7 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import uk.matvey.kit.string.StringKit.toUuid
-import uk.matvey.voron.KtorKit.queryParam
+import uk.matvey.utka.ktor.KtorKit.queryParam
 import java.util.UUID
 
 class ServerAuth(private val algorithm: Algorithm) {

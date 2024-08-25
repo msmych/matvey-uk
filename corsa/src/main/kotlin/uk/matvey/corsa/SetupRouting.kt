@@ -16,7 +16,7 @@ import uk.matvey.corsa.club.ClubResource
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.corsa.event.EventResource
 import uk.matvey.slon.repo.Repo
-import uk.matvey.voron.KtorKit.respondFtl
+import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 fun Application.setupRouting(
     repo: Repo,
