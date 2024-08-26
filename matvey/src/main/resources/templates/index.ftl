@@ -8,18 +8,17 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-<div id="home" class="col">
-    <div class="row split">
-        <div class="row">
-            <a class="tab" href="/">Home</a>
-            <div class="tab">Kino</div>
+<div id="home" class="col gap-16">
+    <div id="menu" class="row split">
+        <div class="row gap-8">
+            <a class="tab click active" href="/">Home</a>
         </div>
-        <div class="row">
+        <div class="row gap-8">
             <#if account?has_content>
-                <div class="tab" hx-get="/me" hx-target="#content">👤 ${account.name} </div>
+                <div class="tab click" hx-get="/me" hx-target="#content">👤 ${account.name} </div>
             </#if>
             <#if !account?has_content>
-                <a class="tab" href="/login">Login</a>
+                <a class="tab click" href="/login">Login</a>
             </#if>
         </div>
     </div>
@@ -38,5 +37,28 @@
 
     .tab {
         padding: 8px 16px;
+        border-radius: 8px;
+    }
+
+    button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 1em;
+        max-width: 256px;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+
+    button.primary {
+        color: white;
+        background-color: darkcyan;
+    }
+
+    input {
+        padding: 8px 16px;
+        border: lightgray 2px solid;
+        border-radius: 8px;
+        font-size: 1em;
     }
 </style>
