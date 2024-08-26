@@ -28,6 +28,8 @@ jobs:
 
       - name: Build
         run: ./gradlew build
+        env:
+          GH_PACKAGES_RO_TOKEN: ${{ secrets.GH_PACKAGES_RO_TOKEN }}
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
@@ -44,6 +46,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --build-arg GH_PACKAGES_RO_TOKEN=${{ secrets.GH_PACKAGES_RO_TOKEN }} -t $IMAGE_NAME .
+          docker build --build-arg -t $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
