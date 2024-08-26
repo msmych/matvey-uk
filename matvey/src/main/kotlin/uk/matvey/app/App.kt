@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.extensibility.ResourceTypeProvider
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
@@ -22,7 +23,7 @@ fun main(args: Array<String>) {
         password = dbConfig.getString("password"),
     )
     val tgConfig = config.getConfig("tg")
-    Flyway.configure()
+    val flywayConfig = Flyway.configure()
         .dataSource(ds)
         .schemas("public")
         .defaultSchema("public")
@@ -33,6 +34,11 @@ fun main(args: Array<String>) {
             )
         )
         .validateMigrationNaming(true)
+
+    log.info { flywayConfig.pluginRegister }
+    log.info { flywayConfig.pluginRegister.getPlugins(ResourceTypeProvider::class.java) }
+
+    flywayConfig
         .load()
         .migrate()
     val repo = Repo(ds)
