@@ -16,7 +16,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/app/build/libs/matvey-all.jar /app/matvey-all.jar
+COPY --from=builder /app/matvey/build/libs/matvey-all.jar /app/matvey-all.jar
 
 EXPOSE 8080
 
