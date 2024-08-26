@@ -42,8 +42,7 @@ open class TestSetup {
                         "token",
                         auth.issueJwt(
                             expiration = 10.minutes,
-                            audience = athleteId.toString(),
-                            subject = athleteName,
+                            subject = athleteId.toString(),
                         ) {
                             withClaim("name", athleteName)
                         }
