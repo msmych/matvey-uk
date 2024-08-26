@@ -2,6 +2,9 @@ FROM eclipse-temurin:21-jdk as builder
 
 WORKDIR /app
 
+ARG GH_PACKAGES_RO_TOKEN
+ENV GH_PACKAGES_RO_TOKEN=$GH_PACKAGES_RO_TOKEN
+
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties /app/
 
 COPY gradle /app/gradle

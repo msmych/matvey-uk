@@ -1,4 +1,4 @@
-name: Build and push image
+name: Build and push Docker image
 
 on:
   push:
@@ -16,20 +16,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Setup JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3.4.2
-
-      - name: Build
-        run: ./gradlew build
-        env:
-          GH_PACKAGES_RO_TOKEN: ${{ secrets.GH_PACKAGES_RO_TOKEN }}
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v1
@@ -49,3 +35,5 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
+        env:
+          GH_PACKAGES_RO_TOKEN: ${{ secrets.GH_PACKAGES_RO_TOKEN }}
