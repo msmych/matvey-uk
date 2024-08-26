@@ -1,21 +1,21 @@
 package uk.matvey.corsa
 
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.slon.repo.Repo
+import uk.matvey.utka.jwt.AuthJwt
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.installFreeMarker
 
 fun Application.serverModule(
     repo: Repo,
     clubService: ClubService,
-    algorithm: Algorithm,
+    auth: AuthJwt,
 ) {
     installFreeMarker("templates")
     install(Authentication) {
-        register(ServerAuth.Provider(algorithm))
+        register(ServerAuth.Provider(auth))
     }
-    setupRouting(repo, clubService, algorithm)
+    setupRouting(repo, clubService, auth)
 }

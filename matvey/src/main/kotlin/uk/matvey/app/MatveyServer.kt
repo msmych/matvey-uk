@@ -80,8 +80,8 @@ fun startServer(
                         call.respondFtl("me", "name" to newName)
                     }
                     get("/logout") {
-                        val account = repo.access { a -> a.getAccountById(call.principal<AccountPrincipal>()!!.id) }
-                        call.response.cookies.append("token", auth.invalidateJwt(account))
+                        val token = call.request.cookies["token"] ?: return@get call.respondRedirect("/")
+                        call.response.cookies.append("token", auth.invalidateJwt(token))
                         call.respondRedirect("/")
                     }
                 }

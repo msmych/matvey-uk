@@ -1,6 +1,5 @@
 package uk.matvey.corsa
 
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
@@ -16,14 +15,15 @@ import uk.matvey.corsa.club.ClubResource
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.corsa.event.EventResource
 import uk.matvey.slon.repo.Repo
+import uk.matvey.utka.jwt.AuthJwt
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 fun Application.setupRouting(
     repo: Repo,
     clubService: ClubService,
-    algorithm: Algorithm,
+    auth: AuthJwt,
 ) {
-    val auth = ServerAuth(algorithm)
+    val auth = ServerAuth(auth)
     val resources = listOf(
         ClubResource(repo, clubService),
         EventResource(repo, clubService),

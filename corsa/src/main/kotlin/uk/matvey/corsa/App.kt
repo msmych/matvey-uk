@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory
 import mu.KotlinLogging
 import uk.matvey.corsa.club.ClubService
 import uk.matvey.slon.repo.Repo
+import uk.matvey.utka.jwt.AuthJwt
 
 private val log = KotlinLogging.logger("Corsa")
 
@@ -16,7 +17,7 @@ fun main(vararg args: String) {
     val repo = Repo(ds)
     val clubService = ClubService(repo)
     val serverConfig = config.getConfig("server")
-    val algorithm = Algorithm.HMAC256(serverConfig.getString("jwtSecret"))
-    startTgBot(config.getConfig("tgBot"), serverConfig, algorithm, repo)
-    startServer(serverConfig, repo, clubService, algorithm)
+    val auth = AuthJwt(Algorithm.HMAC256(serverConfig.getString("jwtSecret")), "corsa")
+    startTgBot(config.getConfig("tgBot"), serverConfig, auth, repo)
+    startServer(serverConfig, repo, clubService, auth)
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import uk.matvey.slon.FlywayKit.flywayMigrate
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
+import uk.matvey.utka.jwt.AuthJwt
 
 fun main(args: Array<String>) {
     val profile = Profile.from(args[0])
@@ -29,8 +30,8 @@ fun main(args: Array<String>) {
         )
     }
     val repo = Repo(ds)
-    val algorithm = Algorithm.HMAC256(config.getString("jwtSecret"))
-    val auth = MatveyAuth(algorithm)
+    val authJwt = AuthJwt(Algorithm.HMAC256(config.getString("jwtSecret")), "matvey")
+    val auth = MatveyAuth(authJwt)
     val serverConfig = config.getConfig("server")
     runBlocking {
         MatveyBot(
