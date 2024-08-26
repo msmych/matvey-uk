@@ -32,6 +32,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --build-arg GH_PACKAGES_RO_TOKEN="${{ secrets.GH_PACKAGES_RO_TOKEN }}" $IMAGE_NAME .
+          docker build -t --build-arg GH_PACKAGES_RO_TOKEN="${{ secrets.GH_PACKAGES_RO_TOKEN }}" -f $IMAGE_NAME .
           docker tag $IMAGE_NAME:latest $IMAGE
           docker push $IMAGE
