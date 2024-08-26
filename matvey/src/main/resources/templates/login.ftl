@@ -7,6 +7,7 @@
 <body>
 <h1>Login</h1>
 <div>
-    To login, please go to <a href="https://t.me/">Telegram bot</a> and send the following command: <code>/login</code>
+    <div>To login, please go to <a href="https://t.me/">Telegram bot</a>, send <code>/start</code> command.</div>
+    <div>After account approval send <code>/login</code> command.</div>
 </div>
 </body>

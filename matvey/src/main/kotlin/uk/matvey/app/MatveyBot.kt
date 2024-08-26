@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import uk.matvey.app.account.Account
 import uk.matvey.app.account.AccountSql.ensureAccount
 import uk.matvey.app.account.AccountSql.getAccountByTgUserId
@@ -22,7 +23,16 @@ class MatveyBot(
     private val matveyAuth: MatveyAuth,
     private val profile: Profile,
 ) {
-    private val bot = TgBot(tgConfig.getString("botToken"), tgConfig.getInt("longPollingSeconds"))
+
+    private val log = KotlinLogging.logger {}
+
+    private val bot = TgBot(
+        token = tgConfig.getString("botToken"),
+        longPollingSeconds = tgConfig.getInt("longPollingSeconds"),
+        onUpdatesRetrievalException = { e -> log.error(e) { "Failed to fetch updates" } },
+        onUpdateProcessingException = { e -> log.error(e) { "Failed to process update" } },
+    )
+
     private val adminGroupId = tgConfig.getLong("adminGroupId")
 
     fun start(): Job {
