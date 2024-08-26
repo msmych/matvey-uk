@@ -23,6 +23,7 @@ import uk.matvey.slon.repo.RepoKit.queryOne
 import uk.matvey.utka.ktor.KtorKit.setFormData
 import java.time.LocalDateTime
 import java.time.ZoneOffset.UTC
+import java.time.temporal.ChronoUnit.MILLIS
 import java.util.UUID.randomUUID
 
 class EventResourceTest : TestSetup() {
@@ -66,7 +67,8 @@ class EventResourceTest : TestSetup() {
             assertThat(r.uuid(CLUB_ID)).isEqualTo(club.id)
             assertThat(r.string(NAME)).isEqualTo(name)
             assertThat(r.localDate(DATE)).isEqualTo(date)
-            assertThat(r.instant(DATE_TIME)).isEqualTo(LocalDateTime.of(date, time).toInstant(UTC))
+            assertThat(r.instant(DATE_TIME).truncatedTo(MILLIS))
+                .isEqualTo(LocalDateTime.of(date, time).toInstant(UTC).truncatedTo(MILLIS))
         }
     }
 
