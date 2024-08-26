@@ -29,6 +29,8 @@ fun main(args: Array<String>) {
             )
         )
         sqlMigrationPrefix("V")
+        sqlMigrationSuffixes(".sql")
+        sqlMigrationSeparator("__")
         validateMigrationNaming(true)
     }
     val repo = Repo(ds)
