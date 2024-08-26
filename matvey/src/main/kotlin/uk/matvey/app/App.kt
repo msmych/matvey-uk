@@ -28,6 +28,7 @@ fun main(args: Array<String>) {
                 "tgAdminId" to tgConfig.getLong("adminId").toString(),
             )
         )
+        validateMigrationNaming(true)
     }
     val repo = Repo(ds)
     val authJwt = AuthJwt(Algorithm.HMAC256(config.getString("jwtSecret")), "matvey")
