@@ -28,6 +28,7 @@ fun main(args: Array<String>) {
                 "tgAdminId" to tgConfig.getLong("adminId").toString(),
             )
         )
+        sqlMigrationPrefix("V")
         validateMigrationNaming(true)
     }
     val repo = Repo(ds)
