@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
         username = dbConfig.getString("username"),
         password = dbConfig.getString("password"),
     )
+    log.info { System.getProperty("java.class.path") }
     val tgConfig = config.getConfig("tg")
     val flywayConfig = Flyway.configure()
         .dataSource(ds)
