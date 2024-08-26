@@ -36,10 +36,9 @@ fun main(args: Array<String>) {
         sqlMigrationSuffixes(".sql")
         sqlMigrationSeparator("__")
         validateMigrationNaming(true)
+        loggers("slf4j")
         log.info {
             this.pluginRegister.getPlugins(ResourceTypeProvider::class.java)
-                .map { it.getPrefixTypePairs(this) }
-                .map { it.map { pair -> "${pair.left} -> ${pair.right}"} }
         }
     }
     val repo = Repo(ds)
