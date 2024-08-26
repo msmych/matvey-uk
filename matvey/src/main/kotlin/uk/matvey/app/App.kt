@@ -3,10 +3,14 @@ package uk.matvey.app
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
+import org.flywaydb.core.extensibility.ResourceTypeProvider
 import uk.matvey.slon.FlywayKit.flywayMigrate
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
+
+private val log = KotlinLogging.logger("Matvey")
 
 fun main(args: Array<String>) {
     val profile = Profile.from(args[0])
@@ -32,6 +36,11 @@ fun main(args: Array<String>) {
         sqlMigrationSuffixes(".sql")
         sqlMigrationSeparator("__")
         validateMigrationNaming(true)
+        log.info {
+            this.pluginRegister.getPlugins(ResourceTypeProvider::class.java)
+                .map { it.getPrefixTypePairs(this) }
+                .map { it.map { pair -> "${pair.left} -> ${pair.right}"} }
+        }
     }
     val repo = Repo(ds)
     val authJwt = AuthJwt(Algorithm.HMAC256(config.getString("jwtSecret")), "matvey")
