@@ -4,8 +4,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.flywaydb.core.extensibility.ResourceTypeProvider
-import uk.matvey.slon.FlywayKit.flywayMigrate
+import org.flywaydb.core.Flyway
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
@@ -23,24 +22,19 @@ fun main(args: Array<String>) {
         password = dbConfig.getString("password"),
     )
     val tgConfig = config.getConfig("tg")
-    flywayMigrate(
-        dataSource = ds,
-        clean = dbConfig.getBoolean("clean"),
-    ) {
-        placeholders(
+    Flyway.configure()
+        .dataSource(ds)
+        .schemas("public")
+        .defaultSchema("public")
+        .locations("classpath:db/migration")
+        .placeholders(
             mapOf(
                 "tgAdminId" to tgConfig.getLong("adminId").toString(),
             )
         )
-        sqlMigrationPrefix("V")
-        sqlMigrationSuffixes(".sql")
-        sqlMigrationSeparator("__")
-        validateMigrationNaming(true)
-        loggers("slf4j")
-        log.info {
-            this.pluginRegister.getPlugins(ResourceTypeProvider::class.java)
-        }
-    }
+        .validateMigrationNaming(true)
+        .load()
+        .migrate()
     val repo = Repo(ds)
     val authJwt = AuthJwt(Algorithm.HMAC256(config.getString("jwtSecret")), "matvey")
     val auth = MatveyAuth(authJwt)
