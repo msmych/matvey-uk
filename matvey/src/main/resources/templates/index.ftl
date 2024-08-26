@@ -15,7 +15,7 @@
         </div>
         <div class="row gap-8">
             <#if account?has_content>
-                <div class="tab click" hx-get="/me" hx-target="#content">👤 ${account.name} </div>
+                <div class="tab click" hx-get="/me" hx-target="#content">👤 ${account.name}</div>
             </#if>
             <#if !account?has_content>
                 <a class="tab click" href="/login">Login</a>
