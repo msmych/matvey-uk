@@ -2,8 +2,8 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY matvey/build/libs/app-all.jar /app/
+COPY matvey/build/libs/matvey-all.jar /app/
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "app-all.jar", "prod"]
+CMD ["java", "-jar", "matvey-all.jar", "prod"]
