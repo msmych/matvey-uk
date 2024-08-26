@@ -19,6 +19,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.shadowJar {
-    enabled = false
+application {
+    mainClass = "uk.matvey.app.AppKt"
 }
