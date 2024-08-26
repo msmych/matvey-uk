@@ -5,10 +5,12 @@ import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.extensibility.Plugin
 import org.flywaydb.core.extensibility.ResourceTypeProvider
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
+import java.util.ServiceLoader
 
 private val log = KotlinLogging.logger("Matvey")
 
@@ -36,6 +38,7 @@ fun main(args: Array<String>) {
         .validateMigrationNaming(true)
 
     log.info { flywayConfig.pluginRegister }
+    log.info { ServiceLoader.load(Plugin::class.java, ServiceLoader::class.java.classLoader).map { it.name } }
     log.info { flywayConfig.pluginRegister.getPlugins(ResourceTypeProvider::class.java) }
 
     flywayConfig
