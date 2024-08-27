@@ -1,4 +1,4 @@
-FROM gradle:8.9-jdk21 as builder
+FROM eclipse-temurin:21-jdk as builder
 
 WORKDIR /app
 
@@ -13,6 +13,16 @@ COPY matvey /app/matvey
 RUN chmod +x gradlew
 
 RUN ./gradlew matvey:build --no-daemon
+
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY --from=builder /app/matvey /app/matvey
+COPY --from=builder /app/gradle /app/gradle
+COPY --from=builder /app/gradlew /app/
+COPY --from=builder /app/settings.gradle.kts /app/
+COPY --from=builder /app/gradle.properties /app/
 
 EXPOSE 8080
 
