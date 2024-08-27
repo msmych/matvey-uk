@@ -15,9 +15,6 @@ dependencies {
     implementation("uk.matvey:telek:$telekVersion")
     implementation("com.typesafe:config:$typesafeConfigVersion")
 
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
-
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

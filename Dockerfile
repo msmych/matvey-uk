@@ -1,23 +1,18 @@
-FROM eclipse-temurin:21-jdk as builder
+FROM gradle:8.9-jdk21 as builder
 
 WORKDIR /app
 
 ARG GH_PACKAGES_RO_TOKEN
 ENV GH_PACKAGES_RO_TOKEN=$GH_PACKAGES_RO_TOKEN
 
-COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties /app/
+COPY gradlew gradle settings.gradle.kts build.gradle.kts gradle.properties /app/
 
-COPY gradle /app/gradle
 COPY matvey /app/matvey
 
-RUN ./gradlew matvey:shadowJar
+RUN chmod +x gradlew
 
-FROM eclipse-temurin:21-jre
-
-WORKDIR /app
-
-COPY --from=builder /app/matvey/build/libs/matvey-all.jar /app/matvey-all.jar
+RUN ./gradlew matvey:build --no-daemon
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "matvey-all.jar", "prod"]
+CMD ["./gradlew", "matvey:run", "--no-daemon", "--args=\"prod\""]

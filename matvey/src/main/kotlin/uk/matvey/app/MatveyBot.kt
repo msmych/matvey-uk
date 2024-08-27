@@ -10,6 +10,7 @@ import uk.matvey.app.account.Account
 import uk.matvey.app.account.AccountSql.ensureAccount
 import uk.matvey.app.account.AccountSql.getAccountByTgUserId
 import uk.matvey.app.account.AccountSql.updateAccountStatus
+import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgBot
 import uk.matvey.telek.TgInlineKeyboardButton
@@ -18,7 +19,7 @@ import uk.matvey.telek.TgUpdate
 
 class MatveyBot(
     tgConfig: Config,
-    private val serverConfig: Config,
+    private val serverConfig: ServerConfig,
     private val repo: Repo,
     private val matveyAuth: MatveyAuth,
     private val profile: Profile,
@@ -90,7 +91,7 @@ class MatveyBot(
         val account = repo.access { a -> a.getAccountByTgUserId(tgUserId) }
         if (account.state == Account.State.ACTIVE) {
             val token = matveyAuth.issueJwt(account)
-            val url = "${serverConfig.getString("host")}:${serverConfig.getInt("port")}/auth?token=$token"
+            val url = "${serverConfig.url()}/auth?token=$token"
             if (profile == Profile.PROD) {
                 bot.sendMessage(
                     chatId = tgUserId,
