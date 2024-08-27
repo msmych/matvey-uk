@@ -15,7 +15,7 @@ jobs:
       - name: Run app
         uses: appleboy/ssh-action@master
         with:
-          host: ec2-18-169-18-53.eu-west-2.compute.amazonaws.com
+          host: ec2-35-179-90-90.eu-west-2.compute.amazonaws.com
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
