@@ -3,8 +3,8 @@ package uk.matvey.app
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
-import uk.matvey.app.config.AppConfig
 import mu.KotlinLogging
+import uk.matvey.app.config.AppConfig
 import uk.matvey.slon.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt

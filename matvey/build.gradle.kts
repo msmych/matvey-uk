@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
 plugins {
     id("io.ktor.plugin") version "2.3.12"
 }
@@ -22,4 +24,8 @@ dependencies {
 
 application {
     mainClass = "uk.matvey.app.AppKt"
+}
+
+tasks.shadowJar {
+    transform(ServiceFileTransformer::class.java)
 }
