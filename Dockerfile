@@ -12,19 +12,15 @@ COPY matvey /app/matvey
 
 RUN chmod +x gradlew
 
-RUN ./gradlew matvey:build --no-daemon
+RUN ./gradlew matvey:shadowJar --no-daemon
 
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/matvey /app/matvey
-COPY --from=builder /app/gradle /app/gradle
-COPY --from=builder /app/gradlew /app/
-COPY --from=builder /app/settings.gradle.kts /app/
-COPY --from=builder /app/build.gradle.kts /app/
-COPY --from=builder /app/gradle.properties /app/
+COPY --from=builder /app/app/build/libs/matvey-all.jar /app/matvey-all.jar
+COPY --from=builder /app/app/build /app/build
 
 EXPOSE 8080
 
-CMD ["./gradlew", "matvey:run", "--no-daemon", "--args=\"prod\""]
+CMD ["java", "-jar", "build/libs/matvey-all.jar", "prod"]
