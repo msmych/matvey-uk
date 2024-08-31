@@ -12,10 +12,9 @@ import uk.matvey.app.account.AccountSql.getAccountByTgUserId
 import uk.matvey.app.account.AccountSql.updateAccountStatus
 import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.slon.repo.Repo
-import uk.matvey.telek.TgBot
-import uk.matvey.telek.TgInlineKeyboardButton
-import uk.matvey.telek.TgInlineKeyboardButton.Companion.callbackData
-import uk.matvey.telek.TgUpdate
+import uk.matvey.telek.Bot
+import uk.matvey.telek.ReplyMarkup.InlineKeyboardButton
+import uk.matvey.telek.Update
 
 class MatveyBot(
     tgConfig: Config,
@@ -27,7 +26,7 @@ class MatveyBot(
 
     private val log = KotlinLogging.logger {}
 
-    private val bot = TgBot(
+    private val bot = Bot(
         token = tgConfig.getString("botToken"),
         longPollingSeconds = tgConfig.getInt("longPollingSeconds"),
         onUpdatesRetrievalException = { e -> log.error(e) { "Failed to fetch updates" } },
@@ -44,7 +43,7 @@ class MatveyBot(
         }
     }
 
-    private suspend fun processUpdate(update: TgUpdate) {
+    private suspend fun processUpdate(update: Update) {
         if (update.message?.text == "/start") {
             processStartCommand(update)
             return
@@ -59,7 +58,7 @@ class MatveyBot(
         }
     }
 
-    private suspend fun processStartCommand(update: TgUpdate) {
+    private suspend fun processStartCommand(update: Update) {
         val from = update.message().from()
         val tgUserId = from.id
         val account = repo.access { a -> a.ensureAccount(from.firstName, tgUserId) }
@@ -69,9 +68,9 @@ class MatveyBot(
                     chatId = adminGroupId,
                     text = "Signup request from ${account.name}",
                     inlineKeyboard = listOf(
-                        listOf(callbackData("✅ Approve", "accounts/$tgUserId/approve")),
-                        listOf(callbackData("❌ Reject", "accounts/$tgUserId/reject"))
-                    )
+                        listOf(InlineKeyboardButton.data("✅ Approve", "accounts/$tgUserId/approve")),
+                        listOf(InlineKeyboardButton.data("❌ Reject", "accounts/$tgUserId/reject"))
+                    ),
                 )
                 bot.sendMessage(
                     tgUserId,
@@ -86,7 +85,7 @@ class MatveyBot(
         }
     }
 
-    private suspend fun processLoginCommand(update: TgUpdate) {
+    private suspend fun processLoginCommand(update: Update) {
         val tgUserId = update.message().from().id
         val account = repo.access { a -> a.getAccountByTgUserId(tgUserId) }
         if (account.state == Account.State.ACTIVE) {
@@ -96,20 +95,17 @@ class MatveyBot(
                 bot.sendMessage(
                     chatId = tgUserId,
                     text = "Login",
-                    inlineKeyboard = listOf(listOf(TgInlineKeyboardButton.url("Go", url)))
+                    inlineKeyboard = listOf(listOf(InlineKeyboardButton.url("Go", url)))
                 )
             } else {
-                bot.sendMessage(
-                    chatId = tgUserId,
-                    text = url
-                )
+                bot.sendMessage(chatId = tgUserId, text = url)
             }
         }
     }
 
-    private suspend fun processAccountActions(update: TgUpdate) {
+    private suspend fun processAccountActions(update: Update) {
         val callbackQuery = update.callbackQuery()
-        val parts = callbackQuery.data!!.split("/")
+        val parts = callbackQuery.data().split("/")
         val tgUserId = parts[1].toLong()
         when (parts[2]) {
             "approve" -> {
@@ -126,7 +122,7 @@ class MatveyBot(
                 }
             }
         }
-        bot.editMessage(callbackQuery.message, inlineKeyboard = listOf())
+        bot.editMessage(callbackQuery.message(), inlineKeyboard = listOf())
         bot.answerCallbackQuery(callbackQuery.id)
     }
 }

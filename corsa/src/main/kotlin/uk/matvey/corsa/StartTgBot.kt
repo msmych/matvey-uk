@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uk.matvey.corsa.athlete.AthleteSql.ensureAthlete
 import uk.matvey.slon.repo.Repo
-import uk.matvey.telek.TgBot
+import uk.matvey.telek.Bot
 import uk.matvey.utka.jwt.AuthJwt
 import kotlin.time.Duration.Companion.hours
 
@@ -17,8 +17,8 @@ fun startTgBot(
     repo: Repo
 ) {
     CoroutineScope(Dispatchers.IO).launch {
-        val tgBot = TgBot(tgBotConfig.getString("token"))
-        tgBot.start { update ->
+        val bot = Bot(tgBotConfig.getString("token"))
+        bot.start { update ->
             update.message
                 ?.takeIf { it.text == "/login" }
                 ?.let {
@@ -33,7 +33,7 @@ fun startTgBot(
                     }
                     val host = serverConfig.getString("host")
                     val port = serverConfig.getInt("port")
-                    tgBot.sendMessage(tgUserId, "$host:$port/auth?token=$jwt")
+                    bot.sendMessage(tgUserId, "$host:$port/auth?token=$jwt")
                 }
         }
     }
