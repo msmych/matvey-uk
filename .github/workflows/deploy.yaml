@@ -26,6 +26,7 @@ jobs:
               -name matvey-p12 \
               -CAfile /etc/letsencrypt/live/matvey.uk/chain.pem \
               -caname "matvey-letsencrypt"
+              -passout pass:${{ secrets.JKS_PASS }}
             sudo keytool -importkeystore \
               -deststorepass ${{ secrets.JKS_PASS }} \
               -destkeypass ${{ secrets.JKS_PASS }} \
