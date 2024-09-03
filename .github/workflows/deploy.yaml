@@ -19,6 +19,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+            echo "Generating PKCS#12"
             sudo openssl pkcs12 -export \
               -in /etc/letsencrypt/live/matvey.uk/fullchain.pem \
               -inkey /etc/letsencrypt/live/matvey.uk/privkey.pem \
@@ -27,6 +28,7 @@ jobs:
               -CAfile /etc/letsencrypt/live/matvey.uk/chain.pem \
               -caname "matvey-letsencrypt"
               -passout pass:${{ secrets.JKS_PASS }}
+            echo "Generating JKS"
             sudo keytool -importkeystore \
               -deststorepass ${{ secrets.JKS_PASS }} \
               -destkeypass ${{ secrets.JKS_PASS }} \
@@ -35,10 +37,12 @@ jobs:
               -srcstoretype PKCS12 \
               -srcstorepass ${{ secrets.JKS_PASS }} \
               -alias matvey-p12
+            echo "Stopping last container"
             docker stop ${{ env.APP_NAME }} || true
             docker rm ${{ env.APP_NAME }} || true
             aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${{ env.AWS_HOST }}
             docker pull ${{ env.IMAGE }} 
+            echo "Running app"
             docker run -d \
               --name ${{ env.APP_NAME }} \
               -v /etc/letsencrypt/live/matvey.uk:/certs \
