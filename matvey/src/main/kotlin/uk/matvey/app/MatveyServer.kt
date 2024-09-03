@@ -46,16 +46,16 @@ fun startServer(
     embeddedServer(
         factory = Netty,
         environment = applicationEngineEnvironment {
-            if (profile == Profile.PROD) {
-                val jksPass = serverConfig.getString("jskPass")
+            if (profile.isProd()) {
+                val jksPass = serverConfig.getString("jskPass").toCharArray()
                 val keyStoreFile = File("/certs/keystore.jks")
                 sslConnector(
                     keyStore = KeyStore.getInstance("JKS").apply {
-                        load(FileInputStream(keyStoreFile), jksPass.toCharArray())
+                        load(FileInputStream(keyStoreFile), jksPass)
                     },
-                    keyAlias = "matveyAppCert",
-                    privateKeyPassword = { jksPass.toCharArray() },
-                    keyStorePassword = { jksPass.toCharArray() }
+                    keyAlias = "matvey-p12",
+                    privateKeyPassword = { jksPass },
+                    keyStorePassword = { jksPass },
                 ) {
                     port = serverConfig.getInt("port")
                     keyStorePath = keyStoreFile
