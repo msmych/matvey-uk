@@ -29,6 +29,7 @@ jobs:
               -caname "matvey-letsencrypt" \
               -passout pass:${{ secrets.JKS_PASS }}
             echo "Generating JKS"
+            sudo chmod 644 /etc/letsencrypt/live/matvey.uk/keystore.p12
             sudo keytool -importkeystore \
               -deststorepass ${{ secrets.JKS_PASS }} \
               -destkeypass ${{ secrets.JKS_PASS }} \
@@ -37,6 +38,7 @@ jobs:
               -srcstoretype PKCS12 \
               -srcstorepass ${{ secrets.JKS_PASS }} \
               -alias matvey-p12
+            sudo chmod 644 /etc/letsencrypt/live/matvey.uk/keystore.jks
             echo "Stopping last container"
             docker stop ${{ env.APP_NAME }} || true
             docker rm ${{ env.APP_NAME }} || true
