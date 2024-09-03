@@ -37,7 +37,8 @@ jobs:
               -srckeystore /etc/letsencrypt/live/matvey.uk/keystore.p12 \
               -srcstoretype PKCS12 \
               -srcstorepass ${{ secrets.JKS_PASS }} \
-              -alias matvey-p12
+              -alias matvey-p12 \
+              -noprompt
             sudo chmod 644 /etc/letsencrypt/live/matvey.uk/keystore.jks
             echo "Stopping last container"
             docker stop ${{ env.APP_NAME }} || true
