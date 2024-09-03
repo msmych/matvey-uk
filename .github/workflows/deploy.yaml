@@ -48,5 +48,5 @@ jobs:
               -e TG_BOT_TOKEN="${{ secrets.TG_BOT_TOKEN }}" \
               -e TG_ADMIN_ID=${{ secrets.TG_ADMIN_ID }} \
               -e TG_ADMIN_GROUP_ID=${{ secrets.TG_ADMIN_GROUP_ID }} \
-              -p 80:8080 \
+              -p 443:8443 \
               ${{ env.IMAGE }}
