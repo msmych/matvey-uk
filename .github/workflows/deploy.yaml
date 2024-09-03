@@ -19,14 +19,14 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            openssl pkcs12 -export \
+            sudo openssl pkcs12 -export \
               -in /etc/letsencrypt/live/matvey.uk/fullchain.pem \
               -inkey /etc/letsencrypt/live/matvey.uk/privkey.pem \
               -out /etc/letsencrypt/live/matvey.uk/keystore.p12 \
               -name matvey-p12 \
               -CAfile /etc/letsencrypt/live/matvey.uk/chain.pem \
               -caname "matvey-letsencrypt"
-            keytool -importkeystore \
+            sudo keytool -importkeystore \
               -deststorepass ${{ secrets.JKS_PASS }} \
               -destkeypass ${{ secrets.JKS_PASS }} \
               -destkeystore /etc/letsencrypt/live/matvey.uk/keystore.jks \
