@@ -27,16 +27,16 @@ jobs:
               -name matvey-p12 \
               -CAfile /etc/letsencrypt/live/matvey.uk/chain.pem \
               -caname "matvey-letsencrypt" \
-              -passout pass:${{ secrets.JKS_PASS }}
+              -passout "pass:${{ secrets.JKS_PASS }}"
             echo "Generating JKS"
             sudo chmod 644 /etc/letsencrypt/live/matvey.uk/keystore.p12
             sudo keytool -importkeystore \
-              -deststorepass ${{ secrets.JKS_PASS }} \
-              -destkeypass ${{ secrets.JKS_PASS }} \
+              -deststorepass "${{ secrets.JKS_PASS }}" \
+              -destkeypass "${{ secrets.JKS_PASS }}" \
               -destkeystore /etc/letsencrypt/live/matvey.uk/keystore.jks \
               -srckeystore /etc/letsencrypt/live/matvey.uk/keystore.p12 \
               -srcstoretype PKCS12 \
-              -srcstorepass ${{ secrets.JKS_PASS }} \
+              -srcstorepass "${{ secrets.JKS_PASS }}" \
               -alias matvey-p12 \
               -noprompt
             sudo chmod 644 /etc/letsencrypt/live/matvey.uk/keystore.jks
