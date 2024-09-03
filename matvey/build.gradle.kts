@@ -15,7 +15,7 @@ dependencies {
     implementation("uk.matvey:slon:$slonVersion")
     implementation("uk.matvey:utka:$utkaVersion")
     implementation("uk.matvey:telek:$telekVersion")
-    implementation("com.typesafe:config:$typesafeConfigVersion")
+    implementation("io.ktor:ktor-network-tls-certificates")
 
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")

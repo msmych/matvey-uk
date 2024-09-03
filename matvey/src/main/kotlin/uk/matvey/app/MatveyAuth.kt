@@ -34,10 +34,6 @@ class MatveyAuth(
         }
     }
 
-    fun invalidateJwt(token: String): String {
-        return auth.invalidateJwt(token)
-    }
-
     override suspend fun onAuthenticate(context: AuthenticationContext) {
         context.call.request.cookies["token"]?.let { JWT.decode(it) }?.let { token ->
             context.principal(AccountPrincipal(token.subject.toUuid(), token.getClaim("name").asString()))
