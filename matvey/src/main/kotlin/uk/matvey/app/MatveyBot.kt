@@ -90,7 +90,7 @@ class MatveyBot(
         val account = repo.access { a -> a.getAccountByTgUserId(tgUserId) }
         if (account.state == Account.State.ACTIVE) {
             val token = matveyAuth.issueJwt(account)
-            val url = "${serverConfig.url()}/auth?token=$token"
+            val url = "${serverConfig.url(profile)}/auth?token=$token"
             if (profile == Profile.PROD) {
                 bot.sendMessage(
                     chatId = tgUserId,

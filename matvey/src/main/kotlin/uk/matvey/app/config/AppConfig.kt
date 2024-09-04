@@ -1,13 +1,20 @@
 package uk.matvey.app.config
 
 import com.typesafe.config.Config
+import uk.matvey.app.Profile
 import uk.matvey.slon.HikariKit.hikariDataSource
 
 class AppConfig(private val config: Config) : Config by config {
 
     class ServerConfig(private val config: Config) : Config by config {
 
-        fun url() = getString("host") + ":" + getInt("port")
+        fun host() = getString("host")
+
+        fun url(profile: Profile) = if (profile !in setOf(Profile.TEST, Profile.LOCAL)) {
+            host()
+        } else {
+            host() + ":" + getInt("port")
+        }
     }
 
     class DbConfig(private val config: Config) : Config by config {
