@@ -40,6 +40,7 @@ fun main(args: Array<String>) {
             profile = profile
         ).start()
     }
+    log.info { "Bot started. Launching server" }
     startServer(
         serverConfig = serverConfig,
         profile = profile,

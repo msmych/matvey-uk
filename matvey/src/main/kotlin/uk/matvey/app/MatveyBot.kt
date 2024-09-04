@@ -59,46 +59,46 @@ class MatveyBot(
     }
 
     private suspend fun processStartCommand(update: Update) {
-        val from = update.message().from()
-        val tgUserId = from.id
-        val account = repo.access { a -> a.ensureAccount(from.firstName, tgUserId) }
+        val user = update.message().from()
+        val userId = user.id
+        val account = repo.access { a -> a.ensureAccount(user.firstName, userId) }
         when (account.state) {
             Account.State.PENDING -> {
                 bot.sendMessage(
                     chatId = adminGroupId,
                     text = "Signup request from ${account.name}",
                     inlineKeyboard = listOf(
-                        listOf(InlineKeyboardButton.data("✅ Approve", "accounts/$tgUserId/approve")),
-                        listOf(InlineKeyboardButton.data("❌ Reject", "accounts/$tgUserId/reject"))
+                        listOf(InlineKeyboardButton.data("✅ Approve", "accounts/$userId/approve")),
+                        listOf(InlineKeyboardButton.data("❌ Reject", "accounts/$userId/reject"))
                     ),
                 )
                 bot.sendMessage(
-                    tgUserId,
+                    userId,
                     """
                         |Hello, ${account.name}! Your signup request is submitted.
                         |I'll notify you when it's approved.
                     """.trimMargin()
                 )
             }
-            Account.State.ACTIVE -> bot.sendMessage(tgUserId, "👋")
+            Account.State.ACTIVE -> bot.sendMessage(userId, "👋")
             Account.State.DISABLED -> {}
         }
     }
 
     private suspend fun processLoginCommand(update: Update) {
-        val tgUserId = update.message().from().id
-        val account = repo.access { a -> a.getAccountByTgUserId(tgUserId) }
+        val userId = update.message().from().id
+        val account = repo.access { a -> a.getAccountByTgUserId(userId) }
         if (account.state == Account.State.ACTIVE) {
             val token = matveyAuth.issueJwt(account)
             val url = "${serverConfig.url(profile)}/auth?token=$token"
             if (profile == Profile.PROD) {
                 bot.sendMessage(
-                    chatId = tgUserId,
+                    chatId = userId,
                     text = "Login",
                     inlineKeyboard = listOf(listOf(InlineKeyboardButton.url("Go", url)))
                 )
             } else {
-                bot.sendMessage(chatId = tgUserId, text = url)
+                bot.sendMessage(chatId = userId, text = url)
             }
         }
     }
@@ -106,18 +106,18 @@ class MatveyBot(
     private suspend fun processAccountActions(update: Update) {
         val callbackQuery = update.callbackQuery()
         val parts = callbackQuery.data().split("/")
-        val tgUserId = parts[1].toLong()
+        val userId = parts[1].toLong()
         when (parts[2]) {
             "approve" -> {
                 repo.access { a ->
-                    val account = a.getAccountByTgUserId(tgUserId)
+                    val account = a.getAccountByTgUserId(userId)
                     a.updateAccountStatus(account.id, Account.State.ACTIVE)
                 }
-                bot.sendMessage(tgUserId, "Your signup request is approved")
+                bot.sendMessage(userId, "Your signup request is approved")
             }
             "reject" -> {
                 repo.access { a ->
-                    val account = a.getAccountByTgUserId(tgUserId)
+                    val account = a.getAccountByTgUserId(userId)
                     a.updateAccountStatus(account.id, Account.State.DISABLED)
                 }
             }
