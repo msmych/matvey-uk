@@ -30,7 +30,13 @@ class AppConfig(private val config: Config) : Config by config {
 
     class TgConfig(private val config: Config) : Config by config {
 
+        fun botToken() = getString("botToken")
+
+        fun longPollingSeconds() = getInt("longPollingSeconds")
+
         fun adminId() = getLong("adminId")
+
+        fun adminGroupId() = getLong("adminGroupId")
     }
 
     fun jwtSecret() = getString("jwtSecret")

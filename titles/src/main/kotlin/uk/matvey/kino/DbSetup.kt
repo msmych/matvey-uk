@@ -1,7 +1,6 @@
 package uk.matvey.kino
 
 import com.typesafe.config.Config
-import uk.matvey.kino.KinoSql.KINO
 import uk.matvey.slon.FlywayKit.flywayMigrate
 import uk.matvey.slon.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
@@ -21,8 +20,8 @@ class DbSetup(
     fun migrate() {
         flywayMigrate(
             dataSource = dataSource,
-            schema = KINO,
-            location = "classpath:db/migration/kino",
+            schema = "titles",
+            location = "classpath:db/migration/titles",
             clean = dataSourceConfig.getBoolean("clean"),
         ) {
             createSchemas(true)

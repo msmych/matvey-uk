@@ -1,6 +1,5 @@
 package uk.matvey.app
 
-import com.typesafe.config.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -11,13 +10,14 @@ import uk.matvey.app.account.AccountSql.ensureAccount
 import uk.matvey.app.account.AccountSql.getAccountByTgUserId
 import uk.matvey.app.account.AccountSql.updateAccountStatus
 import uk.matvey.app.config.AppConfig.ServerConfig
+import uk.matvey.app.config.AppConfig.TgConfig
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.Bot
 import uk.matvey.telek.ReplyMarkup.InlineKeyboardButton
 import uk.matvey.telek.Update
 
 class MatveyBot(
-    tgConfig: Config,
+    tgConfig: TgConfig,
     private val serverConfig: ServerConfig,
     private val repo: Repo,
     private val matveyAuth: MatveyAuth,
@@ -27,13 +27,13 @@ class MatveyBot(
     private val log = KotlinLogging.logger {}
 
     private val bot = Bot(
-        token = tgConfig.getString("botToken"),
-        longPollingSeconds = tgConfig.getInt("longPollingSeconds"),
+        token = tgConfig.botToken(),
+        longPollingSeconds = tgConfig.longPollingSeconds(),
         onUpdatesRetrievalException = { e -> log.error(e) { "Failed to fetch updates" } },
         onUpdateProcessingException = { e -> log.error(e) { "Failed to process update" } },
     )
 
-    private val adminGroupId = tgConfig.getLong("adminGroupId")
+    private val adminGroupId = tgConfig.adminGroupId()
 
     fun start(): Job {
         return CoroutineScope(Dispatchers.IO).launch {
