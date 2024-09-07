@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
     val tgConfig = config.tg()
     flywayMigrate(
         dataSource = ds,
+        location = "classpath:db/migration",
         clean = dbConfig.clean(),
     ) {
         placeholders(mapOf("tgAdminId" to tgConfig.adminId().toString()))
@@ -41,7 +42,7 @@ fun main(args: Array<String>) {
         ).start()
     }
     log.info { "Bot started. Launching server" }
-    startServer(
+    startMatveyServer(
         serverConfig = serverConfig,
         profile = profile,
         auth = auth,

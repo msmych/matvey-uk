@@ -6,12 +6,13 @@ import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
+import uk.matvey.falafel.falafelServerModule
 import uk.matvey.slon.repo.Repo
 import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
 
-fun startServer(
+fun startMatveyServer(
     serverConfig: Config,
     profile: Profile,
     auth: MatveyAuth,
@@ -34,7 +35,8 @@ fun startServer(
                     port = serverConfig.getInt("port")
                     keyStorePath = keyStoreFile
                     module {
-                        serverModule(auth, repo)
+                        matveyServerModule(auth, repo)
+                        falafelServerModule()
                     }
                 }
             } else {
@@ -46,7 +48,8 @@ fun startServer(
                         else -> listOf()
                     }
                     module {
-                        serverModule(auth, repo)
+                        matveyServerModule(auth, repo)
+                        falafelServerModule()
                     }
                 }
             }

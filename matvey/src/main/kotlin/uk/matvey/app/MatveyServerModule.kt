@@ -18,7 +18,7 @@ import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.installFreeMarker
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
-fun Application.serverModule(
+fun Application.matveyServerModule(
     auth: MatveyAuth,
     repo: Repo
 ) {
