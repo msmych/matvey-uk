@@ -22,8 +22,41 @@
             </#if>
         </div>
     </div>
-    <div id="content" class="col">
-        <h1>👋</h1>
+    <div id="content" class="col gap-8">
+        <div>
+            Hi, my name is Matvey
+        </div>
+        <div>
+            I live in London and work as a <a href="https://www.linkedin.com/in/matvey-smychkov-743b21175/">software
+                engineer</a>
+        </div>
+        <div>
+            I do some coding in my spare time as well. Currently, I'm working several open-source Kotlin libraries:
+        </div>
+        <div>
+            <a href="https://github.com/msmych/slon">Slon</a>: lightweight library to work with Postgres
+        </div>
+        <div>
+            <a href="https://github.com/msmych/telek">Telek</a>: Kotlin Telegram Bot API client
+        </div>
+        <div>
+            <a href="https://github.com/msmych/kit">Kit</a>: misc utilities I find useful as an extension of
+            standard library
+        </div>
+        <div>
+            I also solved over 1000 problems on <a href="https://leetcode.com/u/msmych/">LeetCode</a>
+        </div>
+        <div>
+            My favorite <a href="https://strava.app.link/VrrOjcw0KMb">sport activity</a> is running. I finished a
+            marathon in less than 3:50:00
+        </div>
+        <div>
+            You can reach me on <a href="https://t.me/msmych">Telegram</a>
+        </div>
+        <div>This website is being built Kotlin + Ktor + HTMX + Postgres + Gradle + GitHub + the libraries above</div>
+        <div>
+            👾
+        </div>
     </div>
 </div>
 </body>
@@ -31,8 +64,8 @@
     #home {
         margin: 64px auto 0;
         width: 80%;
-        min-width: 400px;
-        max-width: 2000px;
+        min-width: 320px;
+        max-width: 2048px;
     }
 
     .tab {

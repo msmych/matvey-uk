@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
         name = "KitPackages"
         url = uri("https://maven.pkg.github.com/msmych/kit")
         credentials {
-            username = "GitHubPackages-RO"
+            username = "matvey-uk"
             password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
         }
     }
@@ -17,7 +17,7 @@ repositories {
         name = "SlonPackages"
         url = uri("https://maven.pkg.github.com/msmych/slon")
         credentials {
-            username = "GitHubPackages-RO"
+            username = "matvey-uk"
             password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
         }
     }

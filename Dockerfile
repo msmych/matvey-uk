@@ -9,6 +9,7 @@ COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties /app/
 
 COPY gradle /app/gradle
 COPY matvey /app/matvey
+COPY falafel /app/falafel
 
 RUN chmod +x gradlew
 
