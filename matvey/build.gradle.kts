@@ -11,6 +11,17 @@ val typesafeConfigVersion: String by project
 val flywayVersion: String by project
 val junitVersion: String by project
 
+repositories {
+    maven {
+        name = "SlonPackages"
+        url = uri("https://maven.pkg.github.com/msmych/slon")
+        credentials {
+            username = "matvey-uk"
+            password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
+        }
+    }
+}
+
 dependencies {
     implementation("uk.matvey:slon:$slonVersion")
     implementation("uk.matvey:utka:$utkaVersion")

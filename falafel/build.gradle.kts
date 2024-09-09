@@ -16,3 +16,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
+
+application {
+    mainClass = "uk.matvey.falafel.AppKt"
+}

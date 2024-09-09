@@ -6,12 +6,12 @@ import uk.matvey.kit.json.JsonKit
 import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.insertReturningOne
-import uk.matvey.slon.param.IntParam.Companion.int
-import uk.matvey.slon.param.JsonbParam.Companion.jsonb
-import uk.matvey.slon.param.PlainParam.Companion.now
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.OnConflictClause
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.value.Pg
+import uk.matvey.slon.value.PgInt.Companion.toPgInt
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 object AthleteSql {
@@ -23,27 +23,29 @@ object AthleteSql {
     const val TG = "($REFS -> 'tg')::bigint"
 
     fun Access.ensureAthlete(tg: Long, name: String): Athlete {
-        return queryOneOrNull(
-            "select * from $ATHLETES where $TG = ?",
-            listOf(int(tg)),
-            ::readAthlete,
-        ) ?: insertReturningOne(ATHLETES) {
-            values(
-                NAME to text(name),
-                REFS to jsonb(jsonSerialize(Athlete.Refs(tg))),
-                UPDATED_AT to now(),
+        return query(
+            plainQuery(
+                "select * from $ATHLETES where $TG = ?",
+                listOf(tg.toPgInt()),
+                ::readAthlete,
             )
-            onConflictDoNothing()
-            returning { readAthlete(it) }
-        }
+        ).singleOrNull() ?: query(insertOneInto(ATHLETES)
+            .set(NAME, name)
+            .set(REFS, jsonSerialize(Athlete.Refs(tg)))
+            .set(UPDATED_AT, Pg.now())
+            .onConflict(OnConflictClause.doNothing())
+            .returning { readAthlete(it) }
+        ).single()
     }
 
     fun Access.getAthlete(id: UUID): Athlete {
-        return queryOne(
-            "select * from $ATHLETES where $ID = ?",
-            listOf(uuid(id)),
-            ::readAthlete,
-        )
+        return query(
+            plainQuery(
+                "select * from $ATHLETES where $ID = ?",
+                listOf(id.toPgUuid()),
+                ::readAthlete,
+            )
+        ).single()
     }
 
     fun readAthlete(reader: RecordReader): Athlete {

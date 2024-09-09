@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import uk.matvey.app.config.AppConfig
-import uk.matvey.slon.FlywayKit.flywayMigrate
+import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
 
@@ -42,6 +42,14 @@ fun main(args: Array<String>) {
         ).start()
     }
     log.info { "Bot started. Launching server" }
+    if (!profile.isProd()) {
+        flywayMigrate(
+            dataSource = ds,
+            schema = "falafel",
+            location = "classpath:db/falafel/migration",
+            clean = dbConfig.clean(),
+        )
+    }
     startMatveyServer(
         serverConfig = serverConfig,
         profile = profile,

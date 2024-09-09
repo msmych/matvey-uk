@@ -17,9 +17,9 @@ import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.kit.time.TimeKit.localDate
 import uk.matvey.kit.time.TimeKit.localTime
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.UuidParam.Companion.uuid
-import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.value.PgText.Companion.toPgText
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import uk.matvey.utka.ktor.KtorKit.setFormData
 import java.time.LocalDateTime
 import java.time.ZoneOffset.UTC
@@ -63,12 +63,14 @@ class EventResourceTest : TestSetup() {
         assertThat(rs.status).isEqualTo(OK)
         assertThat(rs.bodyAsText()).contains(">$name<")
 
-        repo.queryOne("select * from events where name = ?", listOf(text(name))) { r ->
-            assertThat(r.uuid(CLUB_ID)).isEqualTo(club.id)
-            assertThat(r.string(NAME)).isEqualTo(name)
-            assertThat(r.localDate(DATE)).isEqualTo(date)
-            assertThat(r.instant(DATE_TIME).truncatedTo(MILLIS))
-                .isEqualTo(LocalDateTime.of(date, time).toInstant(UTC).truncatedTo(MILLIS))
+        repo.access { a ->
+            a.query(plainQuery("select * from events where name = ?", listOf(name.toPgText())) { r ->
+                assertThat(r.uuid(CLUB_ID)).isEqualTo(club.id)
+                assertThat(r.string(NAME)).isEqualTo(name)
+                assertThat(r.localDate(DATE)).isEqualTo(date)
+                assertThat(r.instant(DATE_TIME).truncatedTo(MILLIS))
+                    .isEqualTo(LocalDateTime.of(date, time).toInstant(UTC).truncatedTo(MILLIS))
+            })
         }
     }
 
@@ -83,8 +85,12 @@ class EventResourceTest : TestSetup() {
         // then
         assertThat(rs.status).isEqualTo(OK)
 
-        repo.queryOne("select count(*) from events where id = ?", listOf(uuid(event.id))) {
-            assertThat(it.int(1)).isEqualTo(0)
+        repo.access { a ->
+            a.query(
+                plainQuery("select count(*) from events where id = ?", listOf(event.id.toPgUuid())) {
+                    assertThat(it.int(1)).isEqualTo(0)
+                }
+            )
         }
     }
 }

@@ -10,7 +10,8 @@
 <body>
 <h1>🍿 Falafel</h1>
 <div id="main">
-    <button hx-get="/falafel/clubs/new-club-form" hx-target="#main">New club</button>
+    <button hx-get="/falafel/clubs" hx-target="#main">Clubs</button>
+    <button hx-get="/falafel/titles" hx-target="#main">Titles</button>
 </div>
 </body>
 <style>
@@ -18,5 +19,20 @@
         font-family: "Mona Sans", sans-serif;
         background-color: black;
         color: white;
+    }
+
+    button {
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 1em;
+        max-width: 256px;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+
+    button:hover {
+        background-color: midnightblue;
     }
 </style>

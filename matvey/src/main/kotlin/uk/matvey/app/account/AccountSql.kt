@@ -4,13 +4,13 @@ import uk.matvey.kit.json.JsonKit.jsonDeserialize
 import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.insertReturningOne
-import uk.matvey.slon.access.AccessKit.update
-import uk.matvey.slon.param.IntParam.Companion.int
-import uk.matvey.slon.param.JsonbParam.Companion.jsonb
-import uk.matvey.slon.param.PlainParam.Companion.now
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.OnConflictClause.Companion.doNothing
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.value.Pg
+import uk.matvey.slon.value.PgInt.Companion.toPgInt
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 object AccountSql {
@@ -25,44 +25,51 @@ object AccountSql {
     const val TG = "($REFS ->> 'tg')::bigint"
 
     fun Access.ensureAccount(name: String, tgUserId: Long): Account {
-        return queryOneOrNull(
-            "select * from $ACCOUNTS where $TG = ?",
-            listOf(int(tgUserId)),
-            ::readAccount
-        )
-            ?: insertReturningOne(ACCOUNTS) {
-                values(
-                    NAME to text(name),
-                    STATE to text(Account.State.PENDING.name),
-                    REFS to jsonb(jsonSerialize(Account.Refs(tgUserId))),
-                    "updated_at" to now(),
-                )
-                onConflictDoNothing()
-                returning(::readAccount)
-            }
+        return query(
+            plainQuery(
+                "select * from $ACCOUNTS where $TG = ?",
+                listOf(tgUserId.toPgInt()),
+                ::readAccount
+            )
+        ).singleOrNull()
+            ?: query(insertOneInto(ACCOUNTS)
+                .set(NAME, name)
+                .set(STATE, Account.State.PENDING)
+                .set(REFS, jsonSerialize(Account.Refs(tgUserId)))
+                .set("updated_at", Pg.now())
+                .onConflict(doNothing())
+                .returning {
+                    readAccount(it)
+                }
+            ).single()
     }
 
     fun Access.getAccountById(id: UUID): Account {
-        return queryOne(
-            "select * from $ACCOUNTS where id = ?",
-            listOf(uuid(id)),
-            ::readAccount
-        )
+        return query(
+            plainQuery(
+                "select * from $ACCOUNTS where id = ?",
+                listOf(id.toPgUuid()),
+                ::readAccount
+            )
+        ).single()
     }
 
     fun Access.getAccountByTgUserId(tgUserId: Long): Account {
-        return queryOne(
-            "select * from $ACCOUNTS where $TG = ?",
-            listOf(int(tgUserId)),
-            ::readAccount
-        )
+        return query(
+            plainQuery(
+                "select * from $ACCOUNTS where $TG = ?",
+                listOf(tgUserId.toPgInt()),
+                ::readAccount
+            )
+        ).single()
     }
 
     fun Access.updateAccountStatus(id: UUID, state: Account.State) {
-        update(ACCOUNTS) {
-            set(STATE to text(state.name))
-            where("id = ?", uuid(id))
-        }
+        execute(
+            UpdateQueryBuilder.update(ACCOUNTS)
+                .set(STATE, state)
+                .where("id = ?", id.toPgUuid())
+        )
     }
 
     fun readAccount(r: RecordReader): Account {

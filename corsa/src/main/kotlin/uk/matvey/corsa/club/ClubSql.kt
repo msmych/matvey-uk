@@ -4,12 +4,11 @@ import uk.matvey.corsa.CorsaSql.ID
 import uk.matvey.corsa.CorsaSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.deleteFrom
-import uk.matvey.slon.access.AccessKit.insertInto
-import uk.matvey.slon.access.AccessKit.insertReturningOne
-import uk.matvey.slon.param.PlainParam.Companion.now
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.value.Pg
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 object ClubSql {
@@ -25,29 +24,35 @@ object ClubSql {
     const val ROLE = "role"
 
     fun Access.addClub(name: String, athleteId: UUID): Club {
-        val club = insertReturningOne(CLUBS) {
-            values(
-                NAME to text(name),
-                UPDATED_AT to now(),
-            )
-            returning(::readClub)
-        }
-        insertInto(CLUBS_ATHLETES) {
-            values(
-                CLUB_ID to uuid(club.id),
-                ATHLETE_ID to uuid(athleteId),
-                ROLE to text("FOUNDER"),
-            )
-        }
+        val club = query(
+            insertOneInto(CLUBS)
+                .set(NAME, name)
+                .set(UPDATED_AT, Pg.now())
+                .returning {
+                    readClub(it)
+                }
+        ).single()
+        execute(insertOneInto(CLUBS_ATHLETES) {
+            set(CLUB_ID, club.id)
+            set(ATHLETE_ID, athleteId)
+            set(ROLE, "FOUNDER")
+        })
         return club
     }
 
     fun Access.removeClub(id: UUID) {
-        deleteFrom(CLUBS, "$ID = ?", uuid(id))
+        execute(
+            deleteFrom(CLUBS).where("$ID = ?", id.toPgUuid())
+        )
     }
 
     fun Access.getClub(id: UUID): Club {
-        return queryOne("select * from $CLUBS where $ID = ?", listOf(uuid(id))) { readClub(it) }
+        return query(
+            plainQuery(
+                "select * from $CLUBS where $ID = ?",
+                listOf(id.toPgUuid())
+            ) { readClub(it) }
+        ).single()
     }
 
     fun readClub(r: RecordReader) = Club(

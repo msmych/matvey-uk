@@ -36,7 +36,6 @@ fun startMatveyServer(
                     keyStorePath = keyStoreFile
                     module {
                         matveyServerModule(auth, repo)
-                        falafelServerModule()
                     }
                 }
             } else {
@@ -49,7 +48,7 @@ fun startMatveyServer(
                     }
                     module {
                         matveyServerModule(auth, repo)
-                        falafelServerModule()
+                        falafelServerModule(repo)
                     }
                 }
             }

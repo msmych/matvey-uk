@@ -11,14 +11,11 @@ import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.TimestampParam.Companion.timestamp
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.UpdateQueryBuilder
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertInto
-import uk.matvey.slon.repo.RepoKit.query
-import uk.matvey.slon.repo.RepoKit.queryOne
-import uk.matvey.slon.repo.RepoKit.update
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 class IngredientRepo(
@@ -26,45 +23,58 @@ class IngredientRepo(
 ) {
 
     suspend fun add(ingredient: Ingredient) {
-        repo.insertInto(INGREDIENTS) {
-            values(
-                ID to uuid(ingredient.id),
-                ACCOUNT_ID to uuid(ingredient.accountId),
-                TYPE to text(ingredient.type?.name),
-                NAME to text(ingredient.name),
-                VISIBILITY to text(ingredient.visibility.name),
-                CREATED_AT to timestamp(ingredient.createdAt),
-                UPDATED_AT to timestamp(ingredient.updatedAt),
+        repo.access { a ->
+            a.execute(
+                insertOneInto(INGREDIENTS) {
+                    set(ID, ingredient.id)
+                    set(ACCOUNT_ID, ingredient.accountId)
+                    set(TYPE, ingredient.type?.name)
+                    set(NAME, ingredient.name)
+                    set(VISIBILITY, ingredient.visibility.name)
+                    set(CREATED_AT, ingredient.createdAt)
+                    set(UPDATED_AT, ingredient.updatedAt)
+                }
             )
         }
     }
 
     suspend fun update(ingredient: Ingredient) {
-        repo.update(INGREDIENTS) {
-            set(NAME, text(ingredient.name))
-            where("$ID = ?", uuid(ingredient.id))
+        repo.access { a ->
+            a.execute(
+                UpdateQueryBuilder.update(INGREDIENTS)
+                    .set(NAME, ingredient.name)
+                    .where("$ID = ?", ingredient.id.toPgUuid())
+            )
         }
     }
 
     suspend fun get(ingredientId: UUID): Ingredient {
-        return repo.queryOne(
-            "select * from $INGREDIENTS where $ID = ?",
-            listOf(uuid(ingredientId)),
-            ::ingredient
-        )
+        return repo.access { a ->
+            a.query(
+                plainQuery(
+                    "select * from $INGREDIENTS where $ID = ?",
+                    listOf(ingredientId.toPgUuid()),
+                    ::ingredient
+                )
+            ).single()
+        }
     }
 
     suspend fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
-        return repo.query(
-            """
+        return repo.access { a ->
+            a.query(
+                plainQuery(
+                    """
                 select * from $INGREDIENTS 
                 where $accountIdCondition 
                 order by $TYPE nulls last, $NAME
                 """.trimIndent(),
-            listOfNotNull(accountId?.let { uuid(it) }),
-            ::ingredient
-        )
+                    listOfNotNull(accountId?.toPgUuid()),
+                    ::ingredient
+                )
+            )
+        }
     }
 
     suspend fun publicIngredients(): List<Ingredient> {
@@ -72,17 +82,21 @@ class IngredientRepo(
     }
 
     suspend fun findAllByDrink(drinkId: UUID): List<Ingredient> {
-        return repo.query(
-            """
+        return repo.access { a ->
+            a.query(
+                plainQuery(
+                    """
             select * from $INGREDIENTS 
             where $ID in (
                 select (jsonb_array_elements(${DrinkSql.INGREDIENTS}) ->> 'ingredientId')::uuid 
                 from ${DrinkSql.DRINKS} where ${DrinkSql.ID} = ?
             )
             """.trimIndent(),
-            listOf(uuid(drinkId)),
-            ::ingredient
-        )
+                    listOf(drinkId.toPgUuid()),
+                    ::ingredient
+                )
+            )
+        }
     }
 
     private fun ingredient(reader: RecordReader): Ingredient {

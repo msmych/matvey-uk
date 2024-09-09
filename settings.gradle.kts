@@ -1,8 +1,8 @@
 rootProject.name = "matvey-uk"
 
 include(
-    "matvey",
     "falafel",
+    "matvey",
     "corsa",
     "drinki",
     "drinki:app",

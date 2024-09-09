@@ -2,7 +2,7 @@ package uk.matvey.app.config
 
 import com.typesafe.config.Config
 import uk.matvey.app.Profile
-import uk.matvey.slon.HikariKit.hikariDataSource
+import uk.matvey.slon.hikari.HikariKit.hikariDataSource
 
 class AppConfig(private val config: Config) : Config by config {
 

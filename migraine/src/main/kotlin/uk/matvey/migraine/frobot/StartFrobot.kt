@@ -12,8 +12,8 @@ import mu.KotlinLogging
 import uk.matvey.migraine.frobot.handlers.HandleMessageWithLowBattery
 import uk.matvey.migraine.frobot.handlers.RockGardenJump
 import uk.matvey.migraine.frobot.handlers.RockGardenStart
-import uk.matvey.slon.FlywayKit.flywayMigrate
-import uk.matvey.slon.HikariKit.hikariDataSource
+import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
+import uk.matvey.slon.hikari.HikariKit.hikariDataSource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.telek.TgExecuteSupport.answerCallbackQuery
 import uk.matvey.telek.TgRequest
