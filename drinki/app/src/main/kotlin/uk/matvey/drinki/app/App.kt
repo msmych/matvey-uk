@@ -17,7 +17,7 @@ import uk.matvey.drinki.DrinkiRepos
 import uk.matvey.drinki.app.drink.drinkRouting
 import uk.matvey.drinki.app.ingredient.ingredientRouting
 import uk.matvey.drinki.migrate
-import uk.matvey.slon.HikariKit.hikariDataSource
+import uk.matvey.slon.hikari.HikariKit.hikariDataSource
 import javax.sql.DataSource
 
 fun main() {

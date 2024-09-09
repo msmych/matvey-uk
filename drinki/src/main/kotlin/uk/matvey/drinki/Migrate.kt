@@ -9,7 +9,7 @@ import uk.matvey.drinki.ingredient.Ingredient.Type.SPIRIT
 import uk.matvey.drinki.ingredient.Ingredient.Type.SYRUP
 import uk.matvey.drinki.ingredient.Ingredient.Type.TONIC
 import uk.matvey.drinki.ingredient.Ingredient.Type.WINE
-import uk.matvey.slon.FlywayKit.flywayMigrate
+import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 
 fun migrate(drinkiRepos: DrinkiRepos, clean: Boolean) {
     flywayMigrate(

@@ -2,7 +2,7 @@ package uk.matvey.app.config
 
 import com.typesafe.config.Config
 import uk.matvey.app.Profile
-import uk.matvey.slon.HikariKit.hikariDataSource
+import uk.matvey.slon.hikari.HikariKit.hikariDataSource
 
 class AppConfig(private val config: Config) : Config by config {
 
@@ -30,7 +30,13 @@ class AppConfig(private val config: Config) : Config by config {
 
     class TgConfig(private val config: Config) : Config by config {
 
+        fun botToken() = getString("botToken")
+
+        fun longPollingSeconds() = getInt("longPollingSeconds")
+
         fun adminId() = getLong("adminId")
+
+        fun adminGroupId() = getLong("adminGroupId")
     }
 
     fun jwtSecret() = getString("jwtSecret")

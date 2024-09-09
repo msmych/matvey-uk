@@ -1,8 +1,8 @@
 package uk.matvey.corsa
 
 import com.typesafe.config.Config
-import uk.matvey.slon.FlywayKit.flywayMigrate
-import uk.matvey.slon.HikariKit.hikariDataSource
+import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
+import uk.matvey.slon.hikari.HikariKit.hikariDataSource
 import javax.sql.DataSource
 
 fun dataSource(config: Config): DataSource {

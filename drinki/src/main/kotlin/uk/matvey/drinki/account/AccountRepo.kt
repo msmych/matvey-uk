@@ -9,48 +9,56 @@ import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.param.JsonbParam.Companion.jsonb
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.TimestampParam.Companion.timestamp
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.UpdateQueryBuilder
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.insertInto
-import uk.matvey.slon.repo.RepoKit.queryOneOrNull
-import uk.matvey.slon.repo.RepoKit.update
+import uk.matvey.slon.value.PgText.Companion.toPgText
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 
 class AccountRepo(private val repo: Repo) {
 
     suspend fun add(account: Account) {
-        repo.insertInto(ACCOUNTS) {
-            values(
-                ID to uuid(account.id),
-                TG_SESSION to jsonb(JSON.encodeToString(account.tgSession)),
-                CREATED_AT to timestamp(account.createdAt),
-                UPDATED_AT to timestamp(account.updatedAt),
+        repo.access { a ->
+            a.execute(
+                insertOneInto(ACCOUNTS) {
+                    set(ID, account.id)
+                    set(TG_SESSION, JSON.encodeToString(account.tgSession))
+                    set(CREATED_AT, account.createdAt)
+                    set(UPDATED_AT, account.updatedAt)
+                }
             )
         }
     }
 
     suspend fun update(account: Account) {
-        repo.update(ACCOUNTS) {
-            set(TG_SESSION, jsonb(JSON.encodeToString(account.tgSession)))
-            where("$ID = ?", uuid(account.id))
+        repo.access { a ->
+            a.execute(
+                UpdateQueryBuilder.update(ACCOUNTS)
+                    .set(TG_SESSION, JSON.encodeToString(account.tgSession))
+                    .where("$ID = ?", account.id.toPgUuid())
+            )
         }
     }
 
     suspend fun findByTgUserId(tgUserId: Long): Account? {
-        return repo.queryOneOrNull(
-            "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
-            listOf(text(tgUserId.toString()))
-        ) { reader ->
-            Account(
-                reader.uuid(ID),
-                JSON.parseToJsonElement(reader.string(TG_SESSION))
-                    .takeIf { it.jsonObject.containsKey("userId") }
-                    ?.let { JSON.decodeFromJsonElement(it) },
-                reader.instant(CREATED_AT),
-                reader.instant(UPDATED_AT)
+        return repo.access { a ->
+            a.query(
+                plainQuery(
+                    "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
+                    listOf(tgUserId.toString().toPgText())
+                ) { reader ->
+                    Account(
+                        reader.uuid(ID),
+                        JSON.parseToJsonElement(reader.string(TG_SESSION))
+                            .takeIf { it.jsonObject.containsKey("userId") }
+                            ?.let { JSON.decodeFromJsonElement(it) },
+                        reader.instant(CREATED_AT),
+                        reader.instant(UPDATED_AT)
+                    )
+                }
             )
+                .singleOrNull()
         }
     }
 

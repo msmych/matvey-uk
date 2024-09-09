@@ -41,10 +41,18 @@ subprojects {
     repositories {
         mavenCentral()
         maven {
-            name = "GitHubPackages"
+            name = "KitPackages"
             url = uri("https://maven.pkg.github.com/msmych/kit")
             credentials {
-                username = "GitHubPackages-RO"
+                username = "matvey-uk"
+                password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
+            }
+        }
+        maven {
+            name = "SlonPackages"
+            url = uri("https://maven.pkg.github.com/msmych/slon")
+            credentials {
+                username = "matvey-uk"
                 password = project.findProperty("ghPackagesRoToken") as? String ?: System.getenv("GH_PACKAGES_RO_TOKEN")
             }
         }

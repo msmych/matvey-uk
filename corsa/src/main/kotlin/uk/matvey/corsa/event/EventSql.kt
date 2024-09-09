@@ -4,13 +4,11 @@ import uk.matvey.corsa.CorsaSql.ID
 import uk.matvey.corsa.CorsaSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.deleteFrom
-import uk.matvey.slon.access.AccessKit.insertReturningOne
-import uk.matvey.slon.param.DateParam.Companion.date
-import uk.matvey.slon.param.PlainParam.Companion.now
-import uk.matvey.slon.param.TextParam.Companion.text
-import uk.matvey.slon.param.TimestampParam.Companion.timestamp
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
+import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.value.Pg
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset.UTC
@@ -31,24 +29,26 @@ object EventSql {
         date: LocalDate,
         time: LocalTime?,
     ): Event {
-        return insertReturningOne(EVENTS) {
-            values(
-                CLUB_ID to uuid(clubId),
-                NAME to text(name),
-                DATE to date(date),
-                DATE_TIME to timestamp(time?.let { date.atTime(it) }?.toInstant(UTC)),
-                UPDATED_AT to now(),
-            )
-            returning { readEvent(it) }
-        }
+        return query(
+            insertOneInto(EVENTS)
+                .set(CLUB_ID, clubId)
+                .set(NAME, name)
+                .set(DATE, date)
+                .set(DATE_TIME, time?.let { date.atTime(it) }?.toInstant(UTC))
+                .set(UPDATED_AT, Pg.now())
+                .returning { readEvent(it) }
+        ).single()
     }
 
     fun Access.removeEvent(eventId: UUID) {
-        deleteFrom(EVENTS, "$ID = ?", uuid(eventId))
+        execute(deleteFrom(EVENTS).where("$ID = ?", eventId.toPgUuid()))
     }
 
     fun Access.getEventsByClubId(clubId: UUID): List<Event> {
-        return query("select * from $EVENTS where $CLUB_ID = ?", listOf(uuid(clubId))) { readEvent(it) }
+        return query(plainQuery(
+            "select * from $EVENTS where $CLUB_ID = ?",
+            listOf(clubId.toPgUuid())
+        ) { readEvent(it) })
     }
 
     fun readEvent(r: RecordReader): Event {

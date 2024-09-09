@@ -11,9 +11,9 @@ import uk.matvey.corsa.club.ClubSql.NAME
 import uk.matvey.corsa.club.ClubSql.ROLE
 import uk.matvey.corsa.club.ClubSql.getClub
 import uk.matvey.corsa.event.EventSql.getEventsByClubId
-import uk.matvey.slon.param.UuidParam.Companion.uuid
+import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.repo.Repo
-import uk.matvey.slon.repo.RepoKit.query
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 class ClubService(
@@ -21,19 +21,23 @@ class ClubService(
 ) {
 
     suspend fun getAthleteClubs(athleteId: UUID): List<AthleteClub> {
-        return repo.query(
-            """
+        return repo.access { a ->
+            a.query(
+                plainQuery(
+                    """
                 |select *
                 |  from $CLUBS c
                 |  join $CLUBS_ATHLETES ca on c.$ID = ca.$CLUB_ID
                 |  where ca.$ATHLETE_ID = ?
             """.trimMargin(),
-            listOf(uuid(athleteId))
-        ) {
-            AthleteClub(
-                it.uuid(ID),
-                it.string(NAME),
-                it.string(ROLE),
+                    listOf(athleteId.toPgUuid())
+                ) {
+                    AthleteClub(
+                        it.uuid(ID),
+                        it.string(NAME),
+                        it.string(ROLE),
+                    )
+                }
             )
         }
     }
