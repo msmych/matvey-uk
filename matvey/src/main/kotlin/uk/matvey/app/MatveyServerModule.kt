@@ -14,11 +14,13 @@ import io.ktor.server.routing.routing
 import io.ktor.util.date.GMTDate
 import uk.matvey.app.MatveyAuth.AccountPrincipal
 import uk.matvey.app.account.AccountResource
+import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.installFreeMarker
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 fun Application.matveyServerModule(
+    serverConfig: ServerConfig,
     auth: MatveyAuth,
     repo: Repo
 ) {
@@ -35,7 +37,7 @@ fun Application.matveyServerModule(
             call.respondText("OK")
         }
         get("/login") {
-            call.respondFtl("login")
+            call.respondFtl("login", "assets" to serverConfig.assets())
         }
         authenticate("jwt") {
             get("/me") {
@@ -49,7 +51,7 @@ fun Application.matveyServerModule(
             resources.forEach { with(it) { routing() } }
             get("/") {
                 val principal = call.principal<AccountPrincipal>()
-                call.respondFtl("index", "account" to principal)
+                call.respondFtl("index", "account" to principal, "assets" to serverConfig.assets())
             }
         }
         with(auth) { authRouting() }

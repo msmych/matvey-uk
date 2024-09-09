@@ -51,6 +51,7 @@ jobs:
               -v /etc/letsencrypt/live/matvey.uk:/certs \
               -e DB_HOST="${{ secrets.DB_HOST }}" \
               -e JKS_PASS="${{ secrets.JKS_PASS }}" \
+              -e ASSETS_URL="${{ secrets.ASSETS_URL }}" \
               -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
               -e DB_USER="${{ secrets.DB_USER }}" \
               -e DB_PASS="${{ secrets.DB_PASS }}" \

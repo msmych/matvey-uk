@@ -10,11 +10,17 @@ class AppConfig(private val config: Config) : Config by config {
 
         fun host() = getString("host")
 
+        fun port() = getInt("port")
+
         fun url(profile: Profile) = if (profile !in setOf(Profile.TEST, Profile.LOCAL)) {
             host()
         } else {
-            host() + ":" + getInt("port")
+            host() + ":" + port()
         }
+
+        fun jksPass() = getString("jksPass")
+
+        fun assets() = getString("assets")
     }
 
     class DbConfig(private val config: Config) : Config by config {
