@@ -19,9 +19,9 @@ import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
-import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
-import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgText.Companion.toPgText
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -51,15 +51,16 @@ class DrinkRepo(
     suspend fun update(drink: Drink) {
         repo.access { a ->
             a.execute(
-                UpdateQueryBuilder.update(DRINKS)
-                    .set(NAME, drink.name)
-                    .set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
-                    .set(RECIPE, drink.recipe)
-                    .set(VISIBILITY, drink.visibility.name)
-                    .where(
+                update(DRINKS) {
+                    set(NAME, drink.name)
+                    set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
+                    set(RECIPE, drink.recipe)
+                    set(VISIBILITY, drink.visibility.name)
+                    where(
                         "$ID = ?",
                         drink.id.toPgUuid()
                     )
+                }
             )
         }
     }

@@ -10,9 +10,9 @@ import uk.matvey.migraine.frobot.FrobotSql.STATE
 import uk.matvey.migraine.frobot.FrobotSql.TG
 import uk.matvey.migraine.frobot.FrobotSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
-import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgJsonb.Companion.toPgJsonb
 import uk.matvey.slon.value.PgTimestamp.Companion.toPgTimestamp
@@ -40,15 +40,16 @@ class FrobotRepo(
     suspend fun update(frobot: Frobot) {
         repo.access { a ->
             a.execute(
-                UpdateQueryBuilder.update(FROBOT)
-                    .set(STATE, frobot.state)
-                    .set(TG, JSON.encodeToString(frobot.tg))
-                    .set(UPDATED_AT, instant())
-                    .where(
+                update(FROBOT) {
+                    set(STATE, frobot.state)
+                    set(TG, JSON.encodeToString(frobot.tg))
+                    set(UPDATED_AT, instant())
+                    where(
                         "$ID = ? and $UPDATED_AT = ?",
                         frobot.id.toPgUuid(),
                         frobot.updatedAt.toPgTimestamp()
                     )
+                }
             )
         }
     }

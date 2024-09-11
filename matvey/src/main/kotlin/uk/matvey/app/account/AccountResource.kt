@@ -14,7 +14,7 @@ import uk.matvey.app.account.AccountSql.ACCOUNTS
 import uk.matvey.app.account.AccountSql.NAME
 import uk.matvey.app.account.AccountSql.getAccountById
 import uk.matvey.kit.string.StringKit.toUuid
-import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import uk.matvey.utka.Resource
@@ -43,9 +43,10 @@ class AccountResource(
                 val newName = params.getValue("name")
                 repo.access { a ->
                     a.execute(
-                        UpdateQueryBuilder.update(ACCOUNTS)
-                            .set(NAME, newName)
-                            .where("id = ?", principal.id.toPgUuid())
+                        update(ACCOUNTS) {
+                            set(NAME, newName)
+                            where("id = ?", principal.id.toPgUuid())
+                        }
                     )
                 }
                 val account = repo.access { a -> a.getAccountById(call.pathParam("id").toUuid()) }

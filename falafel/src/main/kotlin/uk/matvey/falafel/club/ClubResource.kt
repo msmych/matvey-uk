@@ -6,7 +6,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.falafel.club.ClubSql.CLUBS
-import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.Pg
 import uk.matvey.utka.Resource

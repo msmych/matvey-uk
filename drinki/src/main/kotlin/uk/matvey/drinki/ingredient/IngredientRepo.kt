@@ -11,9 +11,9 @@ import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
-import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
@@ -41,9 +41,10 @@ class IngredientRepo(
     suspend fun update(ingredient: Ingredient) {
         repo.access { a ->
             a.execute(
-                UpdateQueryBuilder.update(INGREDIENTS)
-                    .set(NAME, ingredient.name)
-                    .where("$ID = ?", ingredient.id.toPgUuid())
+                update(INGREDIENTS) {
+                    set(NAME, ingredient.name)
+                    where("$ID = ?", ingredient.id.toPgUuid())
+                }
             )
         }
     }

@@ -9,9 +9,9 @@ import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
 import uk.matvey.kit.json.JsonKit.JSON
-import uk.matvey.slon.query.InsertOneBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
-import uk.matvey.slon.query.UpdateQueryBuilder
+import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgText.Companion.toPgText
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -34,9 +34,10 @@ class AccountRepo(private val repo: Repo) {
     suspend fun update(account: Account) {
         repo.access { a ->
             a.execute(
-                UpdateQueryBuilder.update(ACCOUNTS)
-                    .set(TG_SESSION, JSON.encodeToString(account.tgSession))
-                    .where("$ID = ?", account.id.toPgUuid())
+                update(ACCOUNTS) {
+                    set(TG_SESSION, JSON.encodeToString(account.tgSession))
+                    where("$ID = ?", account.id.toPgUuid())
+                }
             )
         }
     }

@@ -19,7 +19,7 @@
         </div>
         <div class="row gap-8">
             <#if account?has_content>
-                <div class="tab click" hx-get="/me" hx-target="#content">👤 ${account.name}</div>
+                <div id="account-tab" class="tab click" hx-get="/me" hx-target="#content">👤 ${account.name}</div>
             </#if>
             <#if !account?has_content>
                 <a class="tab click" href="/login">Login</a>
@@ -35,16 +35,16 @@
                 engineer</a>
         </div>
         <div>
-            I do some coding in my spare time as well. Currently, I'm working several open-source Kotlin libraries:
+            I do some coding in my spare time as well. Currently, I'm working on several open-source Kotlin libraries:
         </div>
         <div>
-            <a href="https://github.com/msmych/slon">Slon</a>: lightweight library to work with Postgres
+            * <a href="https://github.com/msmych/slon">Slon</a>: lightweight library to work with Postgres
         </div>
         <div>
-            <a href="https://github.com/msmych/telek">Telek</a>: Kotlin Telegram Bot API client
+            * <a href="https://github.com/msmych/telek">Telek</a>: Kotlin Telegram Bot API client
         </div>
         <div>
-            <a href="https://github.com/msmych/kit">Kit</a>: misc utilities I find useful as an extension of
+            * <a href="https://github.com/msmych/kit">Kit</a>: misc utilities I find useful as an extension of
             standard library
         </div>
         <div>
@@ -57,7 +57,9 @@
         <div>
             You can reach me on <a href="https://t.me/msmych">Telegram</a>
         </div>
-        <div>This website is being built Kotlin + Ktor + HTMX + Postgres + Gradle + GitHub + the libraries above</div>
+        <div>
+            This website is being built in Kotlin + Ktor + HTMX + Postgres + Gradle + GitHub + the libraries above
+        </div>
         <div>
             👾
         </div>

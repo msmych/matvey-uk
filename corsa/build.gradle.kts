@@ -1,11 +1,11 @@
 plugins {
-    `java-test-fixtures`
     id("io.ktor.plugin") version "2.3.12"
 }
 
 val slonVersion: String by project
 val telekVersion: String by project
 val utkaVersion: String by project
+val kitVersion: String by project
 val junitVersion: String by project
 val assertjVersion: String by project
 
