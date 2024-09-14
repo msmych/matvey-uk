@@ -7,6 +7,7 @@ import uk.matvey.slon.access.Access
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
@@ -25,9 +26,10 @@ object ClubSql {
 
     fun Access.addClub(name: String, athleteId: UUID): Club {
         val club = query(
-            insertOneInto(CLUBS)
-                .set(NAME, name)
-                .set(UPDATED_AT, Pg.now())
+            insertOneInto(CLUBS) {
+                set(NAME, name)
+                set(UPDATED_AT, Pg.now())
+            }
                 .returning {
                     readClub(it)
                 }

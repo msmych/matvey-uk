@@ -6,8 +6,9 @@ import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.queryOneOrNull
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.OnConflictClause.Companion.doNothing
+import uk.matvey.slon.query.OnConflict.Companion.doNothing
 import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgInt.Companion.toPgInt
@@ -30,15 +31,17 @@ object AccountSql {
             "select * from $ACCOUNTS where $TG = ?",
             listOf(tgUserId.toPgInt()),
             ::readAccount
-        ) ?: query(insertOneInto(ACCOUNTS)
-            .set(NAME, name)
-            .set(STATE, Account.State.PENDING)
-            .set(REFS, jsonSerialize(Account.Refs(tgUserId)))
-            .set("updated_at", Pg.now())
-            .onConflict(doNothing())
-            .returning {
-                readAccount(it)
+        ) ?: query(
+            insertOneInto(ACCOUNTS) {
+                set(NAME, name)
+                set(STATE, Account.State.PENDING)
+                set(REFS, jsonSerialize(Account.Refs(tgUserId)))
+                set("updated_at", Pg.now())
+                onConflict(doNothing())
             }
+                .returning {
+                    readAccount(it)
+                }
         ).single()
     }
 

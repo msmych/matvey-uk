@@ -8,7 +8,6 @@ val slonVersion: String by project
 val utkaVersion: String by project
 val telekVersion: String by project
 val typesafeConfigVersion: String by project
-val flywayVersion: String by project
 val junitVersion: String by project
 
 repositories {

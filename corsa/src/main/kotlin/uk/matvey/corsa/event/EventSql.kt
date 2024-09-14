@@ -7,6 +7,7 @@ import uk.matvey.slon.access.Access
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.time.LocalDate
@@ -30,12 +31,13 @@ object EventSql {
         time: LocalTime?,
     ): Event {
         return query(
-            insertOneInto(EVENTS)
-                .set(CLUB_ID, clubId)
-                .set(NAME, name)
-                .set(DATE, date)
-                .set(DATE_TIME, time?.let { date.atTime(it) }?.toInstant(UTC))
-                .set(UPDATED_AT, Pg.now())
+            insertOneInto(EVENTS) {
+                set(CLUB_ID, clubId)
+                set(NAME, name)
+                set(DATE, date)
+                set(DATE_TIME, time?.let { date.atTime(it) }?.toInstant(UTC))
+                set(UPDATED_AT, Pg.now())
+            }
                 .returning { readEvent(it) }
         ).single()
     }
