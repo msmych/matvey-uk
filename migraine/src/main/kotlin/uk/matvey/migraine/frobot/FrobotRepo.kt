@@ -10,8 +10,9 @@ import uk.matvey.migraine.frobot.FrobotSql.STATE
 import uk.matvey.migraine.frobot.FrobotSql.TG
 import uk.matvey.migraine.frobot.FrobotSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.AccessKit.queryOne
+import uk.matvey.slon.access.AccessKit.queryOneOrNull
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgJsonb.Companion.toPgJsonb
@@ -56,25 +57,21 @@ class FrobotRepo(
 
     suspend fun get(id: UUID): Frobot {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    "select * from $FROBOT where $ID = ?",
-                    listOf(id.toPgUuid()),
-                    ::frobotFrom
-                )
-            ).single()
+            a.queryOne(
+                "select * from $FROBOT where $ID = ?",
+                listOf(id.toPgUuid()),
+                ::frobotFrom
+            )
         }
     }
 
     suspend fun findByTgUserId(userId: Long): Frobot? {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    "select * from $FROBOT where $TG ->> 'userId' = ?",
-                    listOf(userId.toString().toPgJsonb()),
-                    ::frobotFrom
-                )
-            ).singleOrNull()
+            a.queryOneOrNull(
+                "select * from $FROBOT where $TG ->> 'userId' = ?",
+                listOf(userId.toString().toPgJsonb()),
+                ::frobotFrom
+            )
         }
     }
 

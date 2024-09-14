@@ -11,7 +11,7 @@ import uk.matvey.corsa.TestSetup
 import uk.matvey.corsa.club.ClubSql.addClub
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.kit.random.RandomKit.randomName
-import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.access.AccessKit.queryAll
 import uk.matvey.slon.value.PgText.Companion.toPgText
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import uk.matvey.utka.ktor.KtorKit.setFormData
@@ -60,11 +60,11 @@ class ClubResourceTest : TestSetup() {
         assertThat(rs.bodyAsText())
             .contains(">$name<")
         repo.access { a ->
-            a.query(
-                plainQuery("select count(*) from clubs where name = ?", listOf(name.toPgText())) {
-                    assertThat(it.int(1)).isGreaterThan(0)
-                }
-            )
+            a.queryAll(
+                "select count(*) from clubs where name = ?", listOf(name.toPgText())
+            ) {
+                assertThat(it.int(1)).isGreaterThan(0)
+            }
         }
     }
 
@@ -79,11 +79,12 @@ class ClubResourceTest : TestSetup() {
         // then
         assertThat(rs.status).isEqualTo(OK)
         repo.access { a ->
-            a.query(
-                plainQuery("select count(*) from clubs where id = ?", listOf(club.id.toPgUuid())) {
-                    assertThat(it.int(1)).isEqualTo(0)
-                }
-            )
+            a.queryAll(
+                "select count(*) from clubs where id = ?",
+                listOf(club.id.toPgUuid())
+            ) {
+                assertThat(it.int(1)).isEqualTo(0)
+            }
         }
     }
 

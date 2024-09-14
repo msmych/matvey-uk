@@ -4,10 +4,10 @@ import uk.matvey.kit.json.JsonKit.jsonDeserialize
 import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.access.AccessKit.queryOneOrNull
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.OnConflict.Companion.doNothing
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.value.Pg
@@ -46,23 +46,19 @@ object AccountSql {
     }
 
     fun Access.getAccountById(id: UUID): Account {
-        return query(
-            plainQuery(
-                "select * from $ACCOUNTS where id = ?",
-                listOf(id.toPgUuid()),
-                ::readAccount
-            )
-        ).single()
+        return queryOne(
+            "select * from $ACCOUNTS where id = ?",
+            listOf(id.toPgUuid()),
+            ::readAccount
+        )
     }
 
     fun Access.getAccountByTgUserId(tgUserId: Long): Account {
-        return query(
-            plainQuery(
-                "select * from $ACCOUNTS where $TG = ?",
-                listOf(tgUserId.toPgInt()),
-                ::readAccount
-            )
-        ).single()
+        return queryOne(
+            "select * from $ACCOUNTS where $TG = ?",
+            listOf(tgUserId.toPgInt()),
+            ::readAccount
+        )
     }
 
     fun Access.updateAccountStatus(id: UUID, state: Account.State) {

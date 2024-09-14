@@ -11,8 +11,9 @@ import uk.matvey.drinki.ingredient.IngredientSql.TYPE
 import uk.matvey.drinki.ingredient.IngredientSql.UPDATED_AT
 import uk.matvey.drinki.types.Visibility
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.AccessKit.queryAll
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -51,29 +52,25 @@ class IngredientRepo(
 
     suspend fun get(ingredientId: UUID): Ingredient {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    "select * from $INGREDIENTS where $ID = ?",
-                    listOf(ingredientId.toPgUuid()),
-                    ::ingredient
-                )
-            ).single()
+            a.queryOne(
+                "select * from $INGREDIENTS where $ID = ?",
+                listOf(ingredientId.toPgUuid()),
+                ::ingredient
+            )
         }
     }
 
     suspend fun findAllByAccountId(accountId: UUID?): List<Ingredient> {
         val accountIdCondition = accountId?.let { "$ACCOUNT_ID = ?" } ?: "$ACCOUNT_ID is null"
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    """
+            a.queryAll(
+                """
                 select * from $INGREDIENTS 
                 where $accountIdCondition 
                 order by $TYPE nulls last, $NAME
                 """.trimIndent(),
-                    listOfNotNull(accountId?.toPgUuid()),
-                    ::ingredient
-                )
+                listOfNotNull(accountId?.toPgUuid()),
+                ::ingredient
             )
         }
     }
@@ -84,18 +81,16 @@ class IngredientRepo(
 
     suspend fun findAllByDrink(drinkId: UUID): List<Ingredient> {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    """
+            a.queryAll(
+                """
             select * from $INGREDIENTS 
             where $ID in (
                 select (jsonb_array_elements(${DrinkSql.INGREDIENTS}) ->> 'ingredientId')::uuid 
                 from ${DrinkSql.DRINKS} where ${DrinkSql.ID} = ?
             )
             """.trimIndent(),
-                    listOf(drinkId.toPgUuid()),
-                    ::ingredient
-                )
+                listOf(drinkId.toPgUuid()),
+                ::ingredient
             )
         }
     }

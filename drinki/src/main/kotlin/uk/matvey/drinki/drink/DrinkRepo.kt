@@ -18,9 +18,10 @@ import uk.matvey.drinki.types.Visibility
 import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.RecordReader
+import uk.matvey.slon.access.AccessKit.queryAll
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgText.Companion.toPgText
@@ -75,29 +76,25 @@ class DrinkRepo(
 
     suspend fun get(id: UUID): Drink {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    "select * from $DRINKS where $ID = ?",
-                    listOf(id.toPgUuid()),
-                    ::drink
-                )
-            ).single()
+            a.queryOne(
+                "select * from $DRINKS where $ID = ?",
+                listOf(id.toPgUuid()),
+                ::drink
+            )
         }
     }
 
     suspend fun search(accountId: UUID, query: String): List<Drink> {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    """
+            a.queryAll(
+                """
                 select * from $DRINKS 
                 where $VISIBILITY = 'PUBLIC' 
                 or $ACCOUNT_ID = ? and $NAME ilike ? 
                 limit 64
                 """.trimIndent(),
-                    listOf(accountId.toPgUuid(), "%$query%".toPgText()),
-                    ::drink
-                )
+                listOf(accountId.toPgUuid(), "%$query%".toPgText()),
+                ::drink
             )
         }
     }

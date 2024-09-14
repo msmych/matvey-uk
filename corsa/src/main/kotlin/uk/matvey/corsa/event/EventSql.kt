@@ -4,9 +4,9 @@ import uk.matvey.corsa.CorsaSql.ID
 import uk.matvey.corsa.CorsaSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.queryAll
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -47,10 +47,10 @@ object EventSql {
     }
 
     fun Access.getEventsByClubId(clubId: UUID): List<Event> {
-        return query(plainQuery(
+        return queryAll(
             "select * from $EVENTS where $CLUB_ID = ?",
             listOf(clubId.toPgUuid())
-        ) { readEvent(it) })
+        ) { readEvent(it) }
     }
 
     fun readEvent(r: RecordReader): Event {

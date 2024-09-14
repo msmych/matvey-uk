@@ -17,7 +17,7 @@ import uk.matvey.corsa.event.EventSql.addEvent
 import uk.matvey.kit.random.RandomKit.randomAlphabetic
 import uk.matvey.kit.time.TimeKit.localDate
 import uk.matvey.kit.time.TimeKit.localTime
-import uk.matvey.slon.query.Query.Companion.plainQuery
+import uk.matvey.slon.access.AccessKit.queryAll
 import uk.matvey.slon.value.PgText.Companion.toPgText
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import uk.matvey.utka.ktor.KtorKit.setFormData
@@ -64,13 +64,13 @@ class EventResourceTest : TestSetup() {
         assertThat(rs.bodyAsText()).contains(">$name<")
 
         repo.access { a ->
-            a.query(plainQuery("select * from events where name = ?", listOf(name.toPgText())) { r ->
+            a.queryAll("select * from events where name = ?", listOf(name.toPgText())) { r ->
                 assertThat(r.uuid(CLUB_ID)).isEqualTo(club.id)
                 assertThat(r.string(NAME)).isEqualTo(name)
                 assertThat(r.localDate(DATE)).isEqualTo(date)
                 assertThat(r.instant(DATE_TIME).truncatedTo(MILLIS))
                     .isEqualTo(LocalDateTime.of(date, time).toInstant(UTC).truncatedTo(MILLIS))
-            })
+            }
         }
     }
 
@@ -86,11 +86,12 @@ class EventResourceTest : TestSetup() {
         assertThat(rs.status).isEqualTo(OK)
 
         repo.access { a ->
-            a.query(
-                plainQuery("select count(*) from events where id = ?", listOf(event.id.toPgUuid())) {
-                    assertThat(it.int(1)).isEqualTo(0)
-                }
-            )
+            a.queryAll(
+                "select count(*) from events where id = ?",
+                listOf(event.id.toPgUuid())
+            ) {
+                assertThat(it.int(1)).isEqualTo(0)
+            }
         }
     }
 }

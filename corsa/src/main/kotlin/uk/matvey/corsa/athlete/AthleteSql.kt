@@ -6,10 +6,10 @@ import uk.matvey.kit.json.JsonKit
 import uk.matvey.kit.json.JsonKit.jsonSerialize
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.access.AccessKit.queryOneOrNull
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.OnConflict.Companion.doNothing
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgInt.Companion.toPgInt
@@ -41,13 +41,11 @@ object AthleteSql {
     }
 
     fun Access.getAthlete(id: UUID): Athlete {
-        return query(
-            plainQuery(
-                "select * from $ATHLETES where $ID = ?",
-                listOf(id.toPgUuid()),
-                ::readAthlete,
-            )
-        ).single()
+        return queryOne(
+            "select * from $ATHLETES where $ID = ?",
+            listOf(id.toPgUuid()),
+            ::readAthlete,
+        )
     }
 
     fun readAthlete(reader: RecordReader): Athlete {

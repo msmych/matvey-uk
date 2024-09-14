@@ -9,8 +9,8 @@ import uk.matvey.drinki.account.AccountSql.ID
 import uk.matvey.drinki.account.AccountSql.TG_SESSION
 import uk.matvey.drinki.account.AccountSql.UPDATED_AT
 import uk.matvey.kit.json.JsonKit.JSON
+import uk.matvey.slon.access.AccessKit.queryOneOrNull
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.value.PgText.Companion.toPgText
@@ -44,22 +44,19 @@ class AccountRepo(private val repo: Repo) {
 
     suspend fun findByTgUserId(tgUserId: Long): Account? {
         return repo.access { a ->
-            a.query(
-                plainQuery(
-                    "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
-                    listOf(tgUserId.toString().toPgText())
-                ) { reader ->
-                    Account(
-                        reader.uuid(ID),
-                        JSON.parseToJsonElement(reader.string(TG_SESSION))
-                            .takeIf { it.jsonObject.containsKey("userId") }
-                            ?.let { JSON.decodeFromJsonElement(it) },
-                        reader.instant(CREATED_AT),
-                        reader.instant(UPDATED_AT)
-                    )
-                }
-            )
-                .singleOrNull()
+            a.queryOneOrNull(
+                "select * from $ACCOUNTS where $TG_SESSION ->> 'userId' = ?",
+                listOf(tgUserId.toString().toPgText())
+            ) { reader ->
+                Account(
+                    reader.uuid(ID),
+                    JSON.parseToJsonElement(reader.string(TG_SESSION))
+                        .takeIf { it.jsonObject.containsKey("userId") }
+                        ?.let { JSON.decodeFromJsonElement(it) },
+                    reader.instant(CREATED_AT),
+                    reader.instant(UPDATED_AT)
+                )
+            }
         }
     }
 

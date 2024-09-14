@@ -4,9 +4,9 @@ import uk.matvey.corsa.CorsaSql.ID
 import uk.matvey.corsa.CorsaSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.Query.Companion.plainQuery
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -49,12 +49,10 @@ object ClubSql {
     }
 
     fun Access.getClub(id: UUID): Club {
-        return query(
-            plainQuery(
-                "select * from $CLUBS where $ID = ?",
-                listOf(id.toPgUuid())
-            ) { readClub(it) }
-        ).single()
+        return queryOne(
+            "select * from $CLUBS where $ID = ?",
+            listOf(id.toPgUuid())
+        ) { readClub(it) }
     }
 
     fun readClub(r: RecordReader) = Club(
