@@ -7,6 +7,8 @@ create table if not exists balances
     updated_at timestamp not null
 );
 
+create unique index if not exists balances_account_id_idx on balances (account_id);
+
 create table if not exists pins
 (
     id         uuid         not null default gen_random_uuid() primary key,

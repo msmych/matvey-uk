@@ -6,6 +6,7 @@ import java.util.UUID
 data class Balance(
     val id: UUID,
     val accountId: UUID,
+    val quantity: Int,
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
