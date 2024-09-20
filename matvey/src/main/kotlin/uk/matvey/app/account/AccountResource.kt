@@ -9,7 +9,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.patch
 import io.ktor.server.routing.route
 import uk.matvey.app.MatveyAuth
-import uk.matvey.app.MatveyAuth.AccountPrincipal
+import uk.matvey.app.AccountPrincipal
 import uk.matvey.app.account.AccountSql.ACCOUNTS
 import uk.matvey.app.account.AccountSql.NAME
 import uk.matvey.app.account.AccountSql.getAccountById

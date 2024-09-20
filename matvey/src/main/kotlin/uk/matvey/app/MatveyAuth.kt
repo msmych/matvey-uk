@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT
 import io.ktor.server.application.call
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.AuthenticationProvider
-import io.ktor.server.auth.Principal
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -13,14 +12,11 @@ import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.utka.jwt.AuthJwt
 import uk.matvey.utka.ktor.KtorKit.queryParam
-import java.util.UUID
 import kotlin.time.Duration.Companion.days
 
 class MatveyAuth(
     private val auth: AuthJwt,
 ) : AuthenticationProvider(object : Config("jwt") {}) {
-
-    class AccountPrincipal(val id: UUID, val name: String) : Principal
 
     fun issueJwt(account: Account): String {
         val now = instant()

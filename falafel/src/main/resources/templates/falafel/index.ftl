@@ -8,7 +8,7 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-<h1>🍿 Falafel</h1>
+<h1>Falafel</h1>
 <div id="main">
     <button hx-get="/falafel/clubs" hx-target="#main">Clubs</button>
     <button hx-get="/falafel/titles" hx-target="#main">Titles</button>
@@ -36,3 +36,12 @@
         background-color: midnightblue;
     }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('htmx:responseError', e => {
+            if (e.detail.xhr.status === 401) {
+                window.location.href = '/login'
+            }
+        })
+    })
+</script>

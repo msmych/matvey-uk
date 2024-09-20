@@ -9,7 +9,7 @@ class ClubService(
     private val repo: Repo,
 ) {
 
-    suspend fun getClubs(): List<Club> {
+    fun getClubs(): List<Club> {
         return repo.access { a ->
             a.queryAll(
                 "select * from $CLUBS"
