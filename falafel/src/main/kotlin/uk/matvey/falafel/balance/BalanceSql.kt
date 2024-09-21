@@ -7,29 +7,33 @@ import uk.matvey.falafel.FalafelSql.FALAFEL
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.queryOneOrNull
-import uk.matvey.slon.query.InsertOneQueryBuilder
-import uk.matvey.slon.query.OnConflict
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.OnConflict.Companion.doNothing
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
+import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgInt.Companion.toPgInt
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
 object BalanceSql {
 
-    const val BALANCE = "$FALAFEL.balance"
+    const val BALANCE = "$FALAFEL.balances"
 
     const val ACCOUNT_ID = "account_id"
     const val QUANTITY = "quantity"
 
     fun Access.ensureBalance(accountId: UUID): Balance {
-        return queryOneOrNull(
+        val existing = queryOneOrNull(
             "select * from $BALANCE where $ACCOUNT_ID = ?",
-            listOf(accountId.toPgUuid())
-        ) { readBalance(it) }
-            ?: query(InsertOneQueryBuilder.insertOneInto(BALANCE) {
+            listOf(accountId.toPgUuid()),
+            ::readBalance
+        )
+        return existing
+            ?: query(insertOneInto(BALANCE) {
                 set(ACCOUNT_ID, accountId)
                 set(QUANTITY, 32.toPgInt())
-                onConflict(OnConflict.doNothing())
+                set(UPDATED_AT, Pg.now())
+                onConflict(doNothing())
             }.returning { readBalance(it) }).single()
     }
 
@@ -37,7 +41,7 @@ object BalanceSql {
         return Balance(
             id = reader.uuid(ID),
             accountId = reader.uuid(ACCOUNT_ID),
-            quantity = reader.int(QUANTITY),
+            current = reader.int(QUANTITY),
             createdAt = reader.instant(CREATED_AT),
             updatedAt = reader.instant(UPDATED_AT),
         )

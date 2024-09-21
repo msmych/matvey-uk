@@ -2,7 +2,7 @@ create table if not exists balances
 (
     id         uuid      not null default gen_random_uuid() primary key,
     account_id uuid      not null,
-    quantity   bigint    not null,
+    current    bigint    not null,
     created_at timestamp not null default now(),
     updated_at timestamp not null
 );

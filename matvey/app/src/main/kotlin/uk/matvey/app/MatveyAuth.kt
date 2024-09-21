@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.days
 
 class MatveyAuth(
     private val auth: AuthJwt,
+    private val moreAuth: (AuthenticationContext) -> Unit = {},
 ) : AuthenticationProvider(object : Config("jwt") {}) {
 
     fun issueJwt(account: Account): String {
@@ -34,6 +35,7 @@ class MatveyAuth(
         context.call.request.cookies["token"]?.let { JWT.decode(it) }?.let { token ->
             context.principal(AccountPrincipal(token.subject.toUuid(), token.getClaim("name").asString()))
         }
+        moreAuth(context)
     }
 
     fun Route.authRouting() {

@@ -5,6 +5,7 @@ import com.typesafe.config.ConfigFactory
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import uk.matvey.app.config.AppConfig
+import uk.matvey.falafel.FalafelAuth
 import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.jwt.AuthJwt
@@ -30,7 +31,12 @@ fun main(args: Array<String>) {
 
     val repo = Repo(ds)
     val authJwt = AuthJwt(Algorithm.HMAC256(config.jwtSecret()), "matvey")
-    val auth = MatveyAuth(authJwt)
+    val falafelAuth = FalafelAuth(repo)
+    val auth = MatveyAuth(authJwt) {
+        if (!profile.isProd()) {
+            falafelAuth.onAuthenticate(it)
+        }
+    }
     val serverConfig = config.server()
     runBlocking {
         MatveyBot(
