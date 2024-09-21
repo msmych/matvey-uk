@@ -20,7 +20,7 @@ object BalanceSql {
     const val BALANCE = "$FALAFEL.balances"
 
     const val ACCOUNT_ID = "account_id"
-    const val QUANTITY = "quantity"
+    const val CURRENT = "current"
 
     fun Access.ensureBalance(accountId: UUID): Balance {
         val existing = queryOneOrNull(
@@ -31,7 +31,7 @@ object BalanceSql {
         return existing
             ?: query(insertOneInto(BALANCE) {
                 set(ACCOUNT_ID, accountId)
-                set(QUANTITY, 32.toPgInt())
+                set(CURRENT, 32.toPgInt())
                 set(UPDATED_AT, Pg.now())
                 onConflict(doNothing())
             }.returning { readBalance(it) }).single()
@@ -41,7 +41,7 @@ object BalanceSql {
         return Balance(
             id = reader.uuid(ID),
             accountId = reader.uuid(ACCOUNT_ID),
-            current = reader.int(QUANTITY),
+            current = reader.int(CURRENT),
             createdAt = reader.instant(CREATED_AT),
             updatedAt = reader.instant(UPDATED_AT),
         )
