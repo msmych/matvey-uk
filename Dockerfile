@@ -20,7 +20,7 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY --from=builder /app/matvey/build /app/build
+COPY --from=builder /app/matvey/app/build /app/build
 
 EXPOSE 8080
 
