@@ -18,7 +18,7 @@ class RockGardenJump(
     private val bot: TelegramBot,
 ) {
     
-    suspend operator fun invoke(rq: TgRequest, frobotId: UUID) {
+    operator fun invoke(rq: TgRequest, frobotId: UUID) {
         val (i, j) = rq.callbackQueryData().let { it[0].digitToInt() to it[1].digitToInt() }
         val frobot = frobotRepo.get(frobotId)
         if (frobot.rockGardenBoard().cellAt(i, j) is TreasureMap && frobot.rockGardenBoard().isReachableRock(i, j)) {

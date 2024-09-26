@@ -10,11 +10,11 @@ import uk.matvey.migraine.frobot.FrobotSql.STATE
 import uk.matvey.migraine.frobot.FrobotSql.TG
 import uk.matvey.migraine.frobot.FrobotSql.UPDATED_AT
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.access.AccessKit.queryOne
-import uk.matvey.slon.access.AccessKit.queryOneOrNull
-import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOneInto
+import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.repo.RepoKit.queryOneOrNull
+import uk.matvey.slon.repo.RepoKit.update
 import uk.matvey.slon.value.PgJsonb.Companion.toPgJsonb
 import uk.matvey.slon.value.PgTimestamp.Companion.toPgTimestamp
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -24,55 +24,43 @@ class FrobotRepo(
     private val repo: Repo,
 ) {
 
-    suspend fun add(frobot: Frobot) {
-        repo.access { a ->
-            a.execute(
-                insertOneInto(FROBOT) {
-                    set(ID, frobot.id)
-                    set(STATE, frobot.state)
-                    set(TG, JSON.encodeToString(frobot.tg))
-                    set(CREATED_AT, frobot.createdAt)
-                    set(UPDATED_AT, frobot.updatedAt)
-                }
+    fun add(frobot: Frobot) {
+        repo.insertOneInto(FROBOT) {
+            set(ID, frobot.id)
+            set(STATE, frobot.state)
+            set(TG, JSON.encodeToString(frobot.tg))
+            set(CREATED_AT, frobot.createdAt)
+            set(UPDATED_AT, frobot.updatedAt)
+        }
+    }
+
+    fun update(frobot: Frobot) {
+        repo.update(FROBOT) {
+            set(STATE, frobot.state)
+            set(TG, JSON.encodeToString(frobot.tg))
+            set(UPDATED_AT, instant())
+            where(
+                "$ID = ? and $UPDATED_AT = ?",
+                frobot.id.toPgUuid(),
+                frobot.updatedAt.toPgTimestamp()
             )
         }
     }
 
-    suspend fun update(frobot: Frobot) {
-        repo.access { a ->
-            a.execute(
-                update(FROBOT) {
-                    set(STATE, frobot.state)
-                    set(TG, JSON.encodeToString(frobot.tg))
-                    set(UPDATED_AT, instant())
-                    where(
-                        "$ID = ? and $UPDATED_AT = ?",
-                        frobot.id.toPgUuid(),
-                        frobot.updatedAt.toPgTimestamp()
-                    )
-                }
-            )
-        }
+    fun get(id: UUID): Frobot {
+        return repo.queryOne(
+            "select * from $FROBOT where $ID = ?",
+            listOf(id.toPgUuid()),
+            ::frobotFrom
+        )
     }
 
-    suspend fun get(id: UUID): Frobot {
-        return repo.access { a ->
-            a.queryOne(
-                "select * from $FROBOT where $ID = ?",
-                listOf(id.toPgUuid()),
-                ::frobotFrom
-            )
-        }
-    }
-
-    suspend fun findByTgUserId(userId: Long): Frobot? {
-        return repo.access { a ->
-            a.queryOneOrNull(
-                "select * from $FROBOT where $TG ->> 'userId' = ?",
-                listOf(userId.toString().toPgJsonb()),
-                ::frobotFrom
-            )
-        }
+    fun findByTgUserId(userId: Long): Frobot? {
+        return repo.queryOneOrNull(
+            "select * from $FROBOT where $TG ->> 'userId' = ?",
+            listOf(userId.toString().toPgJsonb()),
+            ::frobotFrom
+        )
     }
 
     private fun frobotFrom(reader: RecordReader): Frobot {

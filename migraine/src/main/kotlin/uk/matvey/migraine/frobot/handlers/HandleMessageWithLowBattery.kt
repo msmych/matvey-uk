@@ -12,7 +12,7 @@ class HandleMessageWithLowBattery(
     private val bot: TelegramBot,
 ) {
 
-    suspend operator fun invoke(rq: TgRequest, frobotId: UUID) {
+    operator fun invoke(rq: TgRequest, frobotId: UUID) {
         val text = rq.messageText()
         when (text) {
             in INSECTS -> {

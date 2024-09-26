@@ -18,12 +18,12 @@ import uk.matvey.drinki.types.Visibility
 import uk.matvey.kit.json.JsonKit.JSON
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.RecordReader
-import uk.matvey.slon.access.AccessKit.queryAll
-import uk.matvey.slon.access.AccessKit.queryOne
-import uk.matvey.slon.query.DeleteQueryBuilder.Companion.deleteFrom
-import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
-import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.delete
+import uk.matvey.slon.repo.RepoKit.insertOneInto
+import uk.matvey.slon.repo.RepoKit.queryAll
+import uk.matvey.slon.repo.RepoKit.queryOne
+import uk.matvey.slon.repo.RepoKit.update
 import uk.matvey.slon.value.PgText.Companion.toPgText
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
@@ -32,71 +32,55 @@ class DrinkRepo(
     private val repo: Repo,
 ) {
 
-    suspend fun add(drink: Drink) {
-        repo.access { a ->
-            a.execute(
-                insertOneInto(DRINKS) {
-                    set(ID, drink.id)
-                    set(ACCOUNT_ID, drink.accountId)
-                    set(NAME, drink.name)
-                    set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
-                    set(RECIPE, drink.recipe)
-                    set(VISIBILITY, drink.visibility.name)
-                    set(CREATED_AT, drink.createdAt)
-                    set(UPDATED_AT, drink.updatedAt)
-                }
+    fun add(drink: Drink) {
+        repo.insertOneInto(DRINKS) {
+            set(ID, drink.id)
+            set(ACCOUNT_ID, drink.accountId)
+            set(NAME, drink.name)
+            set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
+            set(RECIPE, drink.recipe)
+            set(VISIBILITY, drink.visibility.name)
+            set(CREATED_AT, drink.createdAt)
+            set(UPDATED_AT, drink.updatedAt)
+        }
+    }
+
+    fun update(drink: Drink) {
+        repo.update(DRINKS) {
+            set(NAME, drink.name)
+            set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
+            set(RECIPE, drink.recipe)
+            set(VISIBILITY, drink.visibility.name)
+            where(
+                "$ID = ?",
+                drink.id.toPgUuid()
             )
         }
     }
 
-    suspend fun update(drink: Drink) {
-        repo.access { a ->
-            a.execute(
-                update(DRINKS) {
-                    set(NAME, drink.name)
-                    set(INGREDIENTS, JSON.encodeToString(drink.ingredientsJson()))
-                    set(RECIPE, drink.recipe)
-                    set(VISIBILITY, drink.visibility.name)
-                    where(
-                        "$ID = ?",
-                        drink.id.toPgUuid()
-                    )
-                }
-            )
-        }
+    fun delete(id: UUID) {
+        repo.delete(DRINKS, "$ID = ?", id.toPgUuid())
     }
 
-    suspend fun delete(id: UUID) {
-        repo.access { a ->
-            a.execute(
-                deleteFrom(DRINKS).where("$ID = ?", id.toPgUuid())
-            )
-        }
+    fun get(id: UUID): Drink {
+        return repo.queryOne(
+            "select * from $DRINKS where $ID = ?",
+            listOf(id.toPgUuid()),
+            ::drink,
+        )
     }
 
-    suspend fun get(id: UUID): Drink {
-        return repo.access { a ->
-            a.queryOne(
-                "select * from $DRINKS where $ID = ?",
-                listOf(id.toPgUuid()),
-                ::drink
-            )
-        }
-    }
-
-    suspend fun search(accountId: UUID, query: String): List<Drink> {
-        return repo.access { a ->
-            a.queryAll(
-                """
+    fun search(accountId: UUID, query: String): List<Drink> {
+        return repo.queryAll(
+            """
                 select * from $DRINKS 
                 where $VISIBILITY = 'PUBLIC' 
                 or $ACCOUNT_ID = ? and $NAME ilike ? 
                 limit 64
                 """.trimIndent(),
-                listOf(accountId.toPgUuid(), "%$query%".toPgText()),
-                ::drink
-            )
-        }
+            listOf(accountId.toPgUuid(), "%$query%".toPgText()),
+            ::drink
+        )
     }
 
     private fun drink(reader: RecordReader) = Drink(
