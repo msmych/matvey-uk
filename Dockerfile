@@ -8,12 +8,13 @@ ENV GH_PACKAGES_RO_TOKEN=$GH_PACKAGES_RO_TOKEN
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties /app/
 
 COPY gradle /app/gradle
-COPY matvey /app/matvey
+COPY matvey/common /app/matvey/common
+COPY matvey/app /app/matvey/app
 COPY falafel /app/falafel
 
 RUN chmod +x gradlew
 
-RUN ./gradlew matvey:shadowJar --no-daemon
+RUN ./gradlew matvey:app:shadowJar --no-daemon
 
 FROM eclipse-temurin:21-jre
 

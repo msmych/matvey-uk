@@ -16,7 +16,7 @@ class RockGardenStart(
     private val frobotRepo: FrobotRepo,
     private val bot: TelegramBot,
 ) {
-    
+
     operator fun invoke(rq: TgRequest, frobotId: UUID) {
         val frobot = frobotRepo.get(frobotId)
         frobot.tg.rockGarden?.messageId?.let { messageId ->
