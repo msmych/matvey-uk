@@ -12,7 +12,7 @@ class GetIngredients(
     private val bot: TelegramBot,
 ) {
     
-    suspend operator fun invoke(rq: TgRequest) {
+    operator fun invoke(rq: TgRequest) {
         val publicIngredients = ingredients.publicIngredients()
         val keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton("New ingredient").callbackData("/ingredient_add")

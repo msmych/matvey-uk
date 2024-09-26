@@ -13,7 +13,7 @@ class EditIngredientName(
     private val bot: TelegramBot,
 ) {
     
-    suspend operator fun invoke(rq: TgRequest) {
+    operator fun invoke(rq: TgRequest) {
         val account = accountRepo.getByTgUserId(rq.userId())
         val ingredient = ingredientRepo.get(account.tgSession().ingredientEdit().ingredientId)
         accountRepo.update(account.editingIngredientName())

@@ -6,8 +6,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.falafel.club.ClubSql.CLUBS
-import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOneInto
 import uk.matvey.slon.value.Pg
 import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
@@ -42,13 +42,9 @@ class ClubResource(
     private fun Route.addClub() {
         post {
             val param = call.receiveParamsMap()
-            repo.access { a ->
-                a.execute(
-                    insertOneInto(CLUBS) {
-                        set("name", param.getValue("name"))
-                        set("updated_at", Pg.now())
-                    }
-                )
+            repo.insertOneInto(CLUBS) {
+                set("name", param.getValue("name"))
+                set("updated_at", Pg.now())
             }
             val clubs = clubService.getClubs()
             call.respondFtl("falafel/clubs/clubs", "clubs" to clubs)

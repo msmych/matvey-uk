@@ -17,7 +17,7 @@ class RockGardenStart(
     private val bot: TelegramBot,
 ) {
     
-    suspend operator fun invoke(rq: TgRequest, frobotId: UUID) {
+    operator fun invoke(rq: TgRequest, frobotId: UUID) {
         val frobot = frobotRepo.get(frobotId)
         frobot.tg.rockGarden?.messageId?.let { messageId ->
             bot.execute(EditMessageReplyMarkup(rq.userId(), messageId).replyMarkup(InlineKeyboardMarkup()))

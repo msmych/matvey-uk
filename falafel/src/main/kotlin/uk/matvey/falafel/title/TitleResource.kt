@@ -6,8 +6,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.falafel.title.TitleSql.TITLES
-import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.repo.Repo
+import uk.matvey.slon.repo.RepoKit.insertOneInto
 import uk.matvey.slon.value.Pg
 import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
@@ -42,14 +42,10 @@ class TitleResource(
     private fun Route.addTitle() {
         post {
             val params = call.receiveParamsMap()
-            repo.access { a ->
-                a.execute(
-                    insertOneInto(TITLES) {
-                        set("state", Title.State.ACTIVE)
-                        set("title", params["title"])
-                        set("updated_at", Pg.now())
-                    }
-                )
+            repo.insertOneInto(TITLES) {
+                set("state", Title.State.ACTIVE)
+                set("title", params["title"])
+                set("updated_at", Pg.now())
             }
             val titles = titleService.getTitles()
             call.respondFtl("/falafel/titles/titles", "titles" to titles)

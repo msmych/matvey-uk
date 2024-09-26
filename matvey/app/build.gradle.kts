@@ -26,6 +26,7 @@ dependencies {
     implementation("uk.matvey:utka:$utkaVersion")
     implementation("uk.matvey:telek:$telekVersion")
 
+    implementation(project(":matvey:common"))
     implementation(project(":falafel"))
 
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))

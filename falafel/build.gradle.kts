@@ -12,6 +12,8 @@ dependencies {
     implementation("uk.matvey:utka:$utkaVersion")
     implementation("uk.matvey:slon:$slonVersion")
 
+    implementation(project(":matvey:common"))
+
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
