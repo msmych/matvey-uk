@@ -24,4 +24,4 @@ COPY --from=builder /app/matvey/app/build /app/build
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "build/libs/app/matvey-all.jar", "prod"]
+CMD ["java", "-jar", "build/libs/app-all.jar", "prod"]
