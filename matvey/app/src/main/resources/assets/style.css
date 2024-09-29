@@ -22,6 +22,11 @@ body {
     font-weight: bold;
 }
 
+.t3 {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
 .gap-8 {
     gap: 8px;
 }

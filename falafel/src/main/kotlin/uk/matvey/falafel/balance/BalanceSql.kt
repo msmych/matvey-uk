@@ -17,19 +17,19 @@ import java.util.UUID
 
 object BalanceSql {
 
-    const val BALANCE = "$FALAFEL.balances"
+    const val BALANCES = "$FALAFEL.balances"
 
     const val ACCOUNT_ID = "account_id"
     const val CURRENT = "current"
 
     fun Access.ensureBalance(accountId: UUID): Balance {
         val existing = queryOneOrNull(
-            "select * from $BALANCE where $ACCOUNT_ID = ?",
+            "select * from $BALANCES where $ACCOUNT_ID = ?",
             listOf(accountId.toPgUuid()),
             ::readBalance
         )
         return existing
-            ?: query(insertOneInto(BALANCE) {
+            ?: query(insertOneInto(BALANCES) {
                 set(ACCOUNT_ID, accountId)
                 set(CURRENT, 32.toPgInt())
                 set(UPDATED_AT, Pg.now())
