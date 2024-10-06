@@ -8,8 +8,10 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import uk.matvey.falafel.FalafelAuth.FalafelPrincipal
+import uk.matvey.app.AccountPrincipal
+import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql
+import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.access.AccessKit.insertOneInto
 import uk.matvey.slon.access.AccessKit.update
@@ -40,10 +42,15 @@ class TagResource(private val repo: Repo, private val tagService: TagService) : 
 
     private fun Route.getTags() {
         get {
+            val account = call.principal<AccountPrincipal>()?.let {
+                val balance = repo.access { a -> a.ensureBalance(it.id) }
+                AccountBalance.from(it, balance)
+            }
             val titleId = call.queryParam("titleId").toUuid()
             val tags = tagService.getTagsByTitleId(titleId)
             call.respondFtl(
                 "/falafel/tags/tags",
+                "account" to account,
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
             )
@@ -52,13 +59,13 @@ class TagResource(private val repo: Repo, private val tagService: TagService) : 
 
     private fun Route.addTag() {
         post {
-            val account = call.principal<FalafelPrincipal>() ?: return@post call.respond(Unauthorized)
+            val principal = call.principal<AccountPrincipal>() ?: return@post call.respond(Unauthorized)
             val titleId = call.queryParam("titleId").toUuid()
             val tagName = call.pathParam("name")
             repo.access { a ->
                 a.update(BalanceSql.BALANCES) {
                     set(BalanceSql.CURRENT, Pg.plain("${BalanceSql.CURRENT} - 1"))
-                    where("${BalanceSql.ACCOUNT_ID} = ? and ${BalanceSql.CURRENT} > 0", account.accountId.toPgUuid())
+                    where("${BalanceSql.ACCOUNT_ID} = ? and ${BalanceSql.CURRENT} > 0", principal.id.toPgUuid())
                 }
                 a.insertOneInto(TagSql.TAGS) {
                     set(TagSql.NAME, tagName)
@@ -66,8 +73,10 @@ class TagResource(private val repo: Repo, private val tagService: TagService) : 
                 }
             }
             val tags = tagService.getTagsByTitleId(titleId)
+            val account = AccountBalance.from(principal, repo.access { a -> a.ensureBalance(principal.id) })
             call.respondFtl(
                 "/falafel/tags/tags",
+                "account" to account,
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
             )
