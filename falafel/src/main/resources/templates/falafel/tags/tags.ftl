@@ -4,10 +4,5 @@
     </button>
 </#list>
 <!-- OOB -->
-<button id="account-tab"
-        hx-get="/me"
-        hx-target="#content"
-        hx-swap-oob="true"
->
-    ${account.name} 🍿${account.currentBalance}
-</button>
+<#import "../components/menu.ftl" as menu>
+<@menu.menu account=account oob=true/>

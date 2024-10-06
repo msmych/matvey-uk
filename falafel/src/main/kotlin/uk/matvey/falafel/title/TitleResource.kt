@@ -1,10 +1,14 @@
 package uk.matvey.falafel.title
 
 import io.ktor.server.application.call
+import io.ktor.server.auth.principal
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import uk.matvey.app.AccountPrincipal
+import uk.matvey.falafel.balance.AccountBalance
+import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.title.TitleSql.TITLES
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertOneInto
@@ -29,7 +33,15 @@ class TitleResource(
     private fun Route.getTitles() {
         get {
             val titles = titleService.getTitles()
-            call.respondFtl("/falafel/titles/titles", "titles" to titles)
+            val account = call.principal<AccountPrincipal>()?.let {
+                val balance = repo.access { a -> a.ensureBalance(it.id) }
+                AccountBalance.from(it, balance)
+            }
+            call.respondFtl(
+                "/falafel/titles/titles",
+                "titles" to titles,
+                "account" to account,
+            )
         }
     }
 
@@ -48,7 +60,15 @@ class TitleResource(
                 set("updated_at", Pg.now())
             }
             val titles = titleService.getTitles()
-            call.respondFtl("/falafel/titles/titles", "titles" to titles)
+            val account = call.principal<AccountPrincipal>()?.let {
+                val balance = repo.access { a -> a.ensureBalance(it.id) }
+                AccountBalance.from(it, balance)
+            }
+            call.respondFtl(
+                "/falafel/titles/titles",
+                "titles" to titles,
+                "account" to account,
+            )
         }
     }
 }

@@ -9,17 +9,8 @@
 </head>
 <body>
 <div class="row gap-16">
-    <div class="col menu gap-16">
-        <#if account?has_content>
-            <button id="account-tab" hx-get="/me" hx-target="#content">
-                ${account.name} 🍿${account.currentBalance}</button>
-        </#if>
-        <#if !account?has_content>
-            <a class="tab click" href="/login">Login</a>
-        </#if>
-        <button hx-get="/falafel/clubs" hx-target="#content">Clubs</button>
-        <button hx-get="/falafel/titles" hx-target="#content">Titles</button>
-    </div>
+        <#import "components/menu.ftl" as menu>
+        <@menu.menu account=account/>
     <div id="content">
     </div>
 </div>
@@ -29,10 +20,6 @@
         font-family: "Mona Sans", sans-serif;
         background-color: black;
         color: white;
-    }
-
-    .menu {
-        flex-basis: 10em;
     }
 
     button {

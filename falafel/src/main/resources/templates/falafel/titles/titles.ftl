@@ -12,3 +12,6 @@
     </#list>
     <button hx-get="/falafel/titles/new-title-form" hx-target="#content">New title</button>
 </div>
+<!-- OOB -->
+<#import "../components/menu.ftl" as menu>
+<@menu.menu account=account oob=true/>
