@@ -10,10 +10,9 @@
 <body>
 <div class="row gap-16">
     <div class="col menu gap-16">
-        <div class="t1" style="padding-left: 16px">Falafel</div>
         <#if account?has_content>
             <button id="account-tab" hx-get="/me" hx-target="#content">
-                ${account.name} 🍿${account.balanceQuantity}</button>
+                ${account.name} 🍿${account.currentBalance}</button>
         </#if>
         <#if !account?has_content>
             <a class="tab click" href="/login">Login</a>
@@ -47,8 +46,19 @@
         border: none;
     }
 
+    button.primary {
+        background-color: midnightblue;
+    }
+
     button:hover {
         background-color: midnightblue;
+    }
+
+    input {
+        padding: 8px 16px;
+        font-size: 1em;
+        border: lightgray 2px solid;
+        border-radius: 4px;
     }
 </style>
 <script>

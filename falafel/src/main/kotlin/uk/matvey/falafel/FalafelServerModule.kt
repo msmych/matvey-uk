@@ -7,7 +7,9 @@ import io.ktor.server.auth.principal
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import uk.matvey.falafel.FalafelAuth.FalafelPrincipal
+import uk.matvey.app.AccountPrincipal
+import uk.matvey.falafel.balance.AccountBalance
+import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.club.ClubResource
 import uk.matvey.falafel.club.ClubService
 import uk.matvey.falafel.tag.TagResource
@@ -32,8 +34,11 @@ fun Application.falafelServerModule(
         route("/falafel") {
             authenticate("jwt") {
                 get {
-                    val principal = call.principal<FalafelPrincipal>()
-                    call.respondFtl("falafel/index", "account" to principal)
+                    val account = call.principal<AccountPrincipal>()?.let {
+                        val balance = repo.access { a -> a.ensureBalance(it.id) }
+                        AccountBalance.from(it, balance)
+                    }
+                    call.respondFtl("falafel/index", "account" to account)
                 }
                 resources.forEach { with(it) { routing() } }
             }

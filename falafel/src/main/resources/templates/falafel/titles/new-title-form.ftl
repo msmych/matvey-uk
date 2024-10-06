@@ -2,5 +2,5 @@
     <div class="t3">New title</div>
     <label for="title">Title</label>
     <input type="text" id="title" name="title" required>
-    <button type="submit">Create</button>
+    <button type="submit" class="primary">Create</button>
 </form>
