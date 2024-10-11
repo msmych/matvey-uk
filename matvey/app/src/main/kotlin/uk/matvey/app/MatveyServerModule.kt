@@ -12,6 +12,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import io.ktor.util.date.GMTDate
+import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.app.account.AccountResource
 import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.slon.repo.Repo

@@ -10,7 +10,9 @@
             </div>
         </div>
     </#list>
-    <button hx-get="/falafel/titles/new-title-form" hx-target="#content">New title</button>
+    <#if account.tags?seq_contains("ADMIN")>
+        <button hx-get="/falafel/titles/new-title-form" hx-target="#content">New title</button>
+    </#if>
 </div>
 <!-- OOB -->
 <#import "../components/menu.ftl" as menu>

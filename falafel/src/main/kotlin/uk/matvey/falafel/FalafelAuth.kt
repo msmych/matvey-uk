@@ -1,7 +1,7 @@
 package uk.matvey.falafel
 
 import io.ktor.server.auth.AuthenticationContext
-import uk.matvey.app.AccountPrincipal
+import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.slon.repo.Repo
 

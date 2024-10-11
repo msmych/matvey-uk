@@ -8,6 +8,7 @@ import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import uk.matvey.app.account.Account
+import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.kit.time.TimeKit.instant
 import uk.matvey.utka.jwt.AuthJwt
@@ -33,7 +34,13 @@ class MatveyAuth(
 
     override suspend fun onAuthenticate(context: AuthenticationContext) {
         context.call.request.cookies["token"]?.let { JWT.decode(it) }?.let { token ->
-            context.principal(AccountPrincipal(token.subject.toUuid(), token.getClaim("name").asString()))
+            context.principal(
+                AccountPrincipal(
+                    token.subject.toUuid(),
+                    token.getClaim("name").asString(),
+                    token.getClaim("tags").asList(String::class.java).map(Account.Tag::valueOf).toSet(),
+                )
+            )
         }
         moreAuth(context)
     }

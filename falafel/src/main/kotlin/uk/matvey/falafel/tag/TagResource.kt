@@ -8,7 +8,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import uk.matvey.app.AccountPrincipal
+import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance

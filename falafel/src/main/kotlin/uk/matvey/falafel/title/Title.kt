@@ -16,6 +16,7 @@ data class Title(
 ) {
 
     enum class State {
+        PENDING,
         ACTIVE,
     }
 
