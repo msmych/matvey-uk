@@ -42,6 +42,10 @@ button:hover, .click:hover {
     background-color: aliceblue;
 }
 
+button:disabled, .click:disabled {
+    cursor: default;
+}
+
 .active {
     font-weight: bold;
 }
