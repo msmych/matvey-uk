@@ -8,6 +8,7 @@ import uk.matvey.app.config.AppConfig
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
+import uk.matvey.tmdb.TmdbClient
 import uk.matvey.utka.jwt.AuthJwt
 
 private val log = KotlinLogging.logger("Matvey")
@@ -56,10 +57,12 @@ fun main(args: Array<String>) {
             clean = dbConfig.clean(),
         )
     }
+    val tmdbClient = TmdbClient(config.tmdb().token())
     startMatveyServer(
         serverConfig = serverConfig,
         profile = profile,
         auth = auth,
         repo = repo,
+        tmdbClient = tmdbClient,
     )
 }

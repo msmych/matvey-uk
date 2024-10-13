@@ -7,7 +7,6 @@ plugins {
 val slonVersion: String by project
 val utkaVersion: String by project
 val telekVersion: String by project
-val typesafeConfigVersion: String by project
 val junitVersion: String by project
 
 repositories {
@@ -28,6 +27,7 @@ dependencies {
 
     implementation(project(":matvey:common"))
     implementation(project(":falafel"))
+    implementation(project(":tmdb-client"))
 
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")

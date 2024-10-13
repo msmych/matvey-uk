@@ -10,4 +10,5 @@ include(
     "drinki:bot",
     "migraine",
     "telek",
+    "tmdb-client",
 )

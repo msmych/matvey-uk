@@ -32,6 +32,7 @@ kotlin {
     jvmToolchain(21)
 }
 
+val junitVersion: String by project
 val kitVersion: String by project
 
 subprojects {
@@ -60,6 +61,10 @@ subprojects {
 
     dependencies {
         implementation("uk.matvey:kit:$kitVersion")
+
+        testImplementation(platform("org.junit:junit-bom:$junitVersion"))
+        testImplementation("org.junit.jupiter:junit-jupiter")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     }
 
     java {

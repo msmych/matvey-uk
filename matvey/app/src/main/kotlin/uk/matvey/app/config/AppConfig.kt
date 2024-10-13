@@ -45,6 +45,11 @@ class AppConfig(private val config: Config) : Config by config {
         fun adminGroupId() = getLong("adminGroupId")
     }
 
+    class TmdbConfig(private val config: Config) : Config by config {
+
+        fun token() = getString("token")
+    }
+
     fun jwtSecret() = getString("jwtSecret")
 
     fun server() = ServerConfig(getConfig("server"))
@@ -52,4 +57,6 @@ class AppConfig(private val config: Config) : Config by config {
     fun db() = DbConfig(getConfig("db"))
 
     fun tg() = TgConfig(getConfig("tg"))
+
+    fun tmdb() = TmdbConfig(getConfig("tmdb"))
 }

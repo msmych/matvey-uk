@@ -1,4 +1,3 @@
-val kitVersion: String by project
 val slonVersion: String by project
 val coroutinesVersion: String by project
 val typesafeConfigVersion: String by project

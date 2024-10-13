@@ -13,6 +13,7 @@ dependencies {
     implementation("uk.matvey:slon:$slonVersion")
 
     implementation(project(":matvey:common"))
+    implementation(project(":tmdb-client"))
 
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")

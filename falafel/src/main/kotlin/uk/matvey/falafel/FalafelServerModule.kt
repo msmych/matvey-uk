@@ -16,16 +16,18 @@ import uk.matvey.falafel.tag.TagResource
 import uk.matvey.falafel.tag.TagService
 import uk.matvey.falafel.title.TitleResource
 import uk.matvey.slon.repo.Repo
+import uk.matvey.tmdb.TmdbClient
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 fun Application.falafelServerModule(
     repo: Repo,
+    tmdbClient: TmdbClient,
 ) {
     val clubService = ClubService(repo)
     val tagService = TagService(repo)
     val resources = listOf(
         ClubResource(repo, clubService),
-        TitleResource(repo),
+        TitleResource(repo, tmdbClient),
         TagResource(repo, tagService),
     )
     routing {

@@ -8,6 +8,7 @@ import io.ktor.server.netty.Netty
 import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.falafel.falafelServerModule
 import uk.matvey.slon.repo.Repo
+import uk.matvey.tmdb.TmdbClient
 import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
@@ -17,6 +18,7 @@ fun startMatveyServer(
     profile: Profile,
     auth: MatveyAuth,
     repo: Repo,
+    tmdbClient: TmdbClient,
 ) {
     embeddedServer(
         factory = Netty,
@@ -48,7 +50,7 @@ fun startMatveyServer(
                     }
                     module {
                         matveyServerModule(serverConfig, auth, repo)
-                        falafelServerModule(repo)
+                        falafelServerModule(repo, tmdbClient)
                     }
                 }
             }
