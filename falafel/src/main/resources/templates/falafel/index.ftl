@@ -1,3 +1,5 @@
+<#import "components/menu.ftl" as menu>
+
 <html lang="en">
 <head>
     <title>Falafel</title>
@@ -9,8 +11,7 @@
 </head>
 <body>
 <div class="row gap-16">
-        <#import "components/menu.ftl" as menu>
-        <@menu.menu account=account/>
+    <@menu.menu account=account/>
     <div id="content">
     </div>
 </div>
@@ -46,6 +47,20 @@
         font-size: 1em;
         border: lightgray 2px solid;
         border-radius: 4px;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .htmx-indicator {
+        display: inline-block;
+        animation: spin 2s linear infinite;
     }
 </style>
 <script>

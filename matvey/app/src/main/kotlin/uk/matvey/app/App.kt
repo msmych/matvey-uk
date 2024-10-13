@@ -61,6 +61,7 @@ fun main(args: Array<String>) {
     startMatveyServer(
         serverConfig = serverConfig,
         profile = profile,
+        falafelAuth = falafelAuth,
         auth = auth,
         repo = repo,
         tmdbClient = tmdbClient,
