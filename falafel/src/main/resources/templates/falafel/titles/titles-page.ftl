@@ -4,11 +4,11 @@
     <div class="t1">Titles</div>
     <form class="row gap-16" hx-get="/falafel/titles/search" hx-target="#titles-list">
         <label>
-            <input name="q" type="text" required placeholder="pulp fiction">
+            <input name="q" type="text" required placeholder="falafel">
         </label>
         <button class="primary" type="submit">Search</button>
     </form>
-    <div id="titles-list"></div>
+    <div id="titles-list" class="col gap-32" hx-get="/falafel/titles/search?q=" hx-trigger="load"></div>
     <div>
         If you couldn't find a title your were looking for, try searching with TMDb:
     </div>

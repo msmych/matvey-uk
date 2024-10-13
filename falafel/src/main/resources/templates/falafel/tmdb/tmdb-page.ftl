@@ -6,7 +6,7 @@
           hx-indicator="#tmdb-search-indicator"
     >
         <label>
-            <input name="q" type="text" required placeholder="pulp fiction">
+            <input name="q" type="text" required placeholder="falafel">
         </label>
         <button class="primary" type="submit">Search</button>
         <div id="tmdb-search-indicator" class="htmx-indicator">🍿</div>

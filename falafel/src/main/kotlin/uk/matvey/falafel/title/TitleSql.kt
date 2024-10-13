@@ -39,7 +39,13 @@ object TitleSql {
 
     fun Repo.searchActiveTitles(query: String): List<Title> {
         return queryAll(
-            "select * from $TITLES where $STATE = ? and $TITLE ilike ?",
+            """
+                |select * from $TITLES
+                | where $STATE = ?
+                | and $TITLE ilike ?
+                | order by $CREATED_AT desc
+                | limit 10
+                |""".trimMargin(),
             listOf(
                 ACTIVE.name.toPgText(),
                 query.split(' ').joinToString(prefix = "%", separator = "%", postfix = "%").toPgText(),

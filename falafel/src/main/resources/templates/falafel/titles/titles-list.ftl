@@ -4,7 +4,7 @@
         <div id="tag-${title.id}"
              class="row gap-8"
              hx-get="/falafel/tags?titleId=${title.id}"
-             hx-trigger="load">
+             hx-trigger="load, every 1m">
         </div>
     </div>
 </#list>
