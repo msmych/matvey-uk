@@ -7,6 +7,7 @@
             <input name="q" type="text" required placeholder="falafel">
         </label>
         <button class="primary" type="submit">Search</button>
+        <div class="htmx-indicator">🍿</div>
     </form>
     <div id="titles-list" class="col gap-32" hx-get="/falafel/titles/search?q=" hx-trigger="load"></div>
     <div>

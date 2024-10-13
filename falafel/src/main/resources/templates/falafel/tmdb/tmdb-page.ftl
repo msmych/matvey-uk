@@ -3,13 +3,12 @@
     <form class="row gap-16"
           hx-get="/falafel/tmdb/search"
           hx-target="#tmdb-movies"
-          hx-indicator="#tmdb-search-indicator"
     >
         <label>
             <input name="q" type="text" required placeholder="falafel">
         </label>
         <button class="primary" type="submit">Search</button>
-        <div id="tmdb-search-indicator" class="htmx-indicator">🍿</div>
+        <div class="htmx-indicator">🍿</div>
     </form>
     <div id="tmdb-movies" class="col gap-16"></div>
 </div>

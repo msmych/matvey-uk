@@ -22,6 +22,7 @@ object TitleSql {
     const val DIRECTOR_NAME = "director_name"
     const val RELEASE_YEAR = "release_year"
     const val REFS = "refs"
+    const val TMDB_ID = "($REFS -> 'tmdb')::int"
     const val TITLE = "title"
     const val CREATED_AT = "created_at"
     const val UPDATED_AT = "updated_at"
@@ -50,6 +51,16 @@ object TitleSql {
                 ACTIVE.name.toPgText(),
                 query.split(' ').joinToString(prefix = "%", separator = "%", postfix = "%").toPgText(),
             ),
+            ::readTitle
+        )
+    }
+
+    fun Repo.findAllByTmbdIds(tmdbIds: List<Int>): List<Title> {
+        return queryAll(
+            """
+                |select * from $TITLES
+                |   where $TMDB_ID in (${tmdbIds.joinToString(",")})
+            """.trimMargin(),
             ::readTitle
         )
     }

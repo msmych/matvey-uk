@@ -9,3 +9,5 @@ create table if not exists titles
     created_at    timestamp     not null default now(),
     updated_at    timestamp     not null
 );
+
+create unique index if not exists titles_tmdb_idx on titles ((refs -> 'tmdb'));

@@ -8,6 +8,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.falafel.title.TitleSql.addTitle
+import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
 import uk.matvey.kit.string.StringKit.toLocalDate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
@@ -55,11 +56,30 @@ class TmdbResource(
         }
     }
 
+    data class TmdbMovie(
+        val id: String,
+        val title: String,
+        val releaseYear: String?,
+        val saved: Boolean,
+    )
+
     private fun Route.searchMovies() {
         get {
             val query = call.queryParam("q")
             val searchResult = tmdbClient.searchMovies(query)
-            call.respondFtl("/falafel/tmdb/tmdb-movies-list", "movies" to searchResult.results)
+            val savedTitles =
+                repo.findAllByTmbdIds(searchResult.results.map { item -> item.id }).associateBy { it.refs.tmdb }
+            call.respondFtl(
+                "/falafel/tmdb/tmdb-movies-list",
+                "movies" to searchResult.results.map {
+                    TmdbMovie(
+                        id = it.id.toString(),
+                        title = it.title,
+                        releaseYear = it.releaseDate.takeUnless { it.isBlank() }?.toLocalDate()?.year?.toString(),
+                        saved = savedTitles.containsKey(it.id),
+                    )
+                },
+            )
         }
     }
 }
