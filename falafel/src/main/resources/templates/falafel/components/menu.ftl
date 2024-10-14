@@ -2,8 +2,9 @@
     <div id="menu" class="col menu gap-16" <#if oob>hx-swap-oob="true"</#if>>
         <#if account?has_content>
             <button class="tab <#if activeTab == "account">active</#if>"
-                    hx-get="/me"
-                    hx-target="#content">
+                    hx-get="/falafel/me"
+                    hx-target="#content"
+            >
                 ${account.name} 🍿${account.currentBalance}
             </button>
         </#if>
@@ -15,6 +16,18 @@
                 hx-target="#content"
         >
             🎞️ Titles
+        </button>
+        <button class="tab <#if activeTab == "tags">active</#if>"
+                hx-get="/falafel/tags"
+                hx-target="#content"
+        >
+            🏷️ Tags
+        </button>
+        <button class="tab <#if activeTab == "tmdb">active</#if>"
+                hx-get="/falafel/tmdb"
+                hx-target="#content"
+        >
+            🗄️ TMDb
         </button>
     </div>
     <style>

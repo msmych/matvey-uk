@@ -8,7 +8,9 @@
             <div>☑️</div>
         <#else>
             <form class="row gap-16" hx-post="/falafel/tmdb" hx-swap="delete">
-                <label><input hidden name="tmdbId" value="${movie.id}"/></label>
+                <label>
+                    <input hidden name="tmdbId" value="${movie.id}"/>
+                </label>
                 <button type="submit">Save</button>
                 <div class="htmx-indicator">🍿</div>
             </form>

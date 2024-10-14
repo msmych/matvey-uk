@@ -9,6 +9,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.app.account.AccountPrincipal
+import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagSql.addTagToTitle
@@ -19,14 +20,25 @@ import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
-class TagResource(private val repo: Repo, private val tagService: TagService) : Resource {
+class TagResource(
+    private val falafelAuth: FalafelAuth,
+    private val repo: Repo,
+    private val tagService: TagService
+) : Resource {
 
     override fun Route.routing() {
         route("/tags") {
-            getTags()
+            getTagsPage()
             route("/{name}") {
                 addTag()
             }
+        }
+    }
+
+    private fun Route.getTagsPage() {
+        get {
+            val account = falafelAuth.getAccountBalance(call)
+            call.respondFtl("/falafel/tags/tags-page", "account" to account)
         }
     }
 
@@ -35,23 +47,6 @@ class TagResource(private val repo: Repo, private val tagService: TagService) : 
         val count: Int,
         val emoji: String,
     )
-
-    private fun Route.getTags() {
-        get {
-            val account = call.principal<AccountPrincipal>()?.let {
-                val balance = repo.access { a -> a.ensureBalance(it.id) }
-                AccountBalance.from(it, balance)
-            }
-            val titleId = call.queryParam("titleId").toUuid()
-            val tags = tagService.getTagsByTitleId(titleId)
-            call.respondFtl(
-                "/falafel/tags/tags",
-                "account" to account,
-                "titleId" to titleId,
-                "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
-            )
-        }
-    }
 
     private fun Route.addTag() {
         post {

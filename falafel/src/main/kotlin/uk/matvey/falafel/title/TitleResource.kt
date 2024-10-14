@@ -1,19 +1,29 @@
 package uk.matvey.falafel.title
 
 import io.ktor.server.application.call
+import io.ktor.server.auth.principal
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.balance.AccountBalance
+import uk.matvey.falafel.balance.BalanceSql.ensureBalance
+import uk.matvey.falafel.tag.TagResource.TagCount
+import uk.matvey.falafel.tag.TagService
+import uk.matvey.falafel.tag.Tags
 import uk.matvey.falafel.title.TitleSql.searchActiveTitles
+import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.Resource
+import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 class TitleResource(
     private val falafelAuth: FalafelAuth,
     private val repo: Repo,
+    private val tagService: TagService,
 ) : Resource {
 
     override fun Route.routing() {
@@ -21,6 +31,11 @@ class TitleResource(
             getTitlesPage()
             route("/search") {
                 searchTitles()
+            }
+            route("/{id}") {
+                route("/tags") {
+                    getTags()
+                }
             }
             getNewTitleForm()
         }
@@ -44,6 +59,23 @@ class TitleResource(
     private fun Route.getNewTitleForm() {
         get("/new-title-form") {
             call.respondFtl("/falafel/titles/new-title-form")
+        }
+    }
+
+    private fun Route.getTags() {
+        get {
+            val account = call.principal<AccountPrincipal>()?.let {
+                val balance = repo.access { a -> a.ensureBalance(it.id) }
+                AccountBalance.from(it, balance)
+            }
+            val titleId = call.pathParam("id").toUuid()
+            val tags = tagService.getTagsByTitleId(titleId)
+            call.respondFtl(
+                "/falafel/tags/tags",
+                "account" to account,
+                "titleId" to titleId,
+                "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
+            )
         }
     }
 }

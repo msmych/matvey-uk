@@ -29,9 +29,9 @@ fun Application.falafelServerModule(
     val tagService = TagService(repo)
     val resources = listOf(
         ClubResource(repo, clubService),
-        TitleResource(falafelAuth, repo),
-        TagResource(repo, tagService),
-        TmdbResource(tmdbClient, repo),
+        TitleResource(falafelAuth, repo, tagService),
+        TagResource(falafelAuth, repo, tagService),
+        TmdbResource(falafelAuth, tmdbClient, repo),
     )
     routing {
         route("/falafel") {
@@ -41,7 +41,13 @@ fun Application.falafelServerModule(
                         val balance = repo.access { a -> a.ensureBalance(it.id) }
                         AccountBalance.from(it, balance)
                     }
-                    call.respondFtl("falafel/index", "account" to account)
+                    call.respondFtl("/falafel/index", "account" to account)
+                }
+                route("/me") {
+                    get {
+                        val account = falafelAuth.getAccountBalance(call)
+                        call.respondFtl("/falafel/account/account-page", "account" to account)
+                    }
                 }
                 resources.forEach { with(it) { routing() } }
             }

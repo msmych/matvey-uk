@@ -1,3 +1,5 @@
+<#import "../components/menu.ftl" as menu/>
+
 <div class="col gap-16">
     <div class="t1">TMDb movies</div>
     <form class="row gap-16"
@@ -12,3 +14,5 @@
     </form>
     <div id="tmdb-movies" class="col gap-16"></div>
 </div>
+
+<@menu.menu account=account activeTab="tmdb" oob=true />

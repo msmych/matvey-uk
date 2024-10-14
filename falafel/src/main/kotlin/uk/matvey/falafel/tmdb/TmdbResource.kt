@@ -7,6 +7,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.title.TitleSql.addTitle
 import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
 import uk.matvey.kit.string.StringKit.toLocalDate
@@ -18,6 +19,7 @@ import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 class TmdbResource(
+    private val falafelAuth: FalafelAuth,
     private val tmdbClient: TmdbClient,
     private val repo: Repo,
 ) : Resource {
@@ -34,7 +36,8 @@ class TmdbResource(
 
     private fun Route.getTmdbPage() {
         get {
-            call.respondFtl("/falafel/tmdb/tmdb-page")
+            val account = falafelAuth.getAccountBalance(call)
+            call.respondFtl("/falafel/tmdb/tmdb-page", "account" to account)
         }
     }
 
