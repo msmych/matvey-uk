@@ -1,15 +1,15 @@
 package uk.matvey.falafel.tmdb
 
-import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.server.application.call
-import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import kotlinx.coroutines.async
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.title.TitleSql.addTitle
 import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
+import uk.matvey.falafel.tmdb.TmdbFtl.respondMovieSaved
 import uk.matvey.kit.string.StringKit.toLocalDate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
@@ -17,6 +17,7 @@ import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
+import java.util.UUID
 
 class TmdbResource(
     private val falafelAuth: FalafelAuth,
@@ -45,9 +46,10 @@ class TmdbResource(
         post {
             val params = call.receiveParamsMap()
             val tmdbId = params.getValue("tmdbId").toInt()
-            val details = tmdbClient.getMovie(tmdbId)
-            val credits = tmdbClient.getMovieCredits(tmdbId)
-            repo.access { a ->
+            val deferredCredits = async { tmdbClient.getMovieCredits(tmdbId) }
+            val deferredDetails = async { tmdbClient.getMovie(tmdbId) }
+            val (details, credits) = deferredDetails.await() to deferredCredits.await()
+            val title = repo.access { a ->
                 a.addTitle(
                     title = details.title,
                     directorName = credits.crew.find { item -> item.job == "Director" }?.name,
@@ -55,7 +57,7 @@ class TmdbResource(
                     tmdbId = tmdbId
                 )
             }
-            call.respond(OK)
+            respondMovieSaved(title.id)
         }
     }
 
@@ -63,15 +65,15 @@ class TmdbResource(
         val id: String,
         val title: String,
         val releaseYear: String?,
-        val saved: Boolean,
+        val titleId: UUID?,
     )
 
     private fun Route.searchMovies() {
         get {
             val query = call.queryParam("q")
             val searchResult = tmdbClient.searchMovies(query)
-            val savedTitles =
-                repo.findAllByTmbdIds(searchResult.results.map { item -> item.id }).associateBy { it.refs.tmdb }
+            val savedTitles = repo.findAllByTmbdIds(searchResult.results.map { item -> item.id })
+                .associateBy { it.refs.tmdb }
             call.respondFtl(
                 "/falafel/tmdb/tmdb-movies-list",
                 "movies" to searchResult.results.map {
@@ -79,7 +81,7 @@ class TmdbResource(
                         id = it.id.toString(),
                         title = it.title,
                         releaseYear = it.releaseDate.takeUnless { it.isBlank() }?.toLocalDate()?.year?.toString(),
-                        saved = savedTitles.containsKey(it.id),
+                        titleId = savedTitles[it.id]?.id,
                     )
                 },
             )

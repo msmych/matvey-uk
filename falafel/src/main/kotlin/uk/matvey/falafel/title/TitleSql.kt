@@ -6,8 +6,9 @@ import uk.matvey.kit.json.JsonKit.jsonDeserialize
 import uk.matvey.kit.json.JsonKit.jsonObjectEncode
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
-import uk.matvey.slon.access.AccessKit.insertOneInto
 import uk.matvey.slon.access.AccessKit.queryOne
+import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
+import uk.matvey.slon.query.ReturningQuery.Companion.returning
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.queryAll
 import uk.matvey.slon.value.Pg
@@ -34,15 +35,18 @@ object TitleSql {
         return queryOne("select * from $TITLES where $ID = ?", listOf(id.toPgUuid()), ::readTitle)
     }
 
-    fun Access.addTitle(title: String, directorName: String?, year: Int?, tmdbId: Int) {
-        insertOneInto(TITLES) {
-            set(STATE, ACTIVE)
-            set(TITLE, title)
-            set(DIRECTOR_NAME, directorName)
-            set(RELEASE_YEAR, year)
-            set(UPDATED_AT, Pg.now())
-            set(REFS, jsonObjectEncode(Title.Refs(tmdbId)))
-        }
+    fun Access.addTitle(title: String, directorName: String?, year: Int?, tmdbId: Int): Title {
+        return query(
+            insertOneInto(TITLES)
+                .set(STATE, ACTIVE)
+                .set(TITLE, title)
+                .set(DIRECTOR_NAME, directorName)
+                .set(RELEASE_YEAR, year)
+                .set(UPDATED_AT, Pg.now())
+                .set(REFS, jsonObjectEncode(Title.Refs(tmdbId)))
+                .build()
+                .returning(::readTitle)
+        ).single()
     }
 
     fun Repo.searchActiveTitles(query: String): List<Title> {
