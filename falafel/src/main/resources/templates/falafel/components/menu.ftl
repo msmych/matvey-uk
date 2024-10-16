@@ -4,6 +4,7 @@
             <button class="tab <#if activeTab == "account">active</#if>"
                     hx-get="/falafel/me"
                     hx-target="#content"
+                    hx-push-url="true"
             >
                 ${account.name} 🍿${account.currentBalance}
             </button>
@@ -14,18 +15,21 @@
         <button class="tab <#if activeTab == "titles">active</#if>"
                 hx-get="/falafel/titles"
                 hx-target="#content"
+                hx-push-url="true"
         >
             🎞️ Titles
         </button>
         <button class="tab <#if activeTab == "tags">active</#if>"
                 hx-get="/falafel/tags"
                 hx-target="#content"
+                hx-push-url="true"
         >
             🏷️ Tags
         </button>
         <button class="tab <#if activeTab == "tmdb">active</#if>"
                 hx-get="/falafel/tmdb"
                 hx-target="#content"
+                hx-push-url="true"
         >
             🗄️ TMDb
         </button>

@@ -6,9 +6,12 @@
         </#if>
         <#if movie.titleId?has_content>
             <div>☑️</div>
-            <button hx-get="/falafel/titles/${movie.titleId}" hx-target="#content">
-                View
-            </button>
+        <button hx-get="/falafel/titles/${movie.titleId}"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            View
+        </button>
         <#else>
             <form hx-post="/falafel/tmdb" hx-target="#tmdb-${movie.id}" hx-swap="outerHTML">
                 <label>

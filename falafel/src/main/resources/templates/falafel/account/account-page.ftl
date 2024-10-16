@@ -2,7 +2,7 @@
 
 <div class="col gap-16">
     <div class="t1">${account.name}</div>
-    <div>Balance: 🍿 ${account.currentBalance}</div>
+    <div class="t3">Balance: 🍿 ${account.currentBalance}</div>
 </div>
 
 <!-- OOB -->

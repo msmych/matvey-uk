@@ -7,5 +7,6 @@
         Update details
     </button>
 </div>
+
 <#-- OOB -->
 <div id="account-tab" class="tab click" hx-get="/me" hx-target="#content" hx-swap-oob="true">👤 ${name}</div>
