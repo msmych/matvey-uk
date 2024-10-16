@@ -9,7 +9,8 @@ import kotlinx.coroutines.async
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.title.TitleSql.addTitle
 import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
-import uk.matvey.falafel.tmdb.TmdbFtl.respondMovieSaved
+import uk.matvey.falafel.tmdb.TmdbFtl.TmdbMovie
+import uk.matvey.falafel.tmdb.TmdbFtl.respondTmdbMovie
 import uk.matvey.kit.string.StringKit.toLocalDate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
@@ -17,7 +18,6 @@ import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
-import java.util.UUID
 
 class TmdbResource(
     private val falafelAuth: FalafelAuth,
@@ -57,16 +57,16 @@ class TmdbResource(
                     tmdbId = tmdbId
                 )
             }
-            respondMovieSaved(title.id)
+            respondTmdbMovie(
+                TmdbMovie(
+                    id = details.id.toString(),
+                    title = details.title,
+                    releaseYear = details.releaseDate?.toLocalDate()?.year?.toString(),
+                    titleId = title.id
+                )
+            )
         }
     }
-
-    data class TmdbMovie(
-        val id: String,
-        val title: String,
-        val releaseYear: String?,
-        val titleId: UUID?,
-    )
 
     private fun Route.searchMovies() {
         get {

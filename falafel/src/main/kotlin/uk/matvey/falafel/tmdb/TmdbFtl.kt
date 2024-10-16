@@ -10,9 +10,14 @@ object TmdbFtl {
 
     const val BASE_PATH = "/falafel/tmdb/"
 
-    data class TitleId(val id: UUID)
+    data class TmdbMovie(
+        val id: String,
+        val title: String,
+        val releaseYear: String?,
+        val titleId: UUID?,
+    )
 
-    suspend fun PipelineContext<Unit, ApplicationCall>.respondMovieSaved(titleId: UUID) {
-        call.respondFtl("$BASE_PATH/tmdb-movie-saved", "title" to TitleId(titleId))
+    suspend fun PipelineContext<Unit, ApplicationCall>.respondTmdbMovie(movie: TmdbMovie) {
+        call.respondFtl("$BASE_PATH/tmdb-movie", "movie" to movie)
     }
 }
