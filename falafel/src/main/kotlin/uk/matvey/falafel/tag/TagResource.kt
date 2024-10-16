@@ -12,6 +12,7 @@ import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
+import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagSql.addTagToTitle
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
@@ -42,11 +43,6 @@ class TagResource(
         }
     }
 
-    data class TagCount(
-        val name: String,
-        val count: Int,
-        val emoji: String,
-    )
 
     private fun Route.addTag() {
         post {
@@ -57,10 +53,10 @@ class TagResource(
             val tags = tagService.getTagsByTitleId(titleId)
             val account = AccountBalance.from(principal, repo.access { a -> a.ensureBalance(principal.id) })
             call.respondFtl(
-                "/falafel/tags/tags",
+                "/falafel/tags/tags-edit",
                 "account" to account,
                 "titleId" to titleId,
-                "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
+                "tags" to tags.map { (name, count) -> TagCount(name, count, TagFtl.TAGS_EMOJIS.getValue(name)) },
             )
         }
     }

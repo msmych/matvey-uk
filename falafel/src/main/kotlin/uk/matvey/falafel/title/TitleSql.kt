@@ -7,11 +7,14 @@ import uk.matvey.kit.json.JsonKit.jsonObjectEncode
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.insertOneInto
+import uk.matvey.slon.access.AccessKit.queryOne
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.queryAll
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgText.Companion.toPgText
+import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.time.Year
+import java.util.UUID
 
 object TitleSql {
 
@@ -26,6 +29,10 @@ object TitleSql {
     const val TITLE = "title"
     const val CREATED_AT = "created_at"
     const val UPDATED_AT = "updated_at"
+
+    fun Access.getTitle(id: UUID): Title {
+        return queryOne("select * from $TITLES where $ID = ?", listOf(id.toPgUuid()), ::readTitle)
+    }
 
     fun Access.addTitle(title: String, directorName: String?, year: Int?, tmdbId: Int) {
         insertOneInto(TITLES) {

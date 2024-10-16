@@ -9,9 +9,13 @@ import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
-import uk.matvey.falafel.tag.TagResource.TagCount
+import uk.matvey.falafel.tag.TagFtl
+import uk.matvey.falafel.tag.TagFtl.TagCount
+import uk.matvey.falafel.tag.TagFtl.respondTagsView
 import uk.matvey.falafel.tag.TagService
-import uk.matvey.falafel.tag.Tags
+import uk.matvey.falafel.tag.TagSql.findAllTagsByTitleId
+import uk.matvey.falafel.title.TitleFtl.respondTitleDetails
+import uk.matvey.falafel.title.TitleSql.getTitle
 import uk.matvey.falafel.title.TitleSql.searchActiveTitles
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
@@ -33,8 +37,12 @@ class TitleResource(
                 searchTitles()
             }
             route("/{id}") {
-                route("/tags") {
-                    getTags()
+                getTitle()
+                route("/tags-view") {
+                    getTagsView()
+                }
+                route("/tags-edit") {
+                    getTagsEdit()
                 }
             }
             getNewTitleForm()
@@ -62,7 +70,24 @@ class TitleResource(
         }
     }
 
-    private fun Route.getTags() {
+    private fun Route.getTitle() {
+        get {
+            val titleId = call.pathParam("id").toUuid()
+            val title = repo.access { a -> a.getTitle(titleId) }
+            respondTitleDetails(title)
+        }
+    }
+
+    private fun Route.getTagsView() {
+        get {
+            val account = requireNotNull(falafelAuth.getAccountBalance(call))
+            val titleId = call.pathParam("id").toUuid()
+            val tags = repo.findAllTagsByTitleId(titleId)
+            respondTagsView(tags, account)
+        }
+    }
+
+    private fun Route.getTagsEdit() {
         get {
             val account = call.principal<AccountPrincipal>()?.let {
                 val balance = repo.access { a -> a.ensureBalance(it.id) }
@@ -71,10 +96,10 @@ class TitleResource(
             val titleId = call.pathParam("id").toUuid()
             val tags = tagService.getTagsByTitleId(titleId)
             call.respondFtl(
-                "/falafel/tags/tags",
+                "/falafel/tags/tags-edit",
                 "account" to account,
                 "titleId" to titleId,
-                "tags" to tags.map { (name, count) -> TagCount(name, count, Tags.TAGS_EMOJIS.getValue(name)) },
+                "tags" to tags.map { (name, count) -> TagCount(name, count, TagFtl.TAGS_EMOJIS.getValue(name)) },
             )
         }
     }
