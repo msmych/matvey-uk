@@ -35,11 +35,11 @@
     }
 
     button.primary {
-        background-color: midnightblue;
+        background-color: brown;
     }
 
     button:hover {
-        background-color: midnightblue;
+        background-color: brown;
     }
 
     input {
@@ -47,6 +47,10 @@
         font-size: 1em;
         border: lightgray 2px solid;
         border-radius: 4px;
+    }
+
+    button:hover, .click:hover {
+        background-color: brown;
     }
 
     @keyframes spin {
