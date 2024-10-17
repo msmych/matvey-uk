@@ -17,6 +17,9 @@
 <div class="row gap-16">
     <@menu.menu account=account/>
     <div id="content">
+        <#if loadPage != "/falafel">
+            <div hx-get="${loadPage}" hx-trigger="load" hx-swap="outerHTML"></div>
+        </#if>
     </div>
 </div>
 </body>

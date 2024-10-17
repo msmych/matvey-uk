@@ -1,10 +1,8 @@
 package uk.matvey.falafel
 
-import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.principal
-import io.ktor.server.response.respond
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
@@ -21,13 +19,10 @@ class FalafelAuth(
         }
     }
 
-    suspend fun getAccountBalance(call: ApplicationCall): AccountBalance? {
-        return call.principal<AccountPrincipal>()?.let {
+    fun getAccountBalance(call: ApplicationCall): AccountBalance {
+        return requireNotNull(call.principal<AccountPrincipal>()).let {
             val balance = repo.access { a -> a.ensureBalance(it.id) }
             AccountBalance.from(it, balance)
-        } ?: run {
-            call.respond(Unauthorized)
-            return null
         }
     }
 }
