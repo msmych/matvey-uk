@@ -5,6 +5,10 @@
     <title>Falafel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/assets/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="${assets}/falafel-favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="${assets}/falafel-favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="${assets}/falafel-favicons/favicon-16x16.png">
+    <link rel="manifest" href="${assets}/falafel-favicons/site.webmanifest">
     <script src="https://unpkg.com/htmx.org@2.0.1"
             integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
             crossorigin="anonymous"></script>

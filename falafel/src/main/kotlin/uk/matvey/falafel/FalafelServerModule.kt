@@ -1,5 +1,6 @@
 package uk.matvey.falafel
 
+import com.typesafe.config.Config
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -21,6 +22,7 @@ import uk.matvey.tmdb.TmdbClient
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 fun Application.falafelServerModule(
+    serverConfig: Config,
     falafelAuth: FalafelAuth,
     repo: Repo,
     tmdbClient: TmdbClient,
@@ -41,7 +43,7 @@ fun Application.falafelServerModule(
                         val balance = repo.access { a -> a.ensureBalance(it.id) }
                         AccountBalance.from(it, balance)
                     }
-                    call.respondFtl("/falafel/index", "account" to account)
+                    call.respondFtl("/falafel/index", "account" to account, "assets" to serverConfig.getString("assets"))
                 }
                 route("/me") {
                     get {

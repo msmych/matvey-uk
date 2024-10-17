@@ -52,7 +52,7 @@ fun startMatveyServer(
                     }
                     module {
                         matveyServerModule(serverConfig, auth, repo)
-                        falafelServerModule(falafelAuth, repo, tmdbClient)
+                        falafelServerModule(serverConfig, falafelAuth, repo, tmdbClient)
                     }
                 }
             }
