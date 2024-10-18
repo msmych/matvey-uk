@@ -4,30 +4,30 @@ import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
-import uk.matvey.falafel.balance.TopupBalanceJob
+import uk.matvey.falafel.balance.IncrementBalancesJob
 import uk.matvey.slon.repo.Repo
 
 class FalafelJobs(
     repo: Repo,
 ) {
 
-    private val jobs = mapOf(
-        TopupBalanceJob(repo) to EVERY_HOUR,
+    val incrementBalancesJob = IncrementBalancesJob(repo)
+
+    val jobs = listOf(incrementBalancesJob)
+        .associateBy { job -> job::class.java }
+
+    private val jobsTriggers = mapOf(
+        incrementBalancesJob to EVERY_HOUR,
     )
 
     private val scheduler = StdSchedulerFactory.getDefaultScheduler()
 
-
     init {
-        scheduler.setJobFactory { bundle, scheduler ->
-            jobs.keys.find {
-                bundle.jobDetail.jobClass == it.javaClass
-            }
-        }
-        jobs.forEach { (job, trigger) ->
+        scheduler.setJobFactory { bundle, scheduler -> jobs[bundle.jobDetail.jobClass] }
+        jobsTriggers.forEach { (job, trigger) ->
             scheduler.scheduleJob(
                 newJob(job::class.java)
-                    .withIdentity(job::class.simpleName, GROUP)
+                    .withIdentity(job::class.simpleName, FALAFEL_JOBS)
                     .build(),
                 trigger
             )
@@ -40,14 +40,14 @@ class FalafelJobs(
 
     companion object {
 
-        const val GROUP = "falafel-jobs"
+        const val FALAFEL_JOBS = "falafel-jobs"
 
         private val EVERY_HOUR = newTrigger()
-            .withIdentity("every-hour", GROUP)
+            .withIdentity("every-hour", FALAFEL_JOBS)
             .startNow()
             .withSchedule(
                 simpleSchedule()
-                    .withIntervalInMinutes(12)
+                    .withIntervalInHours(1)
                     .repeatForever()
             )
             .build()

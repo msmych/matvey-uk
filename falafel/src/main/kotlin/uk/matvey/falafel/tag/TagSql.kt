@@ -6,16 +6,13 @@ import uk.matvey.falafel.balance.BalanceSql
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.insertOneInto
-import uk.matvey.slon.access.AccessKit.queryAll
 import uk.matvey.slon.access.AccessKit.updateSingle
 import uk.matvey.slon.exception.UpdateCountMismatchException
 import uk.matvey.slon.query.UpdateQueryBuilder.Companion.update
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.queryAll
 import uk.matvey.slon.value.Pg
-import uk.matvey.slon.value.PgTimestamp.Companion.toPgTimestamp
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
-import java.time.Instant
 import java.util.UUID
 
 object TagSql {
@@ -56,19 +53,6 @@ object TagSql {
         }
     } catch (e: UpdateCountMismatchException) {
         log.warn(e) { "Failed to add tag $tag for title $titleId" }
-    }
-
-    fun Access.findAllBalanceIdsOfTagsAddedAfter(date: Instant): List<UUID> {
-        return queryAll(
-            """
-                |select distinct $BALANCE_ID
-                |   from $TAGS
-                |   where $CREATED_AT > ?
-            """.trimMargin(),
-            listOf(date.toPgTimestamp())
-        ) { r ->
-            r.uuid(BALANCE_ID)
-        }
     }
 
     fun readTag(reader: RecordReader): Tag {
