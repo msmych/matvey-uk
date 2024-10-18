@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import uk.matvey.app.config.AppConfig
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.FalafelJobs
 import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
@@ -48,7 +49,10 @@ fun main(args: Array<String>) {
             profile = profile
         ).start()
     }
-    log.info { "Bot started. Launching server" }
+    log.info { "Bot started" }
+    FalafelJobs(repo).start()
+    log.info { "Jobs started" }
+    log.info { "Launching server" }
     if (!profile.isProd()) {
         flywayMigrate(
             dataSource = ds,

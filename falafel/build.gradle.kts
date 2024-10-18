@@ -6,11 +6,13 @@ val kitVersion: String by project
 val utkaVersion: String by project
 val slonVersion: String by project
 val junitVersion: String by project
+val quartzVersion: String by project
 
 dependencies {
     implementation("uk.matvey:kit:$kitVersion")
     implementation("uk.matvey:utka:$utkaVersion")
     implementation("uk.matvey:slon:$slonVersion")
+    implementation("org.quartz-scheduler:quartz:$quartzVersion")
 
     implementation(project(":matvey:common"))
     implementation(project(":tmdb-client"))
