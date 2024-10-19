@@ -1,6 +1,5 @@
 package uk.matvey.falafel.title
 
-import io.ktor.server.application.call
 import io.ktor.server.auth.principal
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -11,10 +10,8 @@ import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl
 import uk.matvey.falafel.tag.TagFtl.TagCount
-import uk.matvey.falafel.tag.TagFtl.respondTagsView
 import uk.matvey.falafel.tag.TagService
 import uk.matvey.falafel.tag.TagSql.findAllTagsByTitleId
-import uk.matvey.falafel.title.TitleFtl.respondTitleDetails
 import uk.matvey.falafel.title.TitleSql.getTitle
 import uk.matvey.falafel.title.TitleSql.searchActiveTitles
 import uk.matvey.kit.string.StringKit.toUuid
@@ -74,7 +71,7 @@ class TitleResource(
         get {
             val titleId = call.pathParam("id").toUuid()
             val title = repo.access { a -> a.getTitle(titleId) }
-            respondTitleDetails(title)
+            call.respondFtl("/falafel/titles/title-details", "title" to title)
         }
     }
 
@@ -83,7 +80,11 @@ class TitleResource(
             val account = requireNotNull(falafelAuth.getAccountBalance(call))
             val titleId = call.pathParam("id").toUuid()
             val tags = repo.findAllTagsByTitleId(titleId)
-            respondTagsView(tags, account)
+            call.respondFtl(
+                "/falafel/tags/tags-view",
+                "tags" to tags.map { (name, count) -> TagCount.from(name, count) },
+                "account" to account
+            )
         }
     }
 

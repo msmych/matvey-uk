@@ -10,7 +10,6 @@ import io.ktor.server.request.uri
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import uk.matvey.falafel.FalafelFtl.respondIndex
 import uk.matvey.falafel.club.ClubResource
 import uk.matvey.falafel.club.ClubService
 import uk.matvey.falafel.tag.TagResource
@@ -41,21 +40,31 @@ fun Application.falafelServerModule(
             authenticate("jwt") {
                 intercept(ApplicationCallPipeline.Call) {
                     if (call.request.header("HX-Request") == null) {
-                        val account = falafelAuth.getAccountBalance(call)
-                        respondIndex(account, assets, call.request.uri)
+                        val account = falafelAuth.getAccountBalanceOrNull(call)
+                        call.respondFtl(
+                            "/falafel/index",
+                            "account" to account,
+                            "assets" to assets,
+                            "loadPage" to call.request.uri,
+                        )
                         finish()
                     } else {
                         proceed()
                     }
                 }
                 get {
-                    val account = falafelAuth.getAccountBalance(call)
-                    respondIndex(account, assets, null)
+                    val account = falafelAuth.getAccountBalanceOrNull(call)
+                    call.respondFtl(
+                        "/falafel/index",
+                        "account" to account,
+                        "assets" to assets,
+                        "loadPage" to null,
+                    )
                 }
                 route("/me") {
                     get {
                         val account = falafelAuth.getAccountBalance(call)
-                        call.respondFtl("/falafel/account/account-page", "account" to account)
+                        call.respondFtl("/falafel/account/account-page", "account" to account, "loadPage" to null)
                     }
                 }
                 resources.forEach { with(it) { routing() } }

@@ -1,16 +1,13 @@
 package uk.matvey.falafel.tmdb
 
-import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import kotlinx.coroutines.async
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.title.TitleSql.addTitle
 import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
 import uk.matvey.falafel.tmdb.TmdbFtl.TmdbMovie
-import uk.matvey.falafel.tmdb.TmdbFtl.respondTmdbMovie
 import uk.matvey.kit.string.StringKit.toLocalDate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
@@ -46,9 +43,7 @@ class TmdbResource(
         post {
             val params = call.receiveParamsMap()
             val tmdbId = params.getValue("tmdbId").toInt()
-            val deferredCredits = async { tmdbClient.getMovieCredits(tmdbId) }
-            val deferredDetails = async { tmdbClient.getMovie(tmdbId) }
-            val (details, credits) = deferredDetails.await() to deferredCredits.await()
+            val (details, credits) = tmdbClient.getMovie(tmdbId) to tmdbClient.getMovieCredits(tmdbId)
             val title = repo.access { a ->
                 a.addTitle(
                     title = details.title,
@@ -57,8 +52,8 @@ class TmdbResource(
                     tmdbId = tmdbId
                 )
             }
-            respondTmdbMovie(
-                TmdbMovie(
+            call.respondFtl(
+                "/falafel/tmdb/tmdb-movie", "movie" to TmdbMovie(
                     id = details.id.toString(),
                     title = details.title,
                     releaseYear = details.releaseDate?.toLocalDate()?.year?.toString(),

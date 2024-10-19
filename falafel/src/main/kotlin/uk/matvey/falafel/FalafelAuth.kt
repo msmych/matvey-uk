@@ -3,6 +3,7 @@ package uk.matvey.falafel
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.principal
+import uk.matvey.app.AuthException
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
@@ -19,10 +20,14 @@ class FalafelAuth(
         }
     }
 
-    fun getAccountBalance(call: ApplicationCall): AccountBalance {
-        return requireNotNull(call.principal<AccountPrincipal>()).let {
+    fun getAccountBalanceOrNull(call: ApplicationCall): AccountBalance? {
+        return call.principal<AccountPrincipal>()?.let {
             val balance = repo.access { a -> a.ensureBalance(it.id) }
-            AccountBalance.from(it, balance)
+            return AccountBalance.from(it, balance)
         }
+    }
+
+    fun getAccountBalance(call: ApplicationCall): AccountBalance {
+        return getAccountBalanceOrNull(call) ?: throw AuthException()
     }
 }

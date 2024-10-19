@@ -1,6 +1,7 @@
 package uk.matvey.app
 
-import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.application.serverConfig
+import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
@@ -24,7 +25,16 @@ fun startMatveyServer(
 ) {
     embeddedServer(
         factory = Netty,
-        environment = applicationEngineEnvironment {
+        environment = applicationEnvironment {
+            serverConfig {
+                watchPaths = when (profile) {
+                    Profile.LOCAL,
+                    Profile.TEST -> listOf("resources", "classes")
+                    else -> listOf()
+                }
+            }
+        },
+        configure = {
             if (profile.isProd()) {
                 val jksPass = serverConfig.jksPass().toCharArray()
                 val keyStoreFile = File("/certs/keystore.jks")
@@ -38,25 +48,18 @@ fun startMatveyServer(
                 ) {
                     port = serverConfig.port()
                     keyStorePath = keyStoreFile
-                    module {
-                        matveyServerModule(serverConfig, auth, repo)
-                    }
                 }
             } else {
                 connector {
                     port = serverConfig.port()
-                    watchPaths = when (profile) {
-                        Profile.LOCAL,
-                        Profile.TEST -> listOf("resources", "classes")
-                        else -> listOf()
-                    }
-                    module {
-                        matveyServerModule(serverConfig, auth, repo)
-                        falafelServerModule(serverConfig, falafelAuth, repo, tmdbClient)
-                    }
                 }
             }
         },
-    )
+    ) {
+        matveyServerModule(serverConfig, auth, repo)
+        if (!profile.isProd()) {
+            falafelServerModule(serverConfig, falafelAuth, repo, tmdbClient)
+        }
+    }
         .start(wait = true)
 }

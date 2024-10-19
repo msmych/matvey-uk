@@ -1,11 +1,10 @@
 plugins {
-    id("io.ktor.plugin") version "2.3.12"
+    id("io.ktor.plugin") version "3.0.0"
 }
 
 val slonVersion: String by project
 val telekVersion: String by project
 val utkaVersion: String by project
-val kitVersion: String by project
 val junitVersion: String by project
 val assertjVersion: String by project
 
@@ -24,6 +23,6 @@ dependencies {
     testImplementation(testFixtures("uk.matvey:slon:$slonVersion"))
 }
 
-tasks.shadowJar {
-    enabled = false
+application {
+    mainClass.set("uk.matvey.corsa.AppKt")
 }

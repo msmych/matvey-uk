@@ -1,5 +1,5 @@
 plugins {
-    id("io.ktor.plugin") version "2.3.12"
+    id("io.ktor.plugin") version "3.0.0"
 }
 
 val assertjVersion: String by project

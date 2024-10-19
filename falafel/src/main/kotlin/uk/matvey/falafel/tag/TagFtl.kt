@@ -1,14 +1,6 @@
 package uk.matvey.falafel.tag
 
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
-import io.ktor.util.pipeline.PipelineContext
-import uk.matvey.falafel.balance.AccountBalance
-import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
-
 object TagFtl {
-
-    private const val BASE_PATH = "/falafel/tags"
 
     const val POPCORN = "popcorn"
     const val SPARKLES = "sparkles"
@@ -38,16 +30,4 @@ object TagFtl {
             }
         }
     }
-
-    suspend fun PipelineContext<Unit, ApplicationCall>.respondTagsView(
-        tags: List<Pair<String, Int>>,
-        account: AccountBalance
-    ) {
-        call.respondFtl(
-            "$BASE_PATH/tags-view",
-            "tags" to tags.map { (name, count) -> TagCount.from(name, count) },
-            "account" to account
-        )
-    }
-
 }

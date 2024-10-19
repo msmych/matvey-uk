@@ -1,12 +1,14 @@
 package uk.matvey.app
 
+import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.http.content.staticResources
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -27,6 +29,11 @@ fun Application.matveyServerModule(
     installFreeMarker("templates")
     install(Authentication) {
         register(auth)
+    }
+    install(StatusPages) {
+        exception<AuthException> { call, cause ->
+            call.respond(Unauthorized)
+        }
     }
     val resources = listOf(
         AccountResource(auth, repo),
