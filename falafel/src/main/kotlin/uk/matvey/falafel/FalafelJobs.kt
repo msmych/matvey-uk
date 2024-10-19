@@ -7,9 +7,7 @@ import org.quartz.impl.StdSchedulerFactory
 import uk.matvey.falafel.balance.IncrementBalancesJob
 import uk.matvey.slon.repo.Repo
 
-class FalafelJobs(
-    repo: Repo,
-) {
+class FalafelJobs(repo: Repo) {
 
     val incrementBalancesJob = IncrementBalancesJob(repo)
 

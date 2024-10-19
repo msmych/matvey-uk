@@ -19,19 +19,19 @@
         >
             🎞️ Titles
         </button>
-        <button class="tab <#if activeTab == "tags">active</#if>"
-                hx-get="/falafel/tags"
-                hx-target="#content"
-                hx-push-url="true"
-        >
-            🏷️ Tags
-        </button>
         <button class="tab <#if activeTab == "tmdb">active</#if>"
                 hx-get="/falafel/tmdb"
                 hx-target="#content"
                 hx-push-url="true"
         >
             🗄️ TMDb
+        </button>
+        <button class="tab <#if activeTab == "tags">active</#if>"
+                hx-get="/falafel/tags"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            🏷️ Tags
         </button>
     </div>
     <style>

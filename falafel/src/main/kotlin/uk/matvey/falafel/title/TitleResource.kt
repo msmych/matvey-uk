@@ -4,11 +4,14 @@ import io.ktor.server.auth.principal
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import io.ktor.server.sse.sse
+import io.ktor.sse.ServerSentEvent
+import kotlinx.coroutines.flow.Flow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
-import uk.matvey.falafel.tag.TagFtl
+import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagService
 import uk.matvey.falafel.tag.TagSql.findAllTagsByTitleId
@@ -25,11 +28,15 @@ class TitleResource(
     private val falafelAuth: FalafelAuth,
     private val repo: Repo,
     private val tagService: TagService,
+    private val titleEvents: Flow<Pair<String, String>>,
 ) : Resource {
 
     override fun Route.routing() {
         route("/titles") {
             getTitlesPage()
+            route("/events") {
+                setupTitlesEvents()
+            }
             route("/search") {
                 searchTitles()
             }
@@ -100,8 +107,16 @@ class TitleResource(
                 "/falafel/tags/tags-edit",
                 "account" to account,
                 "titleId" to titleId,
-                "tags" to tags.map { (name, count) -> TagCount(name, count, TagFtl.TAGS_EMOJIS.getValue(name)) },
+                "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
+        }
+    }
+
+    private fun Route.setupTitlesEvents() {
+        sse {
+            titleEvents.collect { (title, tag) ->
+                send(ServerSentEvent("<div>+1 ${TAGS_EMOJIS[tag]} $title</div>"))
+            }
         }
     }
 }

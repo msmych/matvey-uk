@@ -7,10 +7,10 @@ import uk.matvey.falafel.FalafelSql.FALAFEL
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.queryOneOrNull
-import uk.matvey.slon.access.AccessKit.update
 import uk.matvey.slon.query.InsertOneQueryBuilder.Companion.insertOneInto
 import uk.matvey.slon.query.OnConflict.Companion.doNothing
 import uk.matvey.slon.query.ReturningQuery.Companion.returning
+import uk.matvey.slon.query.UpdateQueryBuilder
 import uk.matvey.slon.value.Pg
 import uk.matvey.slon.value.PgInt.Companion.toPgInt
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
@@ -38,11 +38,11 @@ object BalanceSql {
             }.returning { readBalance(it) }).single()
     }
 
-    fun Access.incrementBalances() {
-        update(BALANCES) {
+    fun Access.incrementBalances(): List<Pair<UUID, Int>> {
+        return query(UpdateQueryBuilder.update(BALANCES) {
             set(CURRENT, Pg.plain("$CURRENT + 1"))
             where("$CURRENT < 32")
-        }
+        }.returning { r -> r.uuid(ID) to r.int(CURRENT) })
     }
 
     fun readBalance(reader: RecordReader): Balance {

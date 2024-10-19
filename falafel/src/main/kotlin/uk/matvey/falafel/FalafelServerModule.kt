@@ -4,12 +4,15 @@ import com.typesafe.config.Config
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.call
+import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.header
 import io.ktor.server.request.uri
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.ktor.server.sse.SSE
+import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.falafel.club.ClubResource
 import uk.matvey.falafel.club.ClubService
 import uk.matvey.falafel.tag.TagResource
@@ -28,13 +31,15 @@ fun Application.falafelServerModule(
 ) {
     val clubService = ClubService(repo)
     val tagService = TagService(repo)
+    val titleEvents = MutableSharedFlow<Pair<String, String>>()
     val resources = listOf(
         ClubResource(repo, clubService),
-        TitleResource(falafelAuth, repo, tagService),
-        TagResource(falafelAuth, repo, tagService),
+        TitleResource(falafelAuth, repo, tagService, titleEvents),
+        TagResource(falafelAuth, repo, tagService, titleEvents),
         TmdbResource(falafelAuth, tmdbClient, repo),
     )
     val assets = serverConfig.getString("assets")
+    install(SSE)
     routing {
         route("/falafel") {
             authenticate("jwt") {
@@ -64,7 +69,7 @@ fun Application.falafelServerModule(
                 route("/me") {
                     get {
                         val account = falafelAuth.getAccountBalance(call)
-                        call.respondFtl("/falafel/account/account-page", "account" to account, "loadPage" to null)
+                        call.respondFtl("/falafel/account/account-page", "account" to account)
                     }
                 }
                 resources.forEach { with(it) { routing() } }

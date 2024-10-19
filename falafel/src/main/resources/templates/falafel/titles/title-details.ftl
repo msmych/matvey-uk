@@ -8,5 +8,6 @@
     </#if>
     <div id="tags-${title.id}"
          hx-get="/falafel/titles/${title.id}/tags-edit"
-         hx-trigger="load, every 1m"></div>
+         hx-trigger="load, every 1m"
+    ></div>
 </div>
