@@ -7,7 +7,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
@@ -22,12 +22,13 @@ import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
+import java.util.UUID
 
 class TagResource(
     private val falafelAuth: FalafelAuth,
     private val repo: Repo,
     private val tagService: TagService,
-    private val titleEvents: FlowCollector<Pair<String, String>>,
+    private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
 ) : Resource {
 
     override fun Route.routing() {
@@ -61,7 +62,7 @@ class TagResource(
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
-            titleEvents.emit(title.title to tagName)
+            titlesEvents[title.id]?.emit(tagName)
         }
     }
 }

@@ -10,4 +10,10 @@
          hx-get="/falafel/titles/${title.id}/tags-edit"
          hx-trigger="load, every 1m"
     ></div>
+    <div class="col gap-8"
+         hx-ext="sse"
+         sse-connect="/falafel/titles/${title.id}/events"
+         sse-swap="message"
+         hx-swap="beforeend"
+    ></div>
 </div>

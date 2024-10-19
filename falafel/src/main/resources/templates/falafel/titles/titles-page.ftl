@@ -14,12 +14,6 @@
         If you couldn't find a title your were looking for, try searching with TMDb:
     </div>
     <button hx-get="/falafel/tmdb" hx-target="#content">Search with TMDb</button>
-    <div class="col gap-8"
-         hx-ext="sse"
-         sse-connect="/falafel/titles/events"
-         sse-swap="message"
-         hx-swap="beforeend"
-    ></div>
 </div>
 
 <!-- OOB -->

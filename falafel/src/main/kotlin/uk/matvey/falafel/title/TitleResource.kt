@@ -6,7 +6,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.balance.AccountBalance
@@ -23,20 +23,18 @@ import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
+import java.util.UUID
 
 class TitleResource(
     private val falafelAuth: FalafelAuth,
     private val repo: Repo,
     private val tagService: TagService,
-    private val titleEvents: Flow<Pair<String, String>>,
+    private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
 ) : Resource {
 
     override fun Route.routing() {
         route("/titles") {
             getTitlesPage()
-            route("/events") {
-                setupTitlesEvents()
-            }
             route("/search") {
                 searchTitles()
             }
@@ -47,6 +45,9 @@ class TitleResource(
                 }
                 route("/tags-edit") {
                     getTagsEdit()
+                }
+                route("/events") {
+                    setupTitleEvents()
                 }
             }
             getNewTitleForm()
@@ -112,10 +113,13 @@ class TitleResource(
         }
     }
 
-    private fun Route.setupTitlesEvents() {
+    private fun Route.setupTitleEvents() {
         sse {
-            titleEvents.collect { (title, tag) ->
-                send(ServerSentEvent("<div>+1 ${TAGS_EMOJIS[tag]} $title</div>"))
+            val titleId = call.pathParam("id").toUuid()
+            val events = MutableSharedFlow<String>()
+            titlesEvents.putIfAbsent(titleId, events)
+            events.collect { tagName ->
+                send(ServerSentEvent("<div>+1 ${TAGS_EMOJIS[tagName]}</div>"))
             }
         }
     }

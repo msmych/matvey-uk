@@ -22,6 +22,8 @@ import uk.matvey.falafel.tmdb.TmdbResource
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 fun Application.falafelServerModule(
     serverConfig: Config,
@@ -31,11 +33,11 @@ fun Application.falafelServerModule(
 ) {
     val clubService = ClubService(repo)
     val tagService = TagService(repo)
-    val titleEvents = MutableSharedFlow<Pair<String, String>>()
+    val titlesEvents = ConcurrentHashMap<UUID, MutableSharedFlow<String>>()
     val resources = listOf(
         ClubResource(repo, clubService),
-        TitleResource(falafelAuth, repo, tagService, titleEvents),
-        TagResource(falafelAuth, repo, tagService, titleEvents),
+        TitleResource(falafelAuth, repo, tagService, titlesEvents),
+        TagResource(falafelAuth, repo, tagService, titlesEvents),
         TmdbResource(falafelAuth, tmdbClient, repo),
     )
     val assets = serverConfig.getString("assets")
@@ -56,23 +58,23 @@ fun Application.falafelServerModule(
                     } else {
                         proceed()
                     }
-                }
-                get {
-                    val account = falafelAuth.getAccountBalanceOrNull(call)
-                    call.respondFtl(
-                        "/falafel/index",
-                        "account" to account,
-                        "assets" to assets,
-                        "loadPage" to null,
-                    )
-                }
-                route("/me") {
                     get {
-                        val account = falafelAuth.getAccountBalance(call)
-                        call.respondFtl("/falafel/account/account-page", "account" to account)
+                        val account = falafelAuth.getAccountBalanceOrNull(call)
+                        call.respondFtl(
+                            "/falafel/index",
+                            "account" to account,
+                            "assets" to assets,
+                            "loadPage" to null,
+                        )
                     }
+                    route("/me") {
+                        get {
+                            val account = falafelAuth.getAccountBalance(call)
+                            call.respondFtl("/falafel/account/account-page", "account" to account)
+                        }
+                    }
+                    resources.forEach { with(it) { routing() } }
                 }
-                resources.forEach { with(it) { routing() } }
             }
         }
     }
