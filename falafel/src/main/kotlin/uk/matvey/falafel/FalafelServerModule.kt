@@ -45,8 +45,8 @@ fun Application.falafelServerModule(
     routing {
         route("/falafel") {
             authenticate("jwt") {
-                intercept(ApplicationCallPipeline.Call) {
-                    if (call.request.header("HX-Request") == null) {
+                intercept(ApplicationCallPipeline.Plugins) {
+                    if (call.request.uri.contains("/falafel") && call.request.header("HX-Request") == null) {
                         val account = falafelAuth.getAccountBalanceOrNull(call)
                         call.respondFtl(
                             "/falafel/index",

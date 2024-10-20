@@ -16,6 +16,9 @@
     <div id="menu" class="row split">
         <div class="row gap-8">
             <a class="tab click active" href="/">Home</a>
+            <#if account?has_content>
+                <a class="tab click" href="/falafel">Falafel</a>
+            </#if>
         </div>
         <div class="row gap-8">
             <#if account?has_content>

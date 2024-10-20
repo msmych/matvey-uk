@@ -8,6 +8,7 @@
              class="row gap-8"
              hx-get="/falafel/titles/${title.id}/tags-view"
              hx-trigger="load, every 1m"
+             hx-target="this"
         >
         </div>
     </div>
