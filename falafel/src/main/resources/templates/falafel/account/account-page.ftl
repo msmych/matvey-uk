@@ -6,4 +6,4 @@
 </div>
 
 <!-- OOB -->
-<@menu.menu account=account activeTab="account" oob=true />
+<@menu.menuTitles account=account activeTab="account"/>

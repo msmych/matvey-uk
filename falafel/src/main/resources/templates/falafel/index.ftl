@@ -16,7 +16,43 @@
 </head>
 <body>
 <div class="row gap-16">
-    <@menu.menu account=account!/>
+    <div id="menu" class="col menu gap-16">
+        <#if account?has_content>
+            <button class="tab click"
+                    hx-get="/falafel/me"
+                    hx-target="#content"
+                    hx-push-url="true"
+            >
+                <span id="menu-tab-account">${account.name}</span>
+                <span hx-ext="sse">🍿${account.currentBalance}</span>
+            </button>
+        <#else>
+            <a class="tab click" href="/login">
+                <span id="menu-tab-account">Login</span>
+            </a>
+        </#if>
+        <button class="tab"
+                hx-get="/falafel/titles"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            <span id="menu-tab-titles" style="font-weight: bold">🎞️ Titles</span>
+        </button>
+        <button class="tab"
+                hx-get="/falafel/tmdb"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            <span id="menu-tab-tmdb">🗄️ TMDb</span>
+        </button>
+        <button class="tab"
+                hx-get="/falafel/tags"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            <span id="menu-tab-tags">🏷️ Tags</span>
+        </button>
+    </div>
     <div id="content">
         <#if loadPage?has_content>
             <div hx-get="${loadPage}" hx-trigger="load" hx-swap="outerHTML"></div>
@@ -55,6 +91,14 @@
         font-size: 1em;
         border: lightgray 2px solid;
         border-radius: 4px;
+    }
+
+    .menu {
+        flex-basis: 10em;
+    }
+
+    .tab.active {
+        font-weight: bold;
     }
 
     button:hover, .click:hover {

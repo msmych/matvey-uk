@@ -23,4 +23,4 @@
 </div>
 
 <!-- OOB -->
-<@menu.menu account=account activeTab="tags" oob=true/>
+<@menu.menuTitles account=account activeTab="tags"/>

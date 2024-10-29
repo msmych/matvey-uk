@@ -15,4 +15,4 @@
     <div id="tmdb-movies" class="col gap-16"></div>
 </div>
 
-<@menu.menu account=account activeTab="tmdb" oob=true />
+<@menu.menuTitles account=account activeTab="tmdb"/>

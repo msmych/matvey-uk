@@ -77,9 +77,10 @@ class TitleResource(
 
     private fun Route.getTitle() {
         get {
+            val account = falafelAuth.getAccountBalance(call)
             val titleId = call.pathParam("id").toUuid()
             val title = repo.access { a -> a.getTitle(titleId) }
-            call.respondFtl("/falafel/titles/title-details", "title" to title)
+            call.respondFtl("/falafel/titles/title-details", "title" to title, "account" to account)
         }
     }
 

@@ -45,14 +45,15 @@ fun Application.falafelServerModule(
     routing {
         route("/falafel") {
             authenticate("jwt") {
-                intercept(ApplicationCallPipeline.Plugins) {
+                intercept(ApplicationCallPipeline.Call) {
                     if (call.request.uri.contains("/falafel") && call.request.header("HX-Request") == null) {
                         val account = falafelAuth.getAccountBalanceOrNull(call)
                         call.respondFtl(
                             "/falafel/index",
                             "account" to account,
                             "assets" to assets,
-                            "loadPage" to call.request.uri,
+                            "loadPage" to (call.request.uri.takeUnless { it.endsWith("/falafel") }
+                                ?: "/falafel/titles"),
                         )
                         finish()
                     } else {
@@ -64,7 +65,7 @@ fun Application.falafelServerModule(
                             "/falafel/index",
                             "account" to account,
                             "assets" to assets,
-                            "loadPage" to null,
+                            "loadPage" to "/falafel/titles",
                         )
                     }
                     route("/me") {

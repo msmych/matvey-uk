@@ -1,3 +1,5 @@
+<#import "../components/menu.ftl" as menu>
+
 <div class="col gap-16">
     <div class="t1">${title.title}</div>
     <#if title.releaseYear?has_content>
@@ -17,3 +19,5 @@
          hx-swap="beforeend"
     ></div>
 </div>
+
+<@menu.menuTitles account=account activeTab="titles"/>

@@ -8,6 +8,3 @@
         ${tag.emoji} <#if tag.count gt 0>${tag.count}</#if>
     </button>
 </#list>
-
-<!-- OOB -->
-<@menu.menu account=account oob=true/>
