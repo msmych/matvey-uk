@@ -1,15 +1,20 @@
 package uk.matvey.falafel
 
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.impl.StdSchedulerFactory
 import uk.matvey.falafel.balance.IncrementBalancesJob
 import uk.matvey.slon.repo.Repo
+import java.util.UUID
 
-class FalafelJobs(repo: Repo) {
+class FalafelJobs(
+    repo: Repo,
+    balanceEvents: MutableMap<UUID, MutableSharedFlow<Int>>,
+) {
 
-    val incrementBalancesJob = IncrementBalancesJob(repo)
+    val incrementBalancesJob = IncrementBalancesJob(repo, balanceEvents)
 
     val jobs = listOf(incrementBalancesJob)
         .associateBy { job -> job::class.java }
@@ -21,7 +26,7 @@ class FalafelJobs(repo: Repo) {
     private val scheduler = StdSchedulerFactory.getDefaultScheduler()
 
     init {
-        scheduler.setJobFactory { bundle, scheduler -> jobs[bundle.jobDetail.jobClass] }
+        scheduler.setJobFactory { bundle, _ -> jobs[bundle.jobDetail.jobClass] }
         jobsTriggers.forEach { (job, trigger) ->
             scheduler.scheduleJob(
                 newJob(job::class.java)

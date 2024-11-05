@@ -42,7 +42,7 @@ object BalanceSql {
         return query(UpdateQueryBuilder.update(BALANCES) {
             set(CURRENT, Pg.plain("$CURRENT + 1"))
             where("$CURRENT < 32")
-        }.returning { r -> r.uuid(ID) to r.int(CURRENT) })
+        }.returning { r -> r.uuid(ACCOUNT_ID) to r.int(CURRENT) })
     }
 
     fun readBalance(reader: RecordReader): Balance {

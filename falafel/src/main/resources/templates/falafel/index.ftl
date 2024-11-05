@@ -24,7 +24,13 @@
                     hx-push-url="true"
             >
                 <span id="menu-tab-account">${account.name}</span>
-                <span hx-ext="sse">🍿${account.currentBalance}</span>
+                <span>🍿</span>
+                <span hx-ext="sse"
+                      sse-connect="/falafel/me/events"
+                      sse-swap="message"
+                      hx-target="this"
+                      hx-swap="innerHTML"
+                >${account.currentBalance}</span>
             </button>
         <#else>
             <a class="tab click" href="/login">

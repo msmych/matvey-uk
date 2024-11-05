@@ -2,6 +2,7 @@ package uk.matvey.app
 
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import uk.matvey.app.config.AppConfig
@@ -11,6 +12,8 @@ import uk.matvey.slon.flyway.FlywayKit.flywayMigrate
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
 import uk.matvey.utka.jwt.AuthJwt
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 private val log = KotlinLogging.logger("Matvey")
 
@@ -49,8 +52,9 @@ fun main(args: Array<String>) {
             profile = profile
         ).start()
     }
+    val balanceEvents = ConcurrentHashMap<UUID, MutableSharedFlow<Int>>()
     log.info { "Bot started" }
-    FalafelJobs(repo).start()
+    FalafelJobs(repo, balanceEvents).start()
     log.info { "Jobs started" }
     log.info { "Launching server" }
     if (!profile.isProd()) {
@@ -69,5 +73,6 @@ fun main(args: Array<String>) {
         auth = auth,
         repo = repo,
         tmdbClient = tmdbClient,
+        balanceEvents = balanceEvents,
     )
 }
