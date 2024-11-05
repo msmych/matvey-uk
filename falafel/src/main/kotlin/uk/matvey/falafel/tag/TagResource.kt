@@ -2,6 +2,7 @@ package uk.matvey.falafel.tag
 
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.auth.principal
+import io.ktor.server.request.header
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -10,6 +11,7 @@ import io.ktor.server.routing.route
 import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
@@ -26,6 +28,7 @@ import java.util.UUID
 
 class TagResource(
     private val falafelAuth: FalafelAuth,
+    private val falafelFtl: FalafelFtl,
     private val repo: Repo,
     private val tagService: TagService,
     private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
@@ -42,6 +45,9 @@ class TagResource(
 
     private fun Route.getTagsPage() {
         get {
+            if (call.request.header("HX-Request") != "true") {
+                return@get falafelFtl.respondIndex(call, "/falafel/tags")
+            }
             val account = falafelAuth.getAccountBalance(call)
             call.respondFtl("/falafel/tags/tags-page", "account" to account)
         }

@@ -1,10 +1,12 @@
 package uk.matvey.falafel.tmdb
 
+import io.ktor.server.request.header
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.title.TitleSql.addTitle
 import uk.matvey.falafel.title.TitleSql.findAllByTmbdIds
 import uk.matvey.falafel.tmdb.TmdbFtl.TmdbMovie
@@ -18,6 +20,7 @@ import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 class TmdbResource(
     private val falafelAuth: FalafelAuth,
+    private val falafelFtl: FalafelFtl,
     private val tmdbClient: TmdbClient,
     private val repo: Repo,
 ) : Resource {
@@ -34,6 +37,9 @@ class TmdbResource(
 
     private fun Route.getTmdbPage() {
         get {
+            if (call.request.header("HX-Request") != "true") {
+                return@get falafelFtl.respondIndex(call, "/falafel/tmdb")
+            }
             val account = falafelAuth.getAccountBalance(call)
             call.respondFtl("/falafel/tmdb/tmdb-page", "account" to account)
         }

@@ -1,6 +1,7 @@
 package uk.matvey.falafel.title
 
 import io.ktor.server.auth.principal
+import io.ktor.server.request.header
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
@@ -9,6 +10,7 @@ import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
@@ -27,6 +29,7 @@ import java.util.UUID
 
 class TitleResource(
     private val falafelAuth: FalafelAuth,
+    private val falafelFtl: FalafelFtl,
     private val repo: Repo,
     private val tagService: TagService,
     private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
@@ -56,6 +59,9 @@ class TitleResource(
 
     private fun Route.getTitlesPage() {
         get {
+            if (call.request.header("HX-Request") != "true") {
+                return@get falafelFtl.respondIndex(call, "/falafel/titles")
+            }
             val accountBalance = falafelAuth.getAccountBalance(call)
             call.respondFtl("/falafel/titles/titles-page", "account" to accountBalance)
         }
@@ -79,6 +85,9 @@ class TitleResource(
         get {
             val account = falafelAuth.getAccountBalance(call)
             val titleId = call.pathParam("id").toUuid()
+            if (call.request.header("HX-Request") != "true") {
+                return@get falafelFtl.respondIndex(call, "/falafel/titles/$titleId")
+            }
             val title = repo.access { a -> a.getTitle(titleId) }
             call.respondFtl("/falafel/titles/title-details", "title" to title, "account" to account)
         }

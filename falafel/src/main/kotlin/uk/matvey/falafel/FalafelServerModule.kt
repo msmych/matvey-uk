@@ -4,6 +4,7 @@ import com.typesafe.config.Config
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.header
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -36,28 +37,25 @@ fun Application.falafelServerModule(
     val clubService = ClubService(repo)
     val tagService = TagService(repo)
     val titlesEvents = ConcurrentHashMap<UUID, MutableSharedFlow<String>>()
+    val ftl = FalafelFtl(serverConfig, falafelAuth)
     val resources = listOf(
         ClubResource(repo, clubService),
-        TitleResource(falafelAuth, repo, tagService, titlesEvents),
-        TagResource(falafelAuth, repo, tagService, titlesEvents),
-        TmdbResource(falafelAuth, tmdbClient, repo),
+        TitleResource(falafelAuth, ftl, repo, tagService, titlesEvents),
+        TagResource(falafelAuth, ftl, repo, tagService, titlesEvents),
+        TmdbResource(falafelAuth, ftl, tmdbClient, repo),
     )
-    val assets = serverConfig.getString("assets")
     install(SSE)
     routing {
         route("/falafel") {
             authenticate("jwt") {
                 get {
-                    val account = falafelAuth.getAccountBalanceOrNull(call)
-                    call.respondFtl(
-                        "/falafel/index",
-                        "account" to account,
-                        "assets" to assets,
-                        "loadPage" to "/falafel/titles",
-                    )
+                    ftl.respondIndex(call, "/falafel/titles")
                 }
                 route("/me") {
                     get {
+                        if (call.request.header("HX-Request") != "true") {
+                            return@get ftl.respondIndex(call, "/falafel/me")
+                        }
                         val account = falafelAuth.getAccountBalance(call)
                         call.respondFtl("/falafel/account/account-page", "account" to account)
                     }
