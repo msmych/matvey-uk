@@ -61,7 +61,7 @@
     </div>
     <div id="content">
         <#if loadPage?has_content>
-            <div hx-get="${loadPage}" hx-trigger="load" hx-swap="outerHTML"></div>
+            <div hx-get="${loadPage}" hx-trigger="load delay:100ms" hx-swap="outerHTML"></div>
         </#if>
     </div>
 </div>

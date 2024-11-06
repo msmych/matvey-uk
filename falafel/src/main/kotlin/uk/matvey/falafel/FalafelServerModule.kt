@@ -41,7 +41,7 @@ fun Application.falafelServerModule(
     val resources = listOf(
         ClubResource(repo, clubService),
         TitleResource(falafelAuth, ftl, repo, tagService, titlesEvents),
-        TagResource(falafelAuth, ftl, repo, tagService, titlesEvents),
+        TagResource(falafelAuth, ftl, repo, tagService, titlesEvents, balanceEvents),
         TmdbResource(falafelAuth, ftl, tmdbClient, repo),
     )
     install(SSE)

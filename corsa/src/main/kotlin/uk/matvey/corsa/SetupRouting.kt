@@ -2,7 +2,6 @@ package uk.matvey.corsa
 
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.http.content.staticResources

@@ -32,6 +32,7 @@ class TagResource(
     private val repo: Repo,
     private val tagService: TagService,
     private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
+    private val balanceEvents: MutableMap<UUID, MutableSharedFlow<Int>>,
 ) : Resource {
 
     override fun Route.routing() {
@@ -69,6 +70,7 @@ class TagResource(
                 "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
             titlesEvents[title.id]?.emit(tagName)
+            balanceEvents[account.accountId]?.emit(account.currentBalance)
         }
     }
 }
