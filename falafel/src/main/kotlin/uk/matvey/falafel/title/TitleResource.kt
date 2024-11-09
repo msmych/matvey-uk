@@ -8,6 +8,11 @@ import io.ktor.server.routing.route
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.html.body
+import kotlinx.html.button
+import kotlinx.html.div
+import kotlinx.html.html
+import kotlinx.html.stream.createHTML
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
@@ -89,7 +94,13 @@ class TitleResource(
                 return@get falafelFtl.respondIndex(call, "/falafel/titles/$titleId")
             }
             val title = repo.access { a -> a.getTitle(titleId) }
-            call.respondFtl("/falafel/titles/title-details", "title" to title, "account" to account)
+            val tags = tagService.getTagsByTitleId(titleId)
+            call.respondFtl(
+                "/falafel/titles/title-details",
+                "title" to title,
+                "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
+                "account" to account
+            )
         }
     }
 
@@ -127,9 +138,45 @@ class TitleResource(
         sse {
             val titleId = call.pathParam("id").toUuid()
             val events = MutableSharedFlow<String>()
-            titlesEvents.putIfAbsent(titleId, events)
-            events.collect { tagName ->
-                send(ServerSentEvent("<div>+1 ${TAGS_EMOJIS[tagName]}</div>"))
+            titlesEvents[titleId] = events
+            events.collect {
+                val title = repo.access { a -> a.getTitle(titleId) }
+                val tags = tagService.getTagsByTitleId(titleId)
+                val account = falafelAuth.getAccountBalance(call)
+                send(
+                    ServerSentEvent(
+                        createHTML().html {
+                            body {
+                                div(classes = "t1") {
+                                    +title.title
+                                }
+                                title.releaseYear?.let {
+                                    div(classes = "t3") {
+                                        +"Year: $it"
+                                    }
+                                }
+                                title.directorName?.let {
+                                    div(classes = "t3") {
+                                        +"Director: $it"
+                                    }
+                                }
+                                div {
+                                    tags.forEach { (tagName, count) ->
+                                        button {
+                                            attributes["hx-post"] = "/falafel/tags/$tagName?titleId=${title.id}"
+                                            attributes["hx-swap"] = "none"
+                                            disabled = account.currentBalance <= 0
+                                            +"${TAGS_EMOJIS[tagName]}"
+                                            if (count > 0) {
+                                                +"$count"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
+                )
             }
         }
     }

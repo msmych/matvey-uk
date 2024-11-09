@@ -1,5 +1,3 @@
-<#import "../components/menu.ftl" as menu>
-
 <#list tags as tag>
     <button hx-post="/falafel/tags/${tag.name}?titleId=${titleId}"
             hx-target="#tags-${titleId}"
