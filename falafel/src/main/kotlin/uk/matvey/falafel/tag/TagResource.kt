@@ -17,7 +17,6 @@ import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagSql.addTagToTitle
-import uk.matvey.falafel.title.TitleSql.getTitle
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.Resource
@@ -62,14 +61,13 @@ class TagResource(
             repo.access { a -> a.addTagToTitle(principal.id, tagName, titleId) }
             val tags = tagService.getTagsByTitleId(titleId)
             val account = AccountBalance.from(principal, repo.access { a -> a.ensureBalance(principal.id) })
-            val title = repo.access { a -> a.getTitle(titleId) }
             call.respondFtl(
                 "/falafel/tags/tags-edit",
                 "account" to account,
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
-            titlesEvents[title.id]?.emit(tagName)
+            titlesEvents[titleId]?.emit(tagName)
             balanceEvents[account.accountId]?.emit(account.currentBalance)
         }
     }

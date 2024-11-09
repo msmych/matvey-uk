@@ -33,7 +33,6 @@ object TagSql {
                 from $TAGS
                 where $TITLE_ID = ?
                 group by $NAME
-                order by count desc
             """.trimIndent(),
             listOf(titleId.toPgUuid())
         ) {
