@@ -55,7 +55,8 @@ class TmdbResource(
                     title = details.title,
                     directorName = credits.crew.find { item -> item.job == "Director" }?.name,
                     year = details.releaseDate?.toLocalDate()?.year,
-                    tmdbId = tmdbId
+                    tmdbId = tmdbId,
+                    tmdbPosterPath = details.posterPath,
                 )
             }
             call.respondFtl(
@@ -63,7 +64,8 @@ class TmdbResource(
                     id = details.id.toString(),
                     title = details.title,
                     releaseYear = details.releaseDate?.toLocalDate()?.year?.toString(),
-                    titleId = title.id
+                    titleId = title.id,
+                    posterPath = details.posterPath,
                 )
             )
         }
@@ -81,8 +83,9 @@ class TmdbResource(
                     TmdbMovie(
                         id = it.id.toString(),
                         title = it.title,
-                        releaseYear = it.releaseDate.takeUnless { it.isBlank() }?.toLocalDate()?.year?.toString(),
+                        releaseYear = it.releaseDate.takeUnless { d -> d.isBlank() }?.toLocalDate()?.year?.toString(),
                         titleId = savedTitles[it.id]?.id,
+                        posterPath = it.posterPath,
                     )
                 },
             )

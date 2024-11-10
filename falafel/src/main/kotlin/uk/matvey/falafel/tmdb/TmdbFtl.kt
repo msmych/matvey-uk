@@ -9,5 +9,6 @@ object TmdbFtl {
         val title: String,
         val releaseYear: String?,
         val titleId: UUID?,
+        val posterPath: String?,
     )
 }

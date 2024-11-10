@@ -21,5 +21,7 @@ data class SearchMoviesResponse(
         val originalTitle: String,
         @SerialName("release_date")
         val releaseDate: String,
+        @SerialName("poster_path")
+        val posterPath: String?,
     )
 }

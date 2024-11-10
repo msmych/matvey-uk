@@ -35,7 +35,13 @@ object TitleSql {
         return queryOne("select * from $TITLES where $ID = ?", listOf(id.toPgUuid()), ::readTitle)
     }
 
-    fun Access.addTitle(title: String, directorName: String?, year: Int?, tmdbId: Int): Title {
+    fun Access.addTitle(
+        title: String,
+        directorName: String?,
+        year: Int?,
+        tmdbId: Int,
+        tmdbPosterPath: String?
+    ): Title {
         return query(
             insertOneInto(TITLES)
                 .set(STATE, ACTIVE)
@@ -43,7 +49,7 @@ object TitleSql {
                 .set(DIRECTOR_NAME, directorName)
                 .set(RELEASE_YEAR, year)
                 .set(UPDATED_AT, Pg.now())
-                .set(REFS, jsonObjectEncode(Title.Refs(tmdbId)))
+                .set(REFS, jsonObjectEncode(Title.Refs(tmdbId, tmdbPosterPath)))
                 .build()
                 .returning(::readTitle)
         ).single()

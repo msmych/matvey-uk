@@ -24,5 +24,6 @@ data class Title(
     @Serializable
     data class Refs(
         val tmdb: Int,
+        val tmdbPosterPath: String? = null,
     )
 }

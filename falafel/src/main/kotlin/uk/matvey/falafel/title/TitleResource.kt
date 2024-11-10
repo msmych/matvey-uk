@@ -12,6 +12,7 @@ import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.div
 import kotlinx.html.html
+import kotlinx.html.img
 import kotlinx.html.stream.createHTML
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
@@ -147,28 +148,37 @@ class TitleResource(
                     ServerSentEvent(
                         createHTML().html {
                             body {
-                                div(classes = "t1") {
-                                    +title.title
-                                }
-                                title.releaseYear?.let {
-                                    div(classes = "t3") {
-                                        +"Year: $it"
+                                title.refs.tmdbPosterPath?.let {
+                                    img {
+                                        src = "https://image.tmdb.org/t/p/w440_and_h660_face$it"
+                                        alt = "Poster"
+                                        height = "256"
                                     }
                                 }
-                                title.directorName?.let {
-                                    div(classes = "t3") {
-                                        +"Director: $it"
+                                div(classes = "col gap-16") {
+                                    div(classes = "t1") {
+                                        +title.title
                                     }
-                                }
-                                div {
-                                    tags.forEach { (tagName, count) ->
-                                        button {
-                                            attributes["hx-post"] = "/falafel/tags/$tagName?titleId=${title.id}"
-                                            attributes["hx-swap"] = "none"
-                                            disabled = account.currentBalance <= 0
-                                            +"${TAGS_EMOJIS[tagName]}"
-                                            if (count > 0) {
-                                                +"$count"
+                                    title.releaseYear?.let {
+                                        div(classes = "t3") {
+                                            +"Year: $it"
+                                        }
+                                    }
+                                    title.directorName?.let {
+                                        div(classes = "t3") {
+                                            +"Director: $it"
+                                        }
+                                    }
+                                    div {
+                                        tags.forEach { (tagName, count) ->
+                                            button {
+                                                attributes["hx-post"] = "/falafel/tags/$tagName?titleId=${title.id}"
+                                                attributes["hx-swap"] = "none"
+                                                disabled = account.currentBalance <= 0
+                                                +"${TAGS_EMOJIS[tagName]}"
+                                                if (count > 0) {
+                                                    +"$count"
+                                                }
                                             }
                                         }
                                     }
