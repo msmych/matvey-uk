@@ -8,30 +8,30 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
+import uk.matvey.falafel.balance.BalanceEvents
 import uk.matvey.falafel.balance.BalanceSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagSql.addTagToTitle
+import uk.matvey.falafel.title.TitleEvents
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
-import java.util.UUID
 
 class TagResource(
     private val falafelAuth: FalafelAuth,
     private val falafelFtl: FalafelFtl,
     private val repo: Repo,
     private val tagService: TagService,
-    private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
-    private val balanceEvents: MutableMap<UUID, MutableSharedFlow<Int>>,
+    private val titleEvents: TitleEvents,
+    private val balanceEvents: BalanceEvents,
 ) : Resource {
 
     override fun Route.routing() {
@@ -67,8 +67,8 @@ class TagResource(
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
-            titlesEvents[titleId]?.emit(tagName)
-            balanceEvents[account.accountId]?.emit(account.currentBalance)
+            titleEvents.push(titleId)
+            balanceEvents.push(account.accountId, account.currentBalance)
         }
     }
 }

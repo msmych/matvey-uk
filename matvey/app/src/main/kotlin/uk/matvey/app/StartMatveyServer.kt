@@ -6,16 +6,15 @@ import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
-import kotlinx.coroutines.flow.MutableSharedFlow
 import uk.matvey.app.config.AppConfig.ServerConfig
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.balance.BalanceEvents
 import uk.matvey.falafel.falafelServerModule
 import uk.matvey.slon.repo.Repo
 import uk.matvey.tmdb.TmdbClient
 import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
-import java.util.UUID
 
 fun startMatveyServer(
     serverConfig: ServerConfig,
@@ -24,7 +23,7 @@ fun startMatveyServer(
     auth: MatveyAuth,
     repo: Repo,
     tmdbClient: TmdbClient,
-    balanceEvents: MutableMap<UUID, MutableSharedFlow<Int>>,
+    balanceEvents: BalanceEvents,
 ) {
     embeddedServer(
         factory = Netty,

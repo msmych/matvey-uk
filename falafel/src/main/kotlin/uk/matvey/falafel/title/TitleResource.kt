@@ -7,7 +7,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.div
@@ -31,14 +30,13 @@ import uk.matvey.utka.Resource
 import uk.matvey.utka.ktor.KtorKit.pathParam
 import uk.matvey.utka.ktor.KtorKit.queryParam
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
-import java.util.UUID
 
 class TitleResource(
     private val falafelAuth: FalafelAuth,
     private val falafelFtl: FalafelFtl,
     private val repo: Repo,
     private val tagService: TagService,
-    private val titlesEvents: MutableMap<UUID, MutableSharedFlow<String>>,
+    private val titleEvents: TitleEvents,
 ) : Resource {
 
     override fun Route.routing() {
@@ -138,9 +136,9 @@ class TitleResource(
     private fun Route.setupTitleEvents() {
         sse {
             val titleId = call.pathParam("id").toUuid()
-            val events = MutableSharedFlow<String>()
-            titlesEvents[titleId] = events
-            events.collect {
+            val location = call.request.local.remoteHost + ":" + call.request.local.remotePort
+            titleEvents.register(titleId, location)
+            titleEvents.onEvent(titleId, location) {
                 val title = repo.access { a -> a.getTitle(titleId) }
                 val tags = tagService.getTagsByTitleId(titleId)
                 val account = falafelAuth.getAccountBalance(call)
