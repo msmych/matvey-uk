@@ -17,7 +17,7 @@ import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
-import uk.matvey.falafel.balance.BalanceSql.ensureBalance
+import uk.matvey.falafel.balance.AccountSql.ensureBalance
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagService

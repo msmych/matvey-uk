@@ -3,7 +3,7 @@ package uk.matvey.falafel.balance
 import kotlinx.coroutines.runBlocking
 import org.quartz.Job
 import org.quartz.JobExecutionContext
-import uk.matvey.falafel.balance.BalanceSql.incrementBalances
+import uk.matvey.falafel.balance.AccountSql.incrementBalances
 import uk.matvey.slon.repo.Repo
 
 class IncrementBalancesJob(

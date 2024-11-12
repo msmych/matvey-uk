@@ -6,7 +6,7 @@ import io.ktor.server.auth.principal
 import uk.matvey.app.AuthException
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.balance.AccountBalance
-import uk.matvey.falafel.balance.BalanceSql.ensureBalance
+import uk.matvey.falafel.balance.AccountSql.ensureBalance
 import uk.matvey.slon.repo.Repo
 
 class FalafelAuth(

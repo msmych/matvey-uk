@@ -1,8 +1,9 @@
 package uk.matvey.falafel.tag
 
 import mu.KotlinLogging
+import uk.matvey.app.MatveySql.ID
 import uk.matvey.falafel.FalafelSql.FALAFEL
-import uk.matvey.falafel.balance.BalanceSql
+import uk.matvey.falafel.balance.AccountSql
 import uk.matvey.slon.RecordReader
 import uk.matvey.slon.access.Access
 import uk.matvey.slon.access.AccessKit.insertOneInto
@@ -23,7 +24,7 @@ object TagSql {
 
     const val NAME = "name"
     const val TITLE_ID = "title_id"
-    const val BALANCE_ID = "balance_id"
+    const val ACCOUNT_ID = "account_id"
     const val CREATED_AT = "created_at"
 
     fun Repo.findAllTagsByTitleId(titleId: UUID): List<Pair<String, Int>> {
@@ -41,14 +42,14 @@ object TagSql {
     }
 
     fun Access.addTagToTitle(accountId: UUID, tag: String, titleId: UUID) = try {
-        updateSingle(update(BalanceSql.BALANCES) {
-            set(BalanceSql.CURRENT, Pg.plain("${BalanceSql.CURRENT} - 1"))
-            where("${BalanceSql.ACCOUNT_ID} = ? and ${BalanceSql.CURRENT} > 0", accountId.toPgUuid())
+        updateSingle(update(AccountSql.ACCOUNTS) {
+            set(AccountSql.BALANCE, Pg.plain("${AccountSql.BALANCE} - 1"))
+            where("$ID = ? and ${AccountSql.BALANCE} > 0", accountId.toPgUuid())
         })
         insertOneInto(TAGS) {
             set(NAME, tag)
             set(TITLE_ID, titleId)
-            set(BALANCE_ID, accountId)
+            set(ACCOUNT_ID, accountId)
         }
     } catch (e: UpdateCountMismatchException) {
         log.warn(e) { "Failed to add tag $tag for title $titleId" }
@@ -58,7 +59,7 @@ object TagSql {
         return Tag(
             name = reader.string(NAME),
             titleId = reader.uuid(TITLE_ID),
-            balanceId = reader.uuid(BALANCE_ID),
+            balanceId = reader.uuid(ACCOUNT_ID),
             createdAt = reader.instant(CREATED_AT),
         )
     }

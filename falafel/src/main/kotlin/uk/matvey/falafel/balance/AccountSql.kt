@@ -16,40 +16,39 @@ import uk.matvey.slon.value.PgInt.Companion.toPgInt
 import uk.matvey.slon.value.PgUuid.Companion.toPgUuid
 import java.util.UUID
 
-object BalanceSql {
+object AccountSql {
 
-    const val BALANCES = "$FALAFEL.balances"
+    const val ACCOUNTS = "$FALAFEL.accounts"
 
-    const val ACCOUNT_ID = "account_id"
-    const val CURRENT = "current"
+    const val BALANCE = "balance"
 
-    fun Access.ensureBalance(accountId: UUID): Balance {
+    fun Access.ensureBalance(id: UUID): Balance {
         val existing = queryOneOrNull(
-            "select * from $BALANCES where $ACCOUNT_ID = ?",
-            listOf(accountId.toPgUuid()),
+            "select * from $ACCOUNTS where $ID = ?",
+            listOf(id.toPgUuid()),
             ::readBalance
         )
         return existing
-            ?: query(insertOneInto(BALANCES) {
-                set(ACCOUNT_ID, accountId)
-                set(CURRENT, 32.toPgInt())
+            ?: query(insertOneInto(ACCOUNTS) {
+                set(ID, id)
+                set(BALANCE, 32.toPgInt())
                 set(UPDATED_AT, Pg.now())
                 onConflict(doNothing())
             }.returning { readBalance(it) }).single()
     }
 
     fun Access.incrementBalances(): List<Pair<UUID, Int>> {
-        return query(UpdateQueryBuilder.update(BALANCES) {
-            set(CURRENT, Pg.plain("$CURRENT + 1"))
-            where("$CURRENT < 32")
-        }.returning { r -> r.uuid(ACCOUNT_ID) to r.int(CURRENT) })
+        return query(UpdateQueryBuilder.update(ACCOUNTS) {
+            set(BALANCE, Pg.plain("$BALANCE + 1"))
+            where("$BALANCE < 32")
+        }.returning { r -> r.uuid(ID) to r.int(BALANCE) })
     }
 
     fun readBalance(reader: RecordReader): Balance {
         return Balance(
             id = reader.uuid(ID),
-            accountId = reader.uuid(ACCOUNT_ID),
-            current = reader.int(CURRENT),
+            accountId = reader.uuid(ID),
+            current = reader.int(BALANCE),
             createdAt = reader.instant(CREATED_AT),
             updatedAt = reader.instant(UPDATED_AT),
         )
