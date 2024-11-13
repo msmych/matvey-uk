@@ -22,7 +22,7 @@ object AccountSql {
 
     const val BALANCE = "balance"
 
-    fun Access.ensureBalance(id: UUID): Balance {
+    fun Access.ensureAccount(id: UUID): Balance {
         val existing = queryOneOrNull(
             "select * from $ACCOUNTS where $ID = ?",
             listOf(id.toPgUuid()),

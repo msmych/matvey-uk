@@ -1,9 +1,11 @@
 package uk.matvey.falafel.title
 
 import io.ktor.server.auth.principal
+import io.ktor.server.html.respondHtml
 import io.ktor.server.request.header
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import io.ktor.server.routing.patch
 import io.ktor.server.routing.route
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
@@ -11,17 +13,23 @@ import kotlinx.html.body
 import kotlinx.html.button
 import kotlinx.html.div
 import kotlinx.html.html
-import kotlinx.html.img
 import kotlinx.html.stream.createHTML
 import uk.matvey.app.account.AccountPrincipal
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
-import uk.matvey.falafel.balance.AccountSql.ensureBalance
+import uk.matvey.falafel.balance.AccountSql.ensureAccount
+import uk.matvey.falafel.club.ClubTitleSql.ensureClubTitle
+import uk.matvey.falafel.club.ClubTitleSql.toggleSavedTitle
+import uk.matvey.falafel.club.ClubTitleSql.toggleWatchedTitle
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagService
 import uk.matvey.falafel.tag.TagSql.findAllTagsByTitleId
+import uk.matvey.falafel.title.TitleHtml.titleDetails
+import uk.matvey.falafel.title.TitleHtml.titlePoster
+import uk.matvey.falafel.title.TitleHtml.titleSaved
+import uk.matvey.falafel.title.TitleHtml.titleWatched
 import uk.matvey.falafel.title.TitleSql.getTitle
 import uk.matvey.falafel.title.TitleSql.searchActiveTitles
 import uk.matvey.kit.string.StringKit.toUuid
@@ -52,6 +60,12 @@ class TitleResource(
                 }
                 route("/tags-edit") {
                     getTagsEdit()
+                }
+                route("/watched") {
+                    toggleWatched()
+                }
+                route("/saved") {
+                    toggleSaved()
                 }
                 route("/events") {
                     setupTitleEvents()
@@ -93,13 +107,16 @@ class TitleResource(
                 return@get falafelFtl.respondIndex(call, "/falafel/titles/$titleId")
             }
             val title = repo.access { a -> a.getTitle(titleId) }
+            val clubTitle = repo.access { a -> a.ensureClubTitle(account.accountId, title.id) }
             val tags = tagService.getTagsByTitleId(titleId)
-            call.respondFtl(
-                "/falafel/titles/title-details",
-                "title" to title,
-                "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
-                "account" to account
-            )
+            call.respondHtml {
+                titleDetails(
+                    title,
+                    clubTitle,
+                    tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
+                    account,
+                )
+            }
         }
     }
 
@@ -119,7 +136,7 @@ class TitleResource(
     private fun Route.getTagsEdit() {
         get {
             val account = call.principal<AccountPrincipal>()?.let {
-                val balance = repo.access { a -> a.ensureBalance(it.id) }
+                val balance = repo.access { a -> a.ensureAccount(it.id) }
                 AccountBalance.from(it, balance)
             }
             val titleId = call.pathParam("id").toUuid()
@@ -130,6 +147,32 @@ class TitleResource(
                 "titleId" to titleId,
                 "tags" to tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
             )
+        }
+    }
+
+    private fun Route.toggleWatched() {
+        patch {
+            val account = falafelAuth.getAccountBalance(call)
+            val titleId = call.pathParam("id").toUuid()
+            val clubTitle = repo.access { a -> a.toggleWatchedTitle(account.accountId, titleId) }
+            call.respondHtml {
+                body {
+                    titleWatched(titleId, clubTitle.watched)
+                }
+            }
+        }
+    }
+
+    private fun Route.toggleSaved() {
+        patch {
+            val account = falafelAuth.getAccountBalance(call)
+            val titleId = call.pathParam("id").toUuid()
+            val clubTitle = repo.access { a -> a.toggleSavedTitle(account.accountId, titleId) }
+            call.respondHtml {
+                body {
+                    titleSaved(titleId, clubTitle.saved)
+                }
+            }
         }
     }
 
@@ -147,11 +190,7 @@ class TitleResource(
                         createHTML().html {
                             body {
                                 title.refs.tmdbPosterPath?.let {
-                                    img {
-                                        src = "https://image.tmdb.org/t/p/w440_and_h660_face$it"
-                                        alt = "Poster"
-                                        height = "256"
-                                    }
+                                    titlePoster(it)
                                 }
                                 div(classes = "col gap-16") {
                                     div(classes = "t1") {

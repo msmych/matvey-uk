@@ -13,7 +13,7 @@ import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.BalanceEvents
-import uk.matvey.falafel.balance.AccountSql.ensureBalance
+import uk.matvey.falafel.balance.AccountSql.ensureAccount
 import uk.matvey.falafel.tag.TagFtl.TAGS_EMOJIS
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagSql.addTagToTitle
@@ -60,7 +60,7 @@ class TagResource(
             val tagName = call.pathParam("name")
             repo.access { a -> a.addTagToTitle(principal.id, tagName, titleId) }
             val tags = tagService.getTagsByTitleId(titleId)
-            val account = AccountBalance.from(principal, repo.access { a -> a.ensureBalance(principal.id) })
+            val account = AccountBalance.from(principal, repo.access { a -> a.ensureAccount(principal.id) })
             call.respondFtl(
                 "/falafel/tags/tags-edit",
                 "account" to account,

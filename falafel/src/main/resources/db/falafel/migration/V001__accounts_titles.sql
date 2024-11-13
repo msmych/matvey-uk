@@ -1,4 +1,4 @@
-create table if not exists accounts
+create table if not exists falafel.accounts
 (
     id         uuid      not null default gen_random_uuid() primary key,
     balance    bigint    not null,
