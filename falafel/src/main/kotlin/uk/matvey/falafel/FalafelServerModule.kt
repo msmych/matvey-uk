@@ -35,7 +35,7 @@ fun Application.falafelServerModule(
     val titleEvents = TitleEvents()
     val ftl = FalafelFtl(serverConfig, falafelAuth)
     val resources = listOf(
-        ClubResource(repo, clubService),
+        ClubResource(falafelAuth, repo, clubService),
         TitleResource(falafelAuth, ftl, repo, tagService, titleEvents),
         TagResource(falafelAuth, ftl, repo, tagService, titleEvents, balanceEvents),
         TmdbResource(falafelAuth, ftl, tmdbClient, repo),

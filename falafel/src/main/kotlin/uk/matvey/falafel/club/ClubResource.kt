@@ -1,10 +1,10 @@
 package uk.matvey.falafel.club
 
-import io.ktor.server.application.call
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.club.ClubSql.CLUBS
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertOneInto
@@ -14,6 +14,7 @@ import uk.matvey.utka.ktor.KtorKit.receiveParamsMap
 import uk.matvey.utka.ktor.ftl.FreeMarkerKit.respondFtl
 
 class ClubResource(
+    private val falafelAuth: FalafelAuth,
     private val repo: Repo,
     private val clubService: ClubService,
 ) : Resource {
@@ -28,8 +29,9 @@ class ClubResource(
 
     private fun Route.getClubs() {
         get {
+            val account = falafelAuth.getAccountBalance(call)
             val clubs = clubService.getClubs()
-            call.respondFtl("falafel/clubs/clubs", "clubs" to clubs)
+            call.respondFtl("falafel/clubs/clubs", "clubs" to clubs, "account" to account)
         }
     }
 

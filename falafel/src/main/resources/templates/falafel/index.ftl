@@ -38,6 +38,13 @@
             </a>
         </#if>
         <button class="tab"
+                hx-get="/falafel/clubs"
+                hx-target="#content"
+                hx-push-url="true"
+        >
+            <span id="menu-tab-clubs">Clubs</span>
+        </button>
+        <button class="tab"
                 hx-get="/falafel/titles"
                 hx-target="#content"
                 hx-push-url="true"

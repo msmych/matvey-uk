@@ -10,8 +10,6 @@ import io.ktor.server.routing.route
 import io.ktor.server.sse.sse
 import io.ktor.sse.ServerSentEvent
 import kotlinx.html.body
-import kotlinx.html.button
-import kotlinx.html.div
 import kotlinx.html.html
 import kotlinx.html.stream.createHTML
 import uk.matvey.app.account.AccountPrincipal
@@ -27,7 +25,7 @@ import uk.matvey.falafel.tag.TagFtl.TagCount
 import uk.matvey.falafel.tag.TagService
 import uk.matvey.falafel.tag.TagSql.findAllTagsByTitleId
 import uk.matvey.falafel.title.TitleHtml.titleDetails
-import uk.matvey.falafel.title.TitleHtml.titlePoster
+import uk.matvey.falafel.title.TitleHtml.titleDetailsPage
 import uk.matvey.falafel.title.TitleHtml.titleSaved
 import uk.matvey.falafel.title.TitleHtml.titleWatched
 import uk.matvey.falafel.title.TitleSql.getTitle
@@ -110,7 +108,7 @@ class TitleResource(
             val clubTitle = repo.access { a -> a.ensureClubTitle(account.accountId, title.id) }
             val tags = tagService.getTagsByTitleId(titleId)
             call.respondHtml {
-                titleDetails(
+                titleDetailsPage(
                     title,
                     clubTitle,
                     tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
@@ -183,43 +181,19 @@ class TitleResource(
             titleEvents.register(titleId, location)
             titleEvents.onEvent(titleId, location) {
                 val title = repo.access { a -> a.getTitle(titleId) }
-                val tags = tagService.getTagsByTitleId(titleId)
                 val account = falafelAuth.getAccountBalance(call)
+                val clubTitle = repo.access { a -> a.ensureClubTitle(account.accountId, title.id) }
+                val tags = tagService.getTagsByTitleId(titleId)
                 send(
                     ServerSentEvent(
                         createHTML().html {
                             body {
-                                title.refs.tmdbPosterPath?.let {
-                                    titlePoster(it)
-                                }
-                                div(classes = "col gap-16") {
-                                    div(classes = "t1") {
-                                        +title.title
-                                    }
-                                    title.releaseYear?.let {
-                                        div(classes = "t3") {
-                                            +"Year: $it"
-                                        }
-                                    }
-                                    title.directorName?.let {
-                                        div(classes = "t3") {
-                                            +"Director: $it"
-                                        }
-                                    }
-                                    div {
-                                        tags.forEach { (tagName, count) ->
-                                            button {
-                                                attributes["hx-post"] = "/falafel/tags/$tagName?titleId=${title.id}"
-                                                attributes["hx-swap"] = "none"
-                                                disabled = account.currentBalance <= 0
-                                                +"${TAGS_EMOJIS[tagName]}"
-                                                if (count > 0) {
-                                                    +"$count"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                titleDetails(
+                                    title,
+                                    clubTitle,
+                                    tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
+                                    account
+                                )
                             }
                         }
                     )
