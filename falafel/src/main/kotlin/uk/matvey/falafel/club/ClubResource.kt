@@ -1,11 +1,15 @@
 package uk.matvey.falafel.club
 
+import io.ktor.server.html.respondHtml
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import kotlinx.html.body
 import uk.matvey.falafel.FalafelAuth
+import uk.matvey.falafel.club.ClubHtml.clubsPage
 import uk.matvey.falafel.club.ClubSql.CLUBS
+import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertOneInto
 import uk.matvey.slon.value.Pg
@@ -20,6 +24,13 @@ class ClubResource(
 ) : Resource {
 
     override fun Route.routing() {
+        clubRouting()
+        route("/clubs/{clubId}") {
+            clubRouting()
+        }
+    }
+
+    private fun Route.clubRouting() {
         route("/clubs") {
             getClubs()
             getNewClubForm()
@@ -31,7 +42,12 @@ class ClubResource(
         get {
             val account = falafelAuth.getAccountBalance(call)
             val clubs = clubService.getClubs()
-            call.respondFtl("falafel/clubs/clubs", "clubs" to clubs, "account" to account)
+            val clubId = call.pathParameters["clubId"]?.toUuid()
+            call.respondHtml {
+                body {
+                    clubsPage(clubs, account, clubId)
+                }
+            }
         }
     }
 

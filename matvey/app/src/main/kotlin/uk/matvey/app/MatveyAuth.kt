@@ -1,7 +1,6 @@
 package uk.matvey.app
 
 import com.auth0.jwt.JWT
-import io.ktor.server.application.call
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.AuthenticationProvider
 import io.ktor.server.response.respondRedirect
@@ -33,7 +32,7 @@ class MatveyAuth(
     }
 
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        context.call.request.cookies["token"]?.let { JWT.decode(it) }?.let { token ->
+        context.call.request.cookies["token"]?.let(JWT::decode)?.let { token ->
             context.principal(
                 AccountPrincipal(
                     token.subject.toUuid(),
