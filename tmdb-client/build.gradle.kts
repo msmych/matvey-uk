@@ -12,3 +12,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
 }
+
+tasks.shadowJar {
+    enabled = false
+}

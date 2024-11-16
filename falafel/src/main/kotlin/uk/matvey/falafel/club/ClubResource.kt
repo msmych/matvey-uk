@@ -9,6 +9,7 @@ import kotlinx.html.body
 import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.club.ClubHtml.clubsPage
 import uk.matvey.falafel.club.ClubSql.CLUBS
+import uk.matvey.falafel.club.ClubSql.getClubById
 import uk.matvey.kit.string.StringKit.toUuid
 import uk.matvey.slon.repo.Repo
 import uk.matvey.slon.repo.RepoKit.insertOneInto
@@ -43,9 +44,10 @@ class ClubResource(
             val account = falafelAuth.getAccountBalance(call)
             val clubs = clubService.getClubs()
             val clubId = call.pathParameters["clubId"]?.toUuid()
+            val club = clubId?.let { repo.access { a -> a.getClubById(it) } }
             call.respondHtml {
                 body {
-                    clubsPage(clubs, account, clubId)
+                    clubsPage(clubs, account, club)
                 }
             }
         }

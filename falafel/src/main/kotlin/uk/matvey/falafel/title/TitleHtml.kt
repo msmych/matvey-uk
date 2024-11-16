@@ -8,6 +8,7 @@ import kotlinx.html.div
 import kotlinx.html.img
 import uk.matvey.falafel.FalafelHtml.menu
 import uk.matvey.falafel.balance.AccountBalance
+import uk.matvey.falafel.club.Club
 import uk.matvey.falafel.club.ClubTitle
 import uk.matvey.falafel.tag.TagFtl.TagCount
 import java.time.Year
@@ -15,7 +16,13 @@ import java.util.UUID
 
 object TitleHtml {
 
-    fun HTML.titleDetailsPage(title: Title, clubTitle: ClubTitle, tags: List<TagCount>, account: AccountBalance) =
+    fun HTML.titleDetailsPage(
+        title: Title,
+        clubTitle: ClubTitle,
+        tags: List<TagCount>,
+        account: AccountBalance,
+        currentClub: Club?,
+    ) =
         body {
             div(classes = "row gap-16") {
                 attributes["hx-ext"] = "sse"
@@ -23,7 +30,7 @@ object TitleHtml {
                 attributes["sse-swap"] = "message"
                 titleDetails(title, clubTitle, tags, account)
             }
-            menu(account, "titles")
+            menu("titles", account, currentClub)
         }
 
     fun HtmlBlockTag.titleDetails(

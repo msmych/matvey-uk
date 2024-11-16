@@ -17,6 +17,7 @@ import uk.matvey.falafel.FalafelAuth
 import uk.matvey.falafel.FalafelFtl
 import uk.matvey.falafel.balance.AccountBalance
 import uk.matvey.falafel.balance.AccountSql.ensureAccount
+import uk.matvey.falafel.club.ClubSql.getClubById
 import uk.matvey.falafel.club.ClubTitleSql.ensureClubTitle
 import uk.matvey.falafel.club.ClubTitleSql.toggleSavedTitle
 import uk.matvey.falafel.club.ClubTitleSql.toggleWatchedTitle
@@ -107,12 +108,15 @@ class TitleResource(
             val title = repo.access { a -> a.getTitle(titleId) }
             val clubTitle = repo.access { a -> a.ensureClubTitle(account.accountId, title.id) }
             val tags = tagService.getTagsByTitleId(titleId)
+            val clubId = call.pathParameters["clubId"]?.toUuid()
+            val club = clubId?.let { repo.access { a -> a.getClubById(it) } }
             call.respondHtml {
                 titleDetailsPage(
                     title,
                     clubTitle,
                     tags.map { (name, count) -> TagCount(name, count, TAGS_EMOJIS.getValue(name)) },
                     account,
+                    club,
                 )
             }
         }

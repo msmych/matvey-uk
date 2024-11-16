@@ -15,6 +15,12 @@
     <script src="https://unpkg.com/htmx-ext-sse@2.2.2/sse.js"></script>
 </head>
 <body>
+<div hx-ext="sse"
+     sse-connect="/falafel/me/events"
+     sse-swap="message"
+     hx-target="#current-balance"
+     hx-swap="innerHTML"
+></div>
 <div class="row gap-16">
     <div id="menu" class="col menu gap-16">
         <#if account?has_content>
@@ -25,12 +31,7 @@
             >
                 <span id="menu-tab-account">${account.name}</span>
                 <span>🍿</span>
-                <span hx-ext="sse"
-                      sse-connect="/falafel/me/events"
-                      sse-swap="message"
-                      hx-target="this"
-                      hx-swap="innerHTML"
-                >${account.currentBalance}</span>
+                <span id="current-balance">${account.currentBalance}</span>
             </button>
         <#else>
             <a class="tab click" href="/login">

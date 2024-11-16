@@ -9,15 +9,12 @@ import java.util.UUID
 
 object ClubHtml {
 
-    fun HtmlBlockTag.clubsPage(clubs: List<Club>, account: AccountBalance, clubId: UUID?) {
+    fun HtmlBlockTag.clubsPage(clubs: List<Club>, account: AccountBalance, currentClub: Club?) {
         div(classes = "col gap-16") {
             div(classes = "t1") {
                 +"Clubs"
             }
-            div {
-                +"Current club: $clubId"
-            }
-            if (clubId != null) {
+            if (currentClub != null) {
                 button {
                     attributes["hx-get"] = "/falafel/clubs"
                     attributes["hx-target"] = "#content"
@@ -30,7 +27,7 @@ object ClubHtml {
                     div(classes = "t3") {
                         +club.name
                     }
-                    if (club.id != clubId) {
+                    if (club.id != currentClub?.id) {
                         button {
                             attributes["hx-get"] = "/falafel/clubs/${club.id}/clubs"
                             attributes["hx-target"] = "#content"
@@ -41,12 +38,12 @@ object ClubHtml {
                 }
             }
             button {
-                attributes["hx-get"] = path("new-club-form", clubId)
+                attributes["hx-get"] = path("new-club-form", currentClub?.id)
                 attributes["hx-target"] = "#content"
                 +"New club"
             }
         }
-        menu(account, "clubs")
+        menu("clubs", account, currentClub)
     }
 
     fun path(path: String, clubId: UUID?) = clubId?.let {
