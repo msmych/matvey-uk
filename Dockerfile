@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk as builder
+FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
@@ -11,6 +11,7 @@ COPY gradle /app/gradle
 COPY matvey/common /app/matvey/common
 COPY matvey/app /app/matvey/app
 COPY falafel /app/falafel
+COPY tmdb-client /app/tmdb-client
 
 RUN chmod +x gradlew
 
